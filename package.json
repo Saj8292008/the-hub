@@ -1,0 +1,53 @@
+{
+  "name": "the-hub",
+  "version": "1.0.0",
+  "description": "A Node.js project called the-hub",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node src/index.js",
+    "cli": "node src/cli.js",
+    "hub": "node src/cli.js",
+    "server": "node src/api/server.js",
+    "api": "node src/api/server.js",
+    "bot": "node src/bot/telegram.js",
+    "test:scrapers": "node src/services/scraping/testScrapers.js",
+    "test:scrape": "node src/services/scraping/testScrapers.js",
+    "pm2:start": "pm2 start ecosystem.config.js",
+    "pm2:stop": "pm2 stop the-hub",
+    "pm2:restart": "pm2 restart the-hub",
+    "pm2:delete": "pm2 delete the-hub",
+    "pm2:logs": "pm2 logs the-hub",
+    "pm2:status": "pm2 status",
+    "pm2:monit": "pm2 monit"
+  },
+  "bin": {
+    "hub": "./src/cli.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.90.1",
+    "axios": "^1.13.2",
+    "bottleneck": "^2.19.5",
+    "cheerio": "^1.1.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "node-cron": "^4.2.1",
+    "node-fetch": "^3.3.2",
+    "node-telegram-bot-api": "^0.66.0",
+    "playwright-extra": "^4.3.6",
+    "playwright-extra-plugin-stealth": "^0.0.1",
+    "puppeteer": "^24.35.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "socket.io": "^4.8.3",
+    "user-agents": "^1.1.669",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "pm2": "^6.0.14"
+  }
+}
