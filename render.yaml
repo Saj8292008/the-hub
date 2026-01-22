@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: the-hub
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: node src/index.js
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        value: 8310191561:AAExxS9nt4a2VsUz0W75CG1H_4C0iDG-9UM
+      - key: TELEGRAM_ADMIN_CHAT_ID
+        value: "8427035818"
+      - key: SCRAPERAPI_KEY
+        value: c53a3b6bced75cf230ef7574feea5858
+      - key: APIFY_TOKEN
+        value: apify_api_G1UEBZ6UT7XXhLxPRN8f7oMcnS8ZuD1vGz0C
+      - key: USE_REAL_SCRAPERS
+        value: "false"
+      - key: POLL_SCHEDULE
+        value: "0 * * * *"
+      - key: RUN_ON_START
+        value: "false"
+      - key: SEND_UPDATE_SUMMARY
+        value: "false"
+      - key: SCRAPER_MIN_TIME_CHRONO24
+        value: "3000"
+      - key: SCRAPER_MIN_TIME_AUTOTRADER
+        value: "2000"
+      - key: SCRAPER_MIN_TIME_STOCKX
+        value: "4000"
+      - key: LOG_LEVEL
+        value: info
+      - key: NODE_ENV
+        value: production
+      - key: DEBUG_SCREENSHOTS
+        value: "false"
+      - key: DEBUG_HTML
+        value: "false"
+      - key: PORT
+        value: "3000"
