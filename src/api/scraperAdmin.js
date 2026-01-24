@@ -223,7 +223,8 @@ router.get('/health', ensureCoordinator, (req, res) => {
 /**
  * POST /admin/scraper/schedule
  * Update schedules dynamically (without redeployment)
- * Body: { source: 'reddit', schedule: '*/5 * * * *' }
+ * Body: { source: 'reddit', schedule: 'cron expression' }
+ * Example schedule: '* /5 * * * *' (every 5 minutes, remove space after *)
  */
 router.post('/schedule', ensureCoordinator, (req, res) => {
   const { source, schedule } = req.body;
