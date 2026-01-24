@@ -274,34 +274,39 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header with gradient */}
+      {/* Header with gradient - Redesigned for no overlap */}
       <header className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl"></div>
-        <div className="relative flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
-                Dashboard
-              </h2>
-              <Sparkles className="text-primary-400" size={24} />
+        <div className="relative">
+          {/* Title and subtitle */}
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                  Dashboard Overview
+                </h2>
+                <Sparkles className="text-primary-400" size={24} />
+              </div>
+              <p className="text-gray-400 mt-2 text-base sm:text-lg">
+                Live snapshot across all tracker agents • {totalItems} items tracked
+              </p>
             </div>
-            <p className="text-gray-400 mt-2 text-lg">
-              Live snapshot across all tracker agents • {totalItems} items tracked
-            </p>
+
+            {/* Refresh button - Now clearly separated */}
+            <button
+              onClick={fetchData}
+              disabled={refreshing}
+              className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 overflow-hidden min-w-[140px]"
+            >
+              {/* Shimmer effect when refreshing */}
+              {refreshing && (
+                <div className="absolute inset-0 animate-shimmer opacity-30"></div>
+              )}
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-400 to-primary-300 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"></div>
+              <Activity size={16} className={refreshing ? 'animate-spin' : 'group-hover:rotate-90 transition-transform duration-300'} />
+              <span className="relative">{refreshing ? 'Refreshing...' : 'Refresh Data'}</span>
+            </button>
           </div>
-          <button
-            onClick={fetchData}
-            disabled={refreshing}
-            className="group relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 animate-pulse-subtle overflow-hidden"
-          >
-            {/* Shimmer effect when refreshing */}
-            {refreshing && (
-              <div className="absolute inset-0 animate-shimmer opacity-30"></div>
-            )}
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-400 to-primary-300 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"></div>
-            <Activity size={18} className={refreshing ? 'animate-spin' : 'group-hover:rotate-90 transition-transform duration-300'} />
-            <span className="relative">Refresh Data</span>
-          </button>
         </div>
       </header>
 

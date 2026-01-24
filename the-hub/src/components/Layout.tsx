@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { BarChart3, Settings, Zap, Home, Menu, X, Search } from 'lucide-react'
 import clsx from 'clsx'
 import { NotificationPanel } from './NotificationPanel'
+import { ConnectionStatus } from './ConnectionStatus'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -92,9 +93,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
             </div>
 
-            {/* Right side - Notification Panel */}
-            <div className="flex items-center gap-4">
+            {/* Right side - Actions and Status */}
+            <div className="flex items-center gap-3 sm:gap-4">
+              {/* Notification Panel */}
               <NotificationPanel />
+
+              {/* Vertical Divider - hidden on mobile */}
+              <div className="hidden sm:block h-8 w-px bg-gray-800"></div>
+
+              {/* Connection Status - Inline version */}
+              <div className="hidden sm:flex">
+                <ConnectionStatus inline={true} />
+              </div>
             </div>
           </div>
         </div>
