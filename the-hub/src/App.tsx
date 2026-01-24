@@ -6,6 +6,10 @@ import Analytics from './pages/Analytics'
 import Integrations from './pages/Integrations'
 import Settings from './pages/Settings'
 import WatchListings from './pages/WatchListings'
+import Watches from './pages/Watches'
+import Cars from './pages/Cars'
+import Sneakers from './pages/Sneakers'
+import Sports from './pages/Sports'
 import { ConnectionStatus } from './components/ConnectionStatus'
 
 function App() {
@@ -40,6 +44,10 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/watch-listings" element={<WatchListings />} />
+          <Route path="/watches" element={<Watches />} />
+          <Route path="/cars" element={<Cars />} />
+          <Route path="/sneakers" element={<Sneakers />} />
+          <Route path="/sports" element={<Sports />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/integrations" element={<Integrations />} />
           <Route path="/settings" element={<Settings />} />

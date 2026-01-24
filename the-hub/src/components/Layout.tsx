@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { BarChart3, Settings, Zap, Home, Menu, X, Search } from 'lucide-react'
+import { BarChart3, Settings, Zap, Home, Menu, X, Search, Watch, Car, Footprints, Trophy } from 'lucide-react'
 import clsx from 'clsx'
 import { NotificationPanel } from './NotificationPanel'
 import { ConnectionStatus } from './ConnectionStatus'
@@ -15,7 +15,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navItems = [
     { path: '/', icon: Home, label: 'Dashboard' },
-    { path: '/watch-listings', icon: Search, label: 'Watch Listings' },
+    { path: '/watches', icon: Watch, label: 'Watches' },
+    { path: '/cars', icon: Car, label: 'Cars' },
+    { path: '/sneakers', icon: Footprints, label: 'Sneakers' },
+    { path: '/sports', icon: Trophy, label: 'Sports' },
+    { path: '/watch-listings', icon: Search, label: 'All Listings' },
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },
     { path: '/integrations', icon: Zap, label: 'Integrations' },
     { path: '/settings', icon: Settings, label: 'Settings' },
