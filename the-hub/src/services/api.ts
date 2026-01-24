@@ -36,6 +36,7 @@ class ApiService {
       watches: number;
       cars: number;
       sneakers: number;
+      sports: number;
       aiModels: number;
     }>('/stats');
   }
@@ -143,10 +144,20 @@ class ApiService {
     return this.request<any>(`/sports/schedule${query}`);
   }
 
+  async getTeams() {
+    return this.request<any[]>('/sports/teams');
+  }
+
   async addTeam(data: any) {
     return this.request('/sports/teams', {
       method: 'POST',
       body: JSON.stringify(data),
+    });
+  }
+
+  async deleteTeam(id: string) {
+    return this.request(`/sports/teams/${id}`, {
+      method: 'DELETE',
     });
   }
 
@@ -167,6 +178,65 @@ class ApiService {
   // Health Check
   async healthCheck() {
     return this.request<{ status: string; timestamp: string }>('/health');
+  }
+
+  // Scraper Methods
+  async getScraperListings(params?: {
+    source?: string;
+    brand?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    limit?: number;
+  }) {
+    const query = new URLSearchParams();
+    if (params?.source) query.append('source', params.source);
+    if (params?.brand) query.append('brand', params.brand);
+    if (params?.minPrice) query.append('minPrice', params.minPrice);
+    if (params?.maxPrice) query.append('maxPrice', params.maxPrice);
+    if (params?.limit) query.append('limit', params.limit.toString());
+
+    const queryString = query.toString();
+    return this.request<any[]>(`/scraper/listings${queryString ? '?' + queryString : ''}`);
+  }
+
+  async triggerScrape(source?: string) {
+    return this.request('/scraper/scheduler/run', {
+      method: 'POST',
+      body: JSON.stringify({ source: source || undefined }),
+    });
+  }
+
+  async searchWatches(brand: string, model: string, options?: any) {
+    return this.request<any>('/scraper/search', {
+      method: 'POST',
+      body: JSON.stringify({ brand, model, options }),
+    });
+  }
+
+  async getScraperStats() {
+    return this.request<any>('/scraper/stats');
+  }
+
+  async getScraperSchedulerStatus() {
+    return this.request<any>('/scraper/scheduler/status');
+  }
+
+  async addToWatchlist(brand: string, model: string, options?: any) {
+    return this.request('/scraper/watchlist', {
+      method: 'POST',
+      body: JSON.stringify({ brand, model, options }),
+    });
+  }
+
+  async removeFromWatchlist(brand: string, model: string) {
+    return this.request('/scraper/watchlist', {
+      method: 'DELETE',
+      body: JSON.stringify({ brand, model }),
+    });
+  }
+
+  async getScraperSources() {
+    return this.request<{ sources: string[]; count: number }>('/scraper/sources');
   }
 }
 

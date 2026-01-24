@@ -1,6 +1,7 @@
 require('dotenv').config();
 const logger = require('./utils/logger');
 const PricePoller = require('./schedulers/pricePoller');
+const ScraperCoordinator = require('./scheduler/ScraperCoordinator');
 
 async function main() {
   logger.info('========================================');
@@ -21,25 +22,46 @@ async function main() {
 
   poller.start(schedule);
 
+  // Start scraper coordinator (if enabled)
+  let scraperCoordinator = null;
+  if (process.env.ENABLE_SCRAPER_SCHEDULER === 'true') {
+    scraperCoordinator = new ScraperCoordinator(io, telegramBot);
+    scraperCoordinator.start();
+    logger.info('🔍 Scraper Coordinator: Active');
+
+    // Inject coordinator into admin API
+    const { setCoordinator } = require('./api/scraperAdmin');
+    setCoordinator(scraperCoordinator);
+  } else {
+    logger.info('🔍 Scraper Coordinator: Disabled (set ENABLE_SCRAPER_SCHEDULER=true to enable)');
+  }
+
   logger.info('========================================');
   logger.info('✅ The Hub is running');
   logger.info(`📊 Price polling: ${schedule}`);
+  logger.info(`🔍 Scraper scheduler: ${scraperCoordinator ? 'Enabled' : 'Disabled'}`);
   logger.info(`💬 Admin chat ID: ${process.env.TELEGRAM_ADMIN_CHAT_ID || 'Not configured'}`);
   logger.info(`🔌 Real-time updates: Enabled`);
   logger.info('========================================');
 
   // Graceful shutdown
-  process.on('SIGINT', () => {
-    logger.info('Received SIGINT, shutting down...');
-    poller.stop();
-    process.exit(0);
-  });
+  const gracefulShutdown = async (signal) => {
+    logger.info(`Received ${signal}, shutting down gracefully...`);
 
-  process.on('SIGTERM', () => {
-    logger.info('Received SIGTERM, shutting down...');
+    // Stop accepting new jobs
     poller.stop();
+
+    // Wait for active scraping jobs to finish
+    if (scraperCoordinator) {
+      await scraperCoordinator.shutdown();
+    }
+
+    logger.info('✅ Graceful shutdown complete');
     process.exit(0);
-  });
+  };
+
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 }
 
 main().catch(error => {

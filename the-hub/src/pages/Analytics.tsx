@@ -11,7 +11,7 @@ import {
   Filler
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
-import { TrendingUp, TrendingDown, DollarSign, Watch, Car, Footprints, BarChart3, Target, Activity } from 'lucide-react'
+import { TrendingUp, TrendingDown, DollarSign, Watch, Car, Footprints, BarChart3, Target, Activity, Wallet, Sparkles } from 'lucide-react'
 import api from '../services/api'
 
 ChartJS.register(
@@ -133,7 +133,7 @@ const Analytics: React.FC = () => {
           color: '#d1d5db',
           font: {
             size: 13,
-            weight: '600'
+            weight: 'bold' as const
           },
           padding: 15,
           usePointStyle: true,
@@ -257,7 +257,7 @@ const Analytics: React.FC = () => {
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider">Select Item</h3>
               </div>
               <div className="space-y-2 max-h-[600px] overflow-y-auto pr-2">
-                {allItems.map((item, index) => {
+                {allItems.map((item) => {
                   const Icon = item.icon
                   const name = item.name ||
                     (item.type === 'watch' ? `${item.brand} ${item.model}` :
@@ -363,6 +363,144 @@ const Analytics: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Portfolio Value & Deal Savings - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Portfolio Value Over Time */}
+              <div className="relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl backdrop-blur-sm">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                        <Wallet className="text-blue-400" size={20} />
+                        Portfolio Value
+                      </h3>
+                      <p className="text-sm text-gray-400 mt-1">Total value of tracked items</p>
+                    </div>
+                  </div>
+
+                  {/* Value Chart Mockup */}
+                  <div className="h-48 rounded-xl bg-gray-900/30 p-4 mb-4 relative overflow-hidden">
+                    <div className="absolute inset-0 flex items-end justify-around p-4 gap-2">
+                      {/* Chart bars */}
+                      {[65, 70, 68, 75, 72, 78, 82].map((height, idx) => (
+                        <div key={idx} className="flex-1 flex flex-col justify-end group">
+                          <div
+                            className="w-full rounded-t-lg bg-gradient-to-t from-blue-500/40 to-blue-400/60 transition-all duration-300 group-hover:from-blue-500/60 group-hover:to-blue-400/80"
+                            style={{ height: `${height}%` }}
+                          >
+                            <div className="w-full h-1 bg-blue-400 rounded-full"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Overlay text */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white mb-1">$127,450</div>
+                        <div className="flex items-center justify-center gap-1.5 text-sm">
+                          <TrendingUp className="text-emerald-400" size={16} />
+                          <span className="text-emerald-400 font-semibold">+12.5%</span>
+                          <span className="text-gray-500">this month</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Breakdown */}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        <span className="text-gray-400">Watches</span>
+                      </div>
+                      <span className="font-semibold text-white">$85,200 (67%)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+                        <span className="text-gray-400">Cars</span>
+                      </div>
+                      <span className="font-semibold text-white">$35,750 (28%)</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
+                        <span className="text-gray-400">Sneakers</span>
+                      </div>
+                      <span className="font-semibold text-white">$6,500 (5%)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Deal Savings Tracker */}
+              <div className="relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl backdrop-blur-sm">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl"></div>
+                <div className="relative">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                        <Sparkles className="text-emerald-400" size={20} />
+                        Deal Savings
+                      </h3>
+                      <p className="text-sm text-gray-400 mt-1">Money saved from alerts</p>
+                    </div>
+                  </div>
+
+                  {/* Total Savings */}
+                  <div className="rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 p-6 mb-6 border border-emerald-500/20">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/30">
+                        <DollarSign className="text-emerald-300" size={24} />
+                      </div>
+                      <div>
+                        <p className="text-sm text-emerald-300 font-medium">Total Saved</p>
+                        <p className="text-3xl font-bold text-white">$8,450</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <div className="flex items-center gap-1 text-emerald-400">
+                        <TrendingUp size={14} />
+                        <span className="font-semibold">+15%</span>
+                      </div>
+                      <span className="text-gray-400">vs. retail prices</span>
+                    </div>
+                  </div>
+
+                  {/* Top Deals */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Recent Wins</h4>
+                    <div className="space-y-3">
+                      {[
+                        { item: 'Rolex Submariner', saved: 2800, percent: 25 },
+                        { item: 'Porsche 911', saved: 4200, percent: 18 },
+                        { item: 'Jordan 1 Retro', saved: 450, percent: 35 },
+                        { item: 'Omega Seamaster', saved: 1000, percent: 15 }
+                      ].map((deal, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between rounded-lg bg-gray-800/30 px-3 py-2.5 transition-all hover:bg-gray-800/50"
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10">
+                              <Sparkles className="text-emerald-400" size={14} />
+                            </div>
+                            <span className="text-sm font-medium text-white truncate">{deal.item}</span>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-emerald-400">${deal.saved.toLocaleString()}</p>
+                            <p className="text-xs text-gray-500">{deal.percent}% off</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Price Chart */}
             <div className="relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl backdrop-blur-sm">

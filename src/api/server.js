@@ -80,6 +80,139 @@ app.post('/sports/teams', handleRoute((req) => sportsTracker.addTeam(req.body)))
 app.get('/ai/news', handleRoute((req) => aiTracker.getNews(req.query)));
 app.get('/ai/summary', handleRoute((req) => aiTracker.getSummary(req.query)));
 
+// ============================================================================
+// SCRAPER ENDPOINTS (New Modular Scraping Framework)
+// ============================================================================
+
+const ScraperManager = require('../services/scraping/ScraperManager');
+const WatchScraperScheduler = require('../schedulers/watchScraperScheduler');
+const supabase = require('../db/supabase');
+const localWatchListings = require('../db/localWatchListings');
+
+const scraperManager = new ScraperManager();
+const scraperScheduler = new WatchScraperScheduler(io);
+
+// Start scraper scheduler if enabled
+if (process.env.ENABLE_SCRAPER_SCHEDULER === 'true') {
+  scraperScheduler.start();
+}
+
+// Get all watch listings
+app.get('/scraper/listings', handleRoute(async (req) => {
+  const filters = {
+    source: req.query.source,
+    brand: req.query.brand,
+    minPrice: req.query.minPrice ? parseFloat(req.query.minPrice) : null,
+    maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice) : null,
+    limit: req.query.limit ? parseInt(req.query.limit) : 50
+  };
+
+  let result;
+  if (supabase.isAvailable()) {
+    result = await supabase.getWatchListings(filters);
+  } else {
+    result = await localWatchListings.getWatchListings(filters);
+  }
+
+  return result.data || [];
+}));
+
+// Scrape a specific source
+app.post('/scraper/scrape/:source', handleRoute(async (req) => {
+  const { source } = req.params;
+  const query = req.body.query || req.query.query;
+  const options = req.body.options || {};
+
+  const result = await scraperManager.scrapeSource(source, query, options);
+
+  // Save to database
+  const listings = result.listings || result || [];
+  if (listings.length > 0) {
+    if (supabase.isAvailable()) {
+      await supabase.addWatchListingsBatch(listings);
+    } else {
+      await localWatchListings.addWatchListingsBatch(listings);
+    }
+  }
+
+  return {
+    source,
+    count: listings.length,
+    listings: listings.slice(0, 10), // Return first 10 for preview
+    pagination: result.pagination
+  };
+}));
+
+// Search for a specific watch across all sources
+app.post('/scraper/search', handleRoute(async (req) => {
+  const { brand, model, options } = req.body;
+
+  const result = await scraperManager.searchWatch(brand, model, options || {});
+
+  // Save to database
+  if (result.allListings.length > 0) {
+    if (supabase.isAvailable()) {
+      await supabase.addWatchListingsBatch(result.allListings);
+    } else {
+      await localWatchListings.addWatchListingsBatch(result.allListings);
+    }
+  }
+
+  return result;
+}));
+
+// Get scraper statistics
+app.get('/scraper/stats', handleRoute(async () => {
+  return scraperManager.getStats();
+}));
+
+// Get scraper scheduler status
+app.get('/scraper/scheduler/status', handleRoute(async () => {
+  return scraperScheduler.getStatus();
+}));
+
+// Manually trigger scraper scheduler
+app.post('/scraper/scheduler/run', handleRoute(async (req) => {
+  const { source } = req.body;
+
+  if (source) {
+    const result = await scraperScheduler.runSource(source);
+    return result;
+  } else {
+    const results = await scraperScheduler.runAll();
+    return results;
+  }
+}));
+
+// Add watch to watchlist
+app.post('/scraper/watchlist', handleRoute(async (req) => {
+  const { brand, model, options } = req.body;
+  scraperScheduler.addToWatchlist(brand, model, options || {});
+  return { success: true, message: `Added ${brand} ${model} to watchlist` };
+}));
+
+// Remove from watchlist
+app.delete('/scraper/watchlist', handleRoute(async (req) => {
+  const { brand, model } = req.body;
+  scraperScheduler.removeFromWatchlist(brand, model);
+  return { success: true, message: `Removed ${brand} ${model} from watchlist` };
+}));
+
+// Get available scraper sources
+app.get('/scraper/sources', handleRoute(async () => {
+  return {
+    sources: scraperManager.getAvailableSources(),
+    count: scraperManager.getAvailableSources().length
+  };
+}));
+
+// ============================================================================
+// ADMIN SCRAPER CONTROL ENDPOINTS
+// ============================================================================
+
+const { router: scraperAdminRouter } = require('./scraperAdmin');
+app.use('/admin/scraper', scraperAdminRouter);
+
 // Stats endpoint for dashboard
 app.get('/stats', handleRoute(async () => {
   const watches = await watchTracker.listWatches();

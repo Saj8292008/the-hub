@@ -7,26 +7,38 @@ import {
   Car,
   Footprints,
   Watch,
-  RefreshCw,
   TrendingUp,
   Bell,
-  Sparkles
+  Sparkles,
+  TrendingDown,
+  Package,
+  Zap,
+  AlertTriangle,
+  Trophy
 } from 'lucide-react'
 import api from '../services/api'
+import { SkeletonCard, SkeletonAlert, SkeletonWatchlistItem } from '../components/SkeletonLoader'
+import { RecentListingsWidget } from '../components/RecentListingsWidget'
+import { ScraperDashboard } from '../components/ScraperDashboard'
 
 interface Stats {
   watches: number
   cars: number
   sneakers: number
+  sports: number
   aiModels: number
 }
 
 interface Alert {
   id: string
   type: string
+  alertType?: 'price_drop' | 'new_listing' | 'restock' | 'price_jump'
+  severity?: 'hot' | 'warning' | 'normal'
   title: string
   detail: string
   time: string
+  createdAt?: string
+  message?: string
 }
 
 interface WatchlistItem {
@@ -39,11 +51,58 @@ interface WatchlistItem {
 }
 
 const Dashboard: React.FC = () => {
-  const [stats, setStats] = useState<Stats>({ watches: 0, cars: 0, sneakers: 0, aiModels: 0 })
+  const [stats, setStats] = useState<Stats>({ watches: 0, cars: 0, sneakers: 0, sports: 0, aiModels: 0 })
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+
+  // Helper to get alert type badge
+  const getAlertTypeBadge = (alertType?: string) => {
+    switch (alertType) {
+      case 'price_drop':
+        return { label: 'Price Drop', icon: TrendingDown, color: 'emerald' }
+      case 'new_listing':
+        return { label: 'New Listing', icon: Package, color: 'blue' }
+      case 'restock':
+        return { label: 'Restock', icon: Zap, color: 'purple' }
+      case 'price_jump':
+        return { label: 'Price Jump', icon: AlertTriangle, color: 'orange' }
+      default:
+        return { label: 'Alert', icon: Bell, color: 'rose' }
+    }
+  }
+
+  // Helper to get severity indicator
+  const getSeverityIndicator = (severity?: string) => {
+    switch (severity) {
+      case 'hot':
+        return { emoji: '🔥', label: 'Hot Deal', color: 'rose' }
+      case 'warning':
+        return { emoji: '⚠️', label: 'Price Jump', color: 'amber' }
+      default:
+        return null
+    }
+  }
+
+  // Helper to format timestamp
+  const formatTimestamp = (time?: string) => {
+    if (!time) return 'Just now'
+
+    const date = new Date(time)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60) return `${diffMins}m ago`
+    if (diffHours < 24) return `${diffHours}h ago`
+    if (diffDays < 7) return `${diffDays}d ago`
+
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  }
 
   const fetchData = async () => {
     try {
@@ -51,11 +110,29 @@ const Dashboard: React.FC = () => {
 
       // Fetch stats
       const statsData = await api.getStats()
-      setStats(statsData)
+      setStats({
+        watches: statsData.watches || 0,
+        cars: statsData.cars || 0,
+        sneakers: statsData.sneakers || 0,
+        sports: statsData.sports || 0,
+        aiModels: statsData.aiModels || 0
+      })
 
       // Fetch alerts
       const alertsData = await api.getAlerts()
-      setAlerts(alertsData.slice(0, 3))
+
+      // Enrich alerts with types and severity (demo data until backend supports it)
+      const enrichedAlerts = alertsData.slice(0, 3).map((alert: any, idx: number) => {
+        const types: Array<'price_drop' | 'new_listing' | 'restock' | 'price_jump'> = ['price_drop', 'new_listing', 'restock', 'price_jump']
+
+        return {
+          ...alert,
+          alertType: alert.alertType || types[idx % types.length],
+          severity: alert.severity || (idx === 0 ? 'hot' : idx === 1 ? 'warning' : 'normal')
+        }
+      })
+
+      setAlerts(enrichedAlerts)
 
       // Fetch watchlist items (combine watches, cars, sneakers)
       const [watches, cars, sneakers] = await Promise.all([
@@ -107,29 +184,36 @@ const Dashboard: React.FC = () => {
   const statsConfig = [
     {
       label: 'Watches',
-      value: stats.watches.toString(),
-      change: '+' + stats.watches,
+      value: (stats.watches || 0).toString(),
+      change: '+' + (stats.watches || 0),
       trend: 'up' as const,
       icon: Watch
     },
     {
       label: 'Cars',
-      value: stats.cars.toString(),
-      change: '+' + stats.cars,
+      value: (stats.cars || 0).toString(),
+      change: '+' + (stats.cars || 0),
       trend: 'up' as const,
       icon: Car
     },
     {
       label: 'Sneakers',
-      value: stats.sneakers.toString(),
-      change: '+' + stats.sneakers,
+      value: (stats.sneakers || 0).toString(),
+      change: '+' + (stats.sneakers || 0),
       trend: 'up' as const,
       icon: Footprints
     },
     {
+      label: 'Sports',
+      value: (stats.sports || 0).toString(),
+      change: '+' + (stats.sports || 0),
+      trend: 'up' as const,
+      icon: Trophy
+    },
+    {
       label: 'AI Models',
-      value: stats.aiModels.toString(),
-      change: '+' + stats.aiModels,
+      value: (stats.aiModels || 0).toString(),
+      change: '+' + (stats.aiModels || 0),
       trend: 'up' as const,
       icon: Brain
     }
@@ -137,22 +221,59 @@ const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="absolute inset-0 blur-xl bg-primary-500/20 rounded-full"></div>
-            <RefreshCw className="relative animate-spin text-primary-400" size={40} />
+      <div className="space-y-8 animate-fade-in">
+        {/* Header Skeleton */}
+        <header className="relative">
+          <div className="animate-pulse space-y-3">
+            <div className="h-10 w-64 bg-gray-800 rounded animate-shimmer"></div>
+            <div className="h-5 w-96 bg-gray-800 rounded animate-shimmer"></div>
           </div>
-          <p className="text-gray-300 font-medium">Loading your dashboard...</p>
-        </div>
+        </header>
+
+        {/* Stats Cards Skeleton */}
+        <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </section>
+
+        {/* Alerts & Watchlist Skeleton */}
+        <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+          {/* Latest Alerts Skeleton */}
+          <div className="relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl backdrop-blur-sm">
+            <div className="animate-pulse mb-6">
+              <div className="h-6 w-32 bg-gray-800 rounded animate-shimmer"></div>
+            </div>
+            <div className="space-y-3">
+              <SkeletonAlert />
+              <SkeletonAlert />
+              <SkeletonAlert />
+            </div>
+          </div>
+
+          {/* Watchlist Skeleton */}
+          <div className="relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl backdrop-blur-sm xl:col-span-2">
+            <div className="animate-pulse mb-6">
+              <div className="h-6 w-40 bg-gray-800 rounded animate-shimmer"></div>
+            </div>
+            <div className="space-y-3">
+              <SkeletonWatchlistItem />
+              <SkeletonWatchlistItem />
+              <SkeletonWatchlistItem />
+              <SkeletonWatchlistItem />
+            </div>
+          </div>
+        </section>
       </div>
     )
   }
 
-  const totalItems = stats.watches + stats.cars + stats.sneakers
+  const totalItems = stats.watches + stats.cars + stats.sneakers + stats.sports
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fade-in">
       {/* Header with gradient */}
       <header className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl"></div>
@@ -171,43 +292,54 @@ const Dashboard: React.FC = () => {
           <button
             onClick={fetchData}
             disabled={refreshing}
-            className="group relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+            className="group relative inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 animate-pulse-subtle overflow-hidden"
           >
+            {/* Shimmer effect when refreshing */}
+            {refreshing && (
+              <div className="absolute inset-0 animate-shimmer opacity-30"></div>
+            )}
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-400 to-primary-300 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"></div>
             <Activity size={18} className={refreshing ? 'animate-spin' : 'group-hover:rotate-90 transition-transform duration-300'} />
-            Refresh Data
+            <span className="relative">Refresh Data</span>
           </button>
         </div>
       </header>
 
       {/* Stats Cards */}
-      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {statsConfig.map(({ label, value, change, trend, icon: Icon }, index) => {
+      <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {statsConfig.map(({ label, value, change, icon: Icon }, index) => {
           const gradients = [
             'from-blue-500/20 to-cyan-500/20',
             'from-purple-500/20 to-pink-500/20',
             'from-emerald-500/20 to-teal-500/20',
-            'from-orange-500/20 to-amber-500/20'
+            'from-yellow-500/20 to-orange-500/20',
+            'from-orange-500/20 to-red-500/20'
           ]
           const iconBgs = [
             'from-blue-500/20 to-cyan-500/30',
             'from-purple-500/20 to-pink-500/30',
             'from-emerald-500/20 to-teal-500/30',
-            'from-orange-500/20 to-amber-500/30'
+            'from-yellow-500/20 to-orange-500/30',
+            'from-orange-500/20 to-red-500/30'
           ]
           const iconColors = [
             'text-blue-400',
             'text-purple-400',
             'text-emerald-400',
+            'text-yellow-400',
             'text-orange-400'
           ]
 
           return (
             <div
               key={label}
-              className="group relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl shadow-black/20 backdrop-blur-sm transition-all hover:border-gray-700 hover:shadow-2xl hover:scale-105"
+              className="group relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl shadow-black/20 backdrop-blur-sm transition-all duration-300 hover:border-gray-700 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.02]"
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Gradient overlay */}
               <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
+              {/* Glow effect */}
+              <div className={`absolute -inset-1 bg-gradient-to-r ${gradients[index]} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500 -z-10`}></div>
 
               {/* Content */}
               <div className="relative">
@@ -251,34 +383,66 @@ const Dashboard: React.FC = () => {
             <div className="space-y-3">
               {alerts.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-800/50 mb-4">
-                    <Bell className="text-gray-600" size={24} />
+                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-rose-500/10 to-pink-500/10 mb-4 animate-pulse-subtle">
+                    <Bell className="text-rose-400/50" size={24} />
                   </div>
-                  <p className="text-gray-500 text-sm">No alerts yet</p>
-                  <p className="text-gray-600 text-xs mt-1">Set target prices to receive alerts!</p>
+                  <p className="text-gray-400 text-sm font-semibold mb-1">No alerts yet</p>
+                  <p className="text-gray-600 text-xs mb-4">Set target prices to get notified</p>
+                  <div className="inline-flex items-center gap-1.5 text-xs text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg">
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                    Use <code className="mx-1 font-mono">/settarget</code> in Telegram
+                  </div>
                 </div>
               ) : (
-                alerts.map((alert, index) => (
-                  <div
-                    key={alert.id}
-                    className="group relative overflow-hidden rounded-xl border border-gray-800/50 bg-gray-900/50 p-4 transition-all hover:border-rose-500/30 hover:bg-gray-900/80"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-rose-500/0 via-rose-500/5 to-rose-500/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-semibold text-white truncate">{alert.title || 'Price Alert'}</div>
-                          <div className="mt-1 text-xs text-gray-400 line-clamp-2">{alert.detail || alert.message}</div>
+                alerts.map((alert, index) => {
+                  const typeBadge = getAlertTypeBadge(alert.alertType)
+                  const severity = getSeverityIndicator(alert.severity)
+                  const TypeIcon = typeBadge.icon
+
+                  return (
+                    <div
+                      key={alert.id}
+                      className="group relative overflow-hidden rounded-xl border border-gray-800/50 bg-gray-900/50 p-4 transition-all hover:border-rose-500/30 hover:bg-gray-900/80"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-rose-500/0 via-rose-500/5 to-rose-500/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="relative">
+                        {/* Severity indicator banner */}
+                        {severity && (
+                          <div className={`mb-3 flex items-center gap-1.5 rounded-lg bg-${severity.color}-500/10 px-2.5 py-1.5 border border-${severity.color}-500/20`}>
+                            <span className="text-sm">{severity.emoji}</span>
+                            <span className={`text-xs font-bold text-${severity.color}-400`}>{severity.label}</span>
+                          </div>
+                        )}
+
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`inline-flex items-center gap-1 rounded-md bg-${typeBadge.color}-500/10 px-2 py-0.5 text-xs font-semibold text-${typeBadge.color}-400`}>
+                                <TypeIcon size={10} />
+                                {typeBadge.label}
+                              </span>
+                            </div>
+                            <div className="text-sm font-semibold text-white truncate">{alert.title || 'Price Alert'}</div>
+                            <div className="mt-1 text-xs text-gray-400 line-clamp-2">{alert.detail || alert.message}</div>
+                          </div>
+                          <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-${typeBadge.color}-500/10`}>
+                            <TypeIcon className={`text-${typeBadge.color}-400`} size={14} />
+                          </div>
                         </div>
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500/10">
-                          <Bell className="text-rose-400" size={14} />
+
+                        {/* Timestamp */}
+                        <div className="mt-3 flex items-center gap-2">
+                          <span className="text-xs text-gray-500">{formatTimestamp(alert.time || alert.createdAt)}</span>
+                          <span className="inline-block w-1 h-1 rounded-full bg-gray-600"></span>
+                          <span className="text-xs text-gray-600">
+                            {alert.createdAt ? new Date(alert.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}
+                          </span>
                         </div>
                       </div>
-                      <div className="mt-3 text-xs text-gray-500">{alert.time || new Date(alert.createdAt).toLocaleString()}</div>
                     </div>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           </div>
@@ -303,8 +467,20 @@ const Dashboard: React.FC = () => {
                   <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-800/50 mb-4">
                     <Watch className="text-gray-600" size={24} />
                   </div>
-                  <p className="text-gray-500 text-sm">No items tracked yet</p>
-                  <p className="text-gray-600 text-xs mt-1">Use the Telegram bot to add items!</p>
+                  <p className="text-gray-500 text-sm font-semibold mb-1">No items tracked yet</p>
+                  <p className="text-gray-600 text-xs mb-6">Start tracking your first watch, car, or sneaker</p>
+                  <a
+                    href="https://t.me/your_bot_username"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105"
+                  >
+                    <Sparkles size={16} />
+                    Track Your First Item
+                  </a>
+                  <p className="text-gray-600 text-xs mt-4">
+                    Or send <code className="bg-gray-800 px-1.5 py-0.5 rounded text-primary-400">/addwatch</code> in Telegram
+                  </p>
                 </div>
               ) : (
                 watchlist.map((item, index) => {
@@ -383,6 +559,16 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Scraper Monitor */}
+      <section>
+        <ScraperDashboard />
+      </section>
+
+      {/* Recent Scraped Listings */}
+      <section>
+        <RecentListingsWidget />
       </section>
     </div>
   )

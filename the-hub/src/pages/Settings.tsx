@@ -84,6 +84,8 @@ const Settings: React.FC = () => {
     setConfig(prev => ({
       ...prev,
       notifications: {
+        priceAlerts: prev.notifications?.priceAlerts ?? false,
+        telegramEnabled: prev.notifications?.telegramEnabled ?? false,
         ...prev.notifications,
         [key]: value
       }

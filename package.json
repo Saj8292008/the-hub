@@ -13,6 +13,8 @@
     "bot": "node src/bot/telegram.js",
     "test:scrapers": "node src/services/scraping/testScrapers.js",
     "test:scrape": "node src/services/scraping/testScrapers.js",
+    "test:new-scrapers": "node src/services/scraping/testNewScrapers.js",
+    "scrape": "node src/services/scraping/testNewScrapers.js",
     "pm2:start": "pm2 start ecosystem.config.js",
     "pm2:stop": "pm2 stop the-hub",
     "pm2:restart": "pm2 restart the-hub",
@@ -48,6 +50,7 @@
     "winston": "^3.19.0"
   },
   "devDependencies": {
+    "@railway/cli": "^4.26.0",
     "pm2": "^6.0.14"
   }
 }

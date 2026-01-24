@@ -39,3 +39,11 @@ services:
         value: "false"
       - key: PORT
         value: "3000"
+      - key: ENABLE_SCRAPER_SCHEDULER
+        value: "true"
+      - key: SCRAPER_RUN_ON_START
+        value: "false"
+      - key: SCRAPER_MAX_RETRIES
+        value: "3"
+      - key: SCRAPER_RETRY_DELAY
+        value: "5000"

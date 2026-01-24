@@ -282,6 +282,109 @@ class SupabaseClient {
   }
 
   // ============================================================================
+  // WATCH LISTINGS METHODS (Scraped Listings)
+  // ============================================================================
+
+  async getWatchListings(filters = {}) {
+    return this.query(async (client) => {
+      let query = client
+        .from('watch_listings')
+        .select('*')
+        .order('timestamp', { ascending: false });
+
+      // Apply filters
+      if (filters.source) {
+        query = query.eq('source', filters.source);
+      }
+      if (filters.brand) {
+        query = query.ilike('brand', `%${filters.brand}%`);
+      }
+      if (filters.minPrice) {
+        query = query.gte('price', filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        query = query.lte('price', filters.maxPrice);
+      }
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+
+      return await query;
+    });
+  }
+
+  async addWatchListing(listingData) {
+    return this.query(async (client) => {
+      return await client
+        .from('watch_listings')
+        .insert([{
+          source: listingData.source,
+          title: listingData.title,
+          price: listingData.price,
+          currency: listingData.currency,
+          brand: listingData.brand,
+          model: listingData.model,
+          condition: listingData.condition,
+          location: listingData.location,
+          url: listingData.url,
+          images: listingData.images,
+          seller: listingData.seller,
+          timestamp: listingData.timestamp,
+          raw_data: listingData.raw_data
+        }])
+        .select();
+    });
+  }
+
+  async addWatchListingsBatch(listings) {
+    if (!listings || listings.length === 0) {
+      return { data: [], error: null };
+    }
+
+    return this.query(async (client) => {
+      const records = listings.map(listing => ({
+        source: listing.source,
+        title: listing.title,
+        price: listing.price,
+        currency: listing.currency,
+        brand: listing.brand,
+        model: listing.model,
+        condition: listing.condition,
+        location: listing.location,
+        url: listing.url,
+        images: listing.images,
+        seller: listing.seller,
+        timestamp: listing.timestamp,
+        raw_data: listing.raw_data
+      }));
+
+      return await client
+        .from('watch_listings')
+        .insert(records)
+        .select();
+    });
+  }
+
+  async deleteWatchListing(id) {
+    return this.query(async (client) => {
+      return await client
+        .from('watch_listings')
+        .delete()
+        .eq('id', id);
+    });
+  }
+
+  async findDuplicateListing(url) {
+    return this.query(async (client) => {
+      return await client
+        .from('watch_listings')
+        .select('*')
+        .eq('url', url)
+        .single();
+    });
+  }
+
+  // ============================================================================
   // UTILITY METHODS
   // ============================================================================
 
@@ -383,12 +486,37 @@ class SupabaseClient {
         checked_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       );
 
+      -- Watch listings table (for scraped listings)
+      CREATE TABLE IF NOT EXISTS watch_listings (
+        id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+        source VARCHAR(50) NOT NULL, -- 'reddit', 'ebay', 'watchuseek', etc.
+        title TEXT NOT NULL,
+        price DECIMAL(12,2),
+        currency VARCHAR(10) DEFAULT 'USD',
+        brand VARCHAR(100),
+        model VARCHAR(200),
+        condition VARCHAR(50),
+        location VARCHAR(200),
+        url TEXT UNIQUE NOT NULL,
+        images TEXT[], -- Array of image URLs
+        seller VARCHAR(200),
+        timestamp TIMESTAMP WITH TIME ZONE,
+        raw_data JSONB, -- Store original data for debugging
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      );
+
       -- Indexes for better performance
       CREATE INDEX IF NOT EXISTS idx_price_history_item ON price_history(item_type, item_id, checked_at DESC);
       CREATE INDEX IF NOT EXISTS idx_watches_brand_model ON watches(brand, model);
       CREATE INDEX IF NOT EXISTS idx_cars_make_model_year ON cars(make, model, year);
       CREATE INDEX IF NOT EXISTS idx_sneakers_brand_model ON sneakers(brand, model);
       CREATE INDEX IF NOT EXISTS idx_teams_league ON teams(league);
+      CREATE INDEX IF NOT EXISTS idx_watch_listings_source ON watch_listings(source);
+      CREATE INDEX IF NOT EXISTS idx_watch_listings_brand_model ON watch_listings(brand, model);
+      CREATE INDEX IF NOT EXISTS idx_watch_listings_price ON watch_listings(price);
+      CREATE INDEX IF NOT EXISTS idx_watch_listings_timestamp ON watch_listings(timestamp DESC);
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_watch_listings_url ON watch_listings(url);
     `;
 
     console.log('ℹ️  Note: Table creation requires database admin access.');
