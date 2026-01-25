@@ -13,15 +13,23 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.91.1",
     "chart.js": "^4.4.0",
     "clsx": "^2.0.0",
     "date-fns": "^2.30.0",
+    "highlight.js": "^11.11.1",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
+    "react-helmet-async": "^2.0.5",
     "react-hot-toast": "^2.6.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.20.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-slug": "^6.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-toc": "^9.0.0",
     "socket.io-client": "^4.8.3",
     "zustand": "^4.4.6"
   },

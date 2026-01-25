@@ -31,6 +31,17 @@ const aiTracker = new AiTracker();
 app.use(cors());
 app.use(express.json());
 
+// Crawler detection middleware
+const CrawlerDetection = require('../middleware/crawlerDetection');
+app.use(CrawlerDetection.detect);
+
+// Performance monitoring middleware
+const performanceMonitor = require('../services/performanceMonitor');
+app.use(performanceMonitor.middleware());
+
+// Response caching middleware
+const cacheMiddleware = require('../middleware/caching');
+
 // Basic route
 app.get('/', (req, res) => {
   res.json({ message: 'API Server is running!' });
@@ -86,15 +97,23 @@ app.get('/ai/summary', handleRoute((req) => aiTracker.getSummary(req.query)));
 
 const ScraperManager = require('../services/scraping/ScraperManager');
 const WatchScraperScheduler = require('../schedulers/watchScraperScheduler');
+const DealScoringScheduler = require('../schedulers/dealScoringScheduler');
 const supabase = require('../db/supabase');
 const localWatchListings = require('../db/localWatchListings');
 
 const scraperManager = new ScraperManager();
 const scraperScheduler = new WatchScraperScheduler(io);
+const dealScoringScheduler = new DealScoringScheduler(io);
 
 // Start scraper scheduler if enabled
 if (process.env.ENABLE_SCRAPER_SCHEDULER === 'true') {
   scraperScheduler.start();
+}
+
+// Start deal scoring scheduler if enabled (default: enabled with 1 hour interval)
+if (process.env.ENABLE_DEAL_SCORING_SCHEDULER !== 'false') {
+  const intervalMinutes = parseInt(process.env.DEAL_SCORING_INTERVAL_MINUTES) || 60;
+  dealScoringScheduler.start(intervalMinutes * 60 * 1000);
 }
 
 // Get all watch listings
@@ -212,6 +231,201 @@ app.get('/scraper/sources', handleRoute(async () => {
 
 const { router: scraperAdminRouter } = require('./scraperAdmin');
 app.use('/admin/scraper', scraperAdminRouter);
+
+// ============================================================================
+// BLOG API ENDPOINTS
+// ============================================================================
+
+const blogAPI = require('./blog/blogAPI');
+
+// Blog Posts (with caching for GET requests)
+app.get('/api/blog/posts',
+  cacheMiddleware.cache({ maxAge: 2 * 60 * 1000 }), // 2 minutes
+  handleRoute((req) => blogAPI.getPosts(req))
+);
+app.get('/api/blog/posts/:slug',
+  cacheMiddleware.cache({ maxAge: 5 * 60 * 1000 }), // 5 minutes
+  handleRoute((req) => blogAPI.getPostBySlug(req))
+);
+app.get('/api/blog/posts/id/:id',
+  cacheMiddleware.cache({ maxAge: 5 * 60 * 1000 }),
+  handleRoute((req) => blogAPI.getPostById(req))
+);
+app.post('/api/blog/posts', handleRoute((req) => {
+  // Invalidate cache on create
+  cacheMiddleware.clear('/api/blog/posts');
+  return blogAPI.createPost(req);
+}));
+app.put('/api/blog/posts/:id', handleRoute((req) => {
+  // Invalidate cache on update
+  cacheMiddleware.clear('/api/blog/posts');
+  return blogAPI.updatePost(req);
+}));
+app.delete('/api/blog/posts/:id', handleRoute((req) => {
+  // Invalidate cache on delete
+  cacheMiddleware.clear('/api/blog/posts');
+  return blogAPI.deletePost(req);
+}));
+
+// Blog Categories (cached for 10 minutes)
+app.get('/api/blog/categories',
+  cacheMiddleware.cache({ maxAge: 10 * 60 * 1000 }),
+  handleRoute((req) => blogAPI.getCategories(req))
+);
+
+// Blog Analytics
+app.post('/api/blog/posts/:id/view', handleRoute((req) => blogAPI.trackView(req)));
+app.get('/api/blog/analytics/:id', handleRoute((req) => blogAPI.getPostAnalytics(req)));
+
+// Blog Subscribers
+app.post('/api/blog/subscribe', handleRoute((req) => blogAPI.subscribe(req)));
+app.get('/api/blog/subscribers', handleRoute((req) => blogAPI.getSubscribers(req)));
+
+// ============================================================================
+// DEAL SCORING API ENDPOINTS (AI Features)
+// ============================================================================
+
+const dealScoringAPI = require('./dealScoring');
+
+// Deal Scoring
+app.post('/api/listings/score/:id', handleRoute((req) => dealScoringAPI.scoreListing(req)));
+app.post('/api/listings/score-all', handleRoute((req) => dealScoringAPI.scoreAllListings(req)));
+app.get('/api/listings/hot-deals', handleRoute((req) => dealScoringAPI.getHotDeals(req)));
+app.get('/api/listings/score-stats', handleRoute((req) => dealScoringAPI.getScoreStats(req)));
+app.post('/api/listings/ai-rarity', handleRoute((req) => dealScoringAPI.toggleAIRarity(req)));
+
+// Deal Scoring Scheduler Control
+app.get('/api/deal-scoring/scheduler/status', handleRoute(async () => {
+  return dealScoringScheduler.getStatus();
+}));
+
+app.post('/api/deal-scoring/scheduler/start', handleRoute(async (req) => {
+  const intervalMinutes = req.body.intervalMinutes || 60;
+  dealScoringScheduler.start(intervalMinutes * 60 * 1000);
+  return { success: true, message: 'Deal scoring scheduler started', status: dealScoringScheduler.getStatus() };
+}));
+
+app.post('/api/deal-scoring/scheduler/stop', handleRoute(async () => {
+  dealScoringScheduler.stop();
+  return { success: true, message: 'Deal scoring scheduler stopped' };
+}));
+
+app.post('/api/deal-scoring/scheduler/run-now', handleRoute(async () => {
+  const result = await dealScoringScheduler.forceRun();
+  return { success: true, message: 'Manual scoring run completed', result };
+}));
+
+// ============================================================================
+// AI CONTENT GENERATION API ENDPOINTS
+// ============================================================================
+
+const aiGenerationAPI = require('./aiGeneration');
+
+// AI Blog Post Generation
+app.post('/api/blog/ai/generate', handleRoute((req) => aiGenerationAPI.generatePost(req)));
+app.post('/api/blog/ai/generate-batch', handleRoute((req) => aiGenerationAPI.generateBatch(req)));
+app.post('/api/blog/ai/suggest-titles', handleRoute((req) => aiGenerationAPI.suggestTitles(req)));
+app.post('/api/blog/ai/enhance', handleRoute((req) => aiGenerationAPI.enhanceContent(req)));
+app.get('/api/blog/ai/stats', handleRoute((req) => aiGenerationAPI.getStats(req)));
+
+// ============================================================================
+// NATURAL LANGUAGE SEARCH API ENDPOINTS
+// ============================================================================
+
+const naturalSearchAPI = require('./naturalSearch');
+
+// Natural Language Search
+app.post('/api/search/watches', handleRoute((req) => naturalSearchAPI.searchWatches(req)));
+app.post('/api/search/sneakers', handleRoute((req) => naturalSearchAPI.searchSneakers(req)));
+app.post('/api/search/cars', handleRoute((req) => naturalSearchAPI.searchCars(req)));
+
+// ============================================================================
+// SEO ENDPOINTS (Sitemap, RSS, Robots.txt)
+// ============================================================================
+
+const sitemapGenerator = require('./sitemap');
+const rssGenerator = require('./rss');
+const blogSSR = require('./blogSSR');
+
+// Sitemap and Robots
+app.get('/sitemap.xml', (req, res) => sitemapGenerator.generateSitemap(req, res));
+app.get('/robots.txt', (req, res) => sitemapGenerator.generateRobotsTxt(req, res));
+
+// RSS Feeds (cached for 1 hour)
+app.get('/rss.xml',
+  cacheMiddleware.cache({ maxAge: 60 * 60 * 1000 }),
+  (req, res) => rssGenerator.generateRSS(req, res)
+);
+app.get('/feed.json',
+  cacheMiddleware.cache({ maxAge: 60 * 60 * 1000 }),
+  (req, res) => rssGenerator.generateJSONFeed(req, res)
+);
+
+// ============================================================================
+// PERFORMANCE MONITORING & OPTIMIZATION
+// ============================================================================
+
+// Performance metrics
+app.get('/api/admin/performance/metrics', handleRoute(async () => {
+  return performanceMonitor.getMetrics();
+}));
+
+app.get('/api/admin/performance/summary', handleRoute(async () => {
+  return performanceMonitor.getSummary();
+}));
+
+app.get('/api/admin/performance/slow', handleRoute(async (req) => {
+  const threshold = parseInt(req.query.threshold) || 1000;
+  return performanceMonitor.getSlowEndpoints(threshold);
+}));
+
+app.get('/api/admin/performance/errors', handleRoute(async () => {
+  return performanceMonitor.getErrorProneEndpoints();
+}));
+
+app.post('/api/admin/performance/clear', handleRoute(async () => {
+  return performanceMonitor.clear();
+}));
+
+app.get('/api/admin/performance/export', handleRoute(async () => {
+  return performanceMonitor.exportMetrics();
+}));
+
+// Cache management
+app.get('/api/admin/cache/stats', handleRoute(async () => {
+  return cacheMiddleware.getStats();
+}));
+
+app.post('/api/admin/cache/clear', handleRoute(async (req) => {
+  const { pattern } = req.body;
+  cacheMiddleware.clear(pattern);
+  return { success: true, message: 'Cache cleared' };
+}));
+
+app.post('/api/admin/cache/invalidate', handleRoute(async (req) => {
+  const { key } = req.body;
+  const deleted = cacheMiddleware.invalidate(key);
+  return { success: true, deleted };
+}));
+
+// ============================================================================
+// SERVER-SIDE RENDERING (SSR) FOR CRAWLERS
+// ============================================================================
+
+// Blog SSR routes - serve rendered HTML to crawlers, let SPA handle regular users
+app.get('/blog', (req, res, next) => {
+  if (req.isCrawler) {
+    return blogSSR.renderBlogIndex(req, res);
+  }
+  next(); // Let frontend SPA handle it
+});
+
+app.get('/blog/:slug', (req, res, next) => {
+  if (req.isCrawler) {
+    return blogSSR.renderBlogPost(req, res);
+  }
+  next(); // Let frontend SPA handle it
+});
 
 // Stats endpoint for dashboard
 app.get('/stats', handleRoute(async () => {

@@ -3,7 +3,7 @@ import { Watch, Filter as FilterIcon } from 'lucide-react'
 import { WatchListing, ViewMode, SortOption } from '../types/listings'
 import { ListingCard } from '../components/listings/ListingCard'
 import { FilterSidebar, FilterConfig } from '../components/listings/FilterSidebar'
-import { SearchBar } from '../components/listings/SearchBar'
+import AISearchBar from '../components/listings/AISearchBar'
 import { SortDropdown } from '../components/listings/SortDropdown'
 import { ViewToggle } from '../components/listings/ViewToggle'
 import api from '../services/api'
@@ -183,11 +183,27 @@ const Watches: React.FC = () => {
       if (filters.datePosted) params.datePosted = filters.datePosted
 
       const response = await api.getScraperListings(params)
-      setListings(response)
+
+      // Transform backend data to match frontend interface
+      const transformedListings = response.map((watch: any) => ({
+        ...watch,
+        source: Array.isArray(watch.sources) && watch.sources.length > 0
+          ? watch.sources[0]
+          : watch.source || 'unknown',
+        title: watch.title || `${watch.brand} ${watch.model}`,
+        price: watch.price || watch.currentPrice || 0,
+        currency: watch.currency || 'USD',
+        url: watch.url || '#',
+        images: watch.images || [],
+        timestamp: watch.timestamp || watch.created_at || new Date().toISOString(),
+        created_at: watch.created_at || new Date().toISOString()
+      }))
+
+      setListings(transformedListings)
 
       // Mock pagination data (update when API supports it)
-      setTotalItems(response.length)
-      setTotalPages(Math.ceil(response.length / 50))
+      setTotalItems(transformedListings.length)
+      setTotalPages(Math.ceil(transformedListings.length / 50))
 
     } catch (error) {
       console.error('Failed to fetch listings:', error)
@@ -243,6 +259,65 @@ const Watches: React.FC = () => {
     toast.success('Alert set! (Modal to be implemented)')
   }
 
+  const handleAISearch = (aiFilters: any, message?: string) => {
+    // Convert AI filters to internal filter format
+    const convertedFilters: Record<string, any> = {}
+
+    if (aiFilters.brand) {
+      convertedFilters.brands = [aiFilters.brand.toLowerCase().replace(/\s+/g, '-')]
+    }
+
+    if (aiFilters.model) {
+      setSearchQuery(aiFilters.model)
+    } else {
+      setSearchQuery('')
+    }
+
+    if (aiFilters.price_min) {
+      convertedFilters.price_min = aiFilters.price_min
+    }
+
+    if (aiFilters.price_max) {
+      convertedFilters.price_max = aiFilters.price_max
+    }
+
+    if (aiFilters.condition) {
+      convertedFilters.conditions = [aiFilters.condition.toLowerCase().replace(/\s+/g, '-')]
+    }
+
+    if (aiFilters.box_and_papers) {
+      convertedFilters.boxPapers = 'yes'
+    }
+
+    if (aiFilters.year_min || aiFilters.year_max) {
+      // Years would need additional filter support
+      // For now, add to search query
+      if (aiFilters.year_min) {
+        setSearchQuery((prev) => `${prev} ${aiFilters.year_min}`.trim())
+      }
+    }
+
+    if (aiFilters.material) {
+      const materialMap: Record<string, string> = {
+        steel: 'steel',
+        'stainless steel': 'steel',
+        gold: 'gold',
+        'rose gold': 'rose-gold',
+        titanium: 'titanium',
+        ceramic: 'ceramic'
+      }
+      const normalized = materialMap[aiFilters.material.toLowerCase()] || aiFilters.material.toLowerCase()
+      convertedFilters.materials = [normalized]
+    }
+
+    setFilters(convertedFilters)
+    setPage(1)
+
+    if (message) {
+      toast.success(message, { duration: 5000 })
+    }
+  }
+
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -286,14 +361,12 @@ const Watches: React.FC = () => {
             )}
           </button>
 
-          {/* Search Bar */}
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search watches by brand, model, or keywords..."
+          {/* AI Search Bar */}
+          <AISearchBar
+            category="watches"
             categoryColor={CATEGORY_COLOR}
-            recentSearches={recentSearches}
-            onRecentSearchClick={setSearchQuery}
+            placeholder='Try: "rolex submariner under 10k" or "omega speedmaster with box and papers"'
+            onSearch={handleAISearch}
           />
 
           {/* Sort and View Controls */}

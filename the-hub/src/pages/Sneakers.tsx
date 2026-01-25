@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Footprints } from 'lucide-react'
+import { Footprints, Filter as FilterIcon } from 'lucide-react'
 import { SneakerListing, ViewMode, SortOption } from '../types/listings'
 import { ListingCard } from '../components/listings/ListingCard'
 import { FilterSidebar, FilterConfig } from '../components/listings/FilterSidebar'
-import { SearchBar } from '../components/listings/SearchBar'
+import AISearchBar from '../components/listings/AISearchBar'
 import { SortDropdown } from '../components/listings/SortDropdown'
 import { ViewToggle } from '../components/listings/ViewToggle'
 import api from '../services/api'
@@ -13,14 +13,27 @@ import clsx from 'clsx'
 const CATEGORY_COLOR = '#00D9FF' // Cyan
 
 const SORT_OPTIONS: SortOption[] = [
-  { value: 'newest', label: 'Newest First' },
+  { value: 'newest', label: 'Newest Listings' },
   { value: 'price_asc', label: 'Price: Low to High' },
   { value: 'price_desc', label: 'Price: High to Low' },
   { value: 'size', label: 'By Size' },
-  { value: 'resale_value', label: 'Best Resale Value' }
+  { value: 'resale_value', label: 'Best Resale Value' },
+  { value: 'deals', label: 'Best Deals' }
 ]
 
 const FILTER_CONFIG: FilterConfig[] = [
+  {
+    type: 'multiselect',
+    label: 'Source',
+    key: 'sources',
+    options: [
+      { value: 'stockx', label: 'StockX' },
+      { value: 'goat', label: 'GOAT' },
+      { value: 'ebay', label: 'eBay' },
+      { value: 'reddit', label: 'Reddit' },
+      { value: 'grailed', label: 'Grailed' }
+    ]
+  },
   {
     type: 'multiselect',
     label: 'Brand',
@@ -32,7 +45,24 @@ const FILTER_CONFIG: FilterConfig[] = [
       { value: 'yeezy', label: 'Yeezy' },
       { value: 'new-balance', label: 'New Balance' },
       { value: 'asics', label: 'ASICS' },
-      { value: 'puma', label: 'Puma' }
+      { value: 'puma', label: 'Puma' },
+      { value: 'vans', label: 'Vans' },
+      { value: 'converse', label: 'Converse' }
+    ]
+  },
+  {
+    type: 'multiselect',
+    label: 'Model',
+    key: 'models',
+    options: [
+      { value: 'air-jordan-1', label: 'Air Jordan 1' },
+      { value: 'dunk-low', label: 'Dunk Low' },
+      { value: 'dunk-high', label: 'Dunk High' },
+      { value: 'yeezy-350', label: 'Yeezy 350' },
+      { value: 'yeezy-500', label: 'Yeezy 500' },
+      { value: 'air-max-1', label: 'Air Max 1' },
+      { value: 'air-max-90', label: 'Air Max 90' },
+      { value: 'new-balance-550', label: 'New Balance 550' }
     ]
   },
   {
@@ -48,6 +78,11 @@ const FILTER_CONFIG: FilterConfig[] = [
     label: 'Size (US)',
     key: 'sizes',
     options: [
+      { value: '4.5', label: 'US 4.5' },
+      { value: '5', label: 'US 5' },
+      { value: '5.5', label: 'US 5.5' },
+      { value: '6', label: 'US 6' },
+      { value: '6.5', label: 'US 6.5' },
       { value: '7', label: 'US 7' },
       { value: '7.5', label: 'US 7.5' },
       { value: '8', label: 'US 8' },
@@ -59,7 +94,21 @@ const FILTER_CONFIG: FilterConfig[] = [
       { value: '11', label: 'US 11' },
       { value: '11.5', label: 'US 11.5' },
       { value: '12', label: 'US 12' },
-      { value: '13', label: 'US 13' }
+      { value: '12.5', label: 'US 12.5' },
+      { value: '13', label: 'US 13' },
+      { value: '14', label: 'US 14' },
+      { value: '15', label: 'US 15' }
+    ]
+  },
+  {
+    type: 'multiselect',
+    label: 'Gender',
+    key: 'gender',
+    options: [
+      { value: 'mens', label: "Men's" },
+      { value: 'womens', label: "Women's" },
+      { value: 'gs', label: 'Grade School (GS)' },
+      { value: 'ps', label: 'Preschool (PS)' }
     ]
   },
   {
@@ -73,18 +122,6 @@ const FILTER_CONFIG: FilterConfig[] = [
     ]
   },
   {
-    type: 'multiselect',
-    label: 'Model',
-    key: 'models',
-    options: [
-      { value: 'air-jordan-1', label: 'Air Jordan 1' },
-      { value: 'dunk-low', label: 'Dunk Low' },
-      { value: 'yeezy-350', label: 'Yeezy 350' },
-      { value: 'travis-scott', label: 'Travis Scott' },
-      { value: 'air-max', label: 'Air Max' }
-    ]
-  },
-  {
     type: 'checkbox',
     label: 'Authenticity Guarantee',
     key: 'isAuthentic'
@@ -93,8 +130,8 @@ const FILTER_CONFIG: FilterConfig[] = [
     type: 'range',
     label: 'Release Year',
     key: 'year',
-    min: 2010,
-    max: 2026
+    min: 1985,
+    max: 2025
   },
   {
     type: 'date',
@@ -140,9 +177,25 @@ const Sneakers: React.FC = () => {
     try {
       setLoading(true)
       const response = await api.getSneakers()
-      setListings(response as any)
-      setTotalItems(response.length)
-      setTotalPages(Math.ceil(response.length / 50))
+
+      // Transform backend data to match frontend interface
+      const transformedListings = response.map((sneaker: any) => ({
+        ...sneaker,
+        source: Array.isArray(sneaker.sources) && sneaker.sources.length > 0
+          ? sneaker.sources[0]
+          : sneaker.source || 'unknown',
+        title: sneaker.name || `${sneaker.brand} ${sneaker.model}`,
+        price: sneaker.currentPrice || sneaker.targetPrice || 0,
+        currency: 'USD',
+        url: sneaker.url || '#',
+        images: sneaker.images || [],
+        timestamp: sneaker.lastChecked || sneaker.created_at || new Date().toISOString(),
+        created_at: sneaker.created_at || new Date().toISOString()
+      }))
+
+      setListings(transformedListings as any)
+      setTotalItems(transformedListings.length)
+      setTotalPages(Math.ceil(transformedListings.length / 50))
     } catch (error) {
       console.error('Failed to fetch listings:', error)
       toast.error('Failed to load sneaker listings')
@@ -191,8 +244,64 @@ const Sneakers: React.FC = () => {
     toast.success('Alert set! (Modal to be implemented)')
   }
 
+  const handleAISearch = (aiFilters: any, message?: string) => {
+    // Convert AI filters to internal filter format
+    const convertedFilters: Record<string, any> = {}
+
+    if (aiFilters.brand) {
+      convertedFilters.brands = [aiFilters.brand.toLowerCase().replace(/\s+/g, '-')]
+    }
+
+    if (aiFilters.model) {
+      setSearchQuery(aiFilters.model)
+    } else {
+      setSearchQuery('')
+    }
+
+    if (aiFilters.colorway) {
+      setSearchQuery((prev) => `${prev} ${aiFilters.colorway}`.trim())
+    }
+
+    if (aiFilters.price_min) {
+      convertedFilters.price_min = aiFilters.price_min
+    }
+
+    if (aiFilters.price_max) {
+      convertedFilters.price_max = aiFilters.price_max
+    }
+
+    if (aiFilters.size) {
+      convertedFilters.sizes = [String(aiFilters.size)]
+    }
+
+    if (aiFilters.condition) {
+      const conditionMap: Record<string, string> = {
+        new: 'ds',
+        deadstock: 'ds',
+        ds: 'ds',
+        vnds: 'vnds',
+        used: 'used'
+      }
+      const normalized = conditionMap[aiFilters.condition.toLowerCase()] || aiFilters.condition.toLowerCase()
+      convertedFilters.conditions = [normalized]
+    }
+
+    if (aiFilters.release_year) {
+      convertedFilters.year_min = aiFilters.release_year
+      convertedFilters.year_max = aiFilters.release_year
+    }
+
+    setFilters(convertedFilters)
+    setPage(1)
+
+    if (message) {
+      toast.success(message, { duration: 5000 })
+    }
+  }
+
   return (
     <div className="min-h-screen">
+      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
           <div className="p-3 rounded-xl" style={{ backgroundColor: `${CATEGORY_COLOR}20` }}>
@@ -201,22 +310,44 @@ const Sneakers: React.FC = () => {
           <div>
             <h1 className="text-4xl font-bold text-white">Sneaker Listings</h1>
             <p className="text-gray-400 mt-1">
-              {totalItems.toLocaleString()} sneakers from trusted sellers
+              {totalItems.toLocaleString()} sneakers tracked across all sources
             </p>
           </div>
         </div>
       </div>
 
+      {/* Search and Controls */}
       <div className="mb-6 space-y-4">
         <div className="flex flex-col lg:flex-row gap-4">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search by model, colorway, or style code..."
+          {/* Mobile Filter Button */}
+          <button
+            onClick={() => setIsFilterOpen(true)}
+            className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg"
+          >
+            <FilterIcon size={18} />
+            <span>Filters</span>
+            {Object.keys(filters).length > 0 && (
+              <span
+                className="px-2 py-0.5 rounded-full text-xs"
+                style={{
+                  backgroundColor: `${CATEGORY_COLOR}30`,
+                  color: CATEGORY_COLOR
+                }}
+              >
+                {Object.keys(filters).length}
+              </span>
+            )}
+          </button>
+
+          {/* AI Search Bar */}
+          <AISearchBar
+            category="sneakers"
             categoryColor={CATEGORY_COLOR}
-            recentSearches={recentSearches}
-            onRecentSearchClick={setSearchQuery}
+            placeholder='Try: "jordan 1 size 11 good condition" or "dunk low panda size 10"'
+            onSearch={handleAISearch}
           />
+
+          {/* Sort and View Controls */}
           <div className="flex gap-3">
             <SortDropdown
               options={SORT_OPTIONS}
@@ -268,17 +399,42 @@ const Sneakers: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className={clsx('grid gap-6', viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1')}>
-              {listings.map((listing) => (
-                <ListingCard
-                  key={listing.id}
-                  listing={listing}
-                  categoryColor={CATEGORY_COLOR}
-                  onTrack={handleTrack}
-                  onSetAlert={handleSetAlert}
-                />
-              ))}
-            </div>
+            <>
+              <div className={clsx('grid gap-6', viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1')}>
+                {listings.map((listing) => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    categoryColor={CATEGORY_COLOR}
+                    onTrack={handleTrack}
+                    onSetAlert={handleSetAlert}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-400">
+                    Page {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

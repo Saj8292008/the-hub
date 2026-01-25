@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Car } from 'lucide-react'
+import { Car, Filter as FilterIcon } from 'lucide-react'
 import { CarListing, ViewMode, SortOption } from '../types/listings'
 import { ListingCard } from '../components/listings/ListingCard'
 import { FilterSidebar, FilterConfig } from '../components/listings/FilterSidebar'
-import { SearchBar } from '../components/listings/SearchBar'
+import AISearchBar from '../components/listings/AISearchBar'
 import { SortDropdown } from '../components/listings/SortDropdown'
 import { ViewToggle } from '../components/listings/ViewToggle'
 import api from '../services/api'
@@ -13,15 +13,28 @@ import clsx from 'clsx'
 const CATEGORY_COLOR = '#FF6B35' // Burnt Orange
 
 const SORT_OPTIONS: SortOption[] = [
-  { value: 'newest', label: 'Newest First' },
+  { value: 'newest', label: 'Newest Listings' },
   { value: 'price_asc', label: 'Price: Low to High' },
   { value: 'price_desc', label: 'Price: High to Low' },
   { value: 'year_desc', label: 'Year: Newest First' },
   { value: 'year_asc', label: 'Year: Oldest First' },
-  { value: 'mileage_asc', label: 'Mileage: Low to High' }
+  { value: 'mileage_asc', label: 'Mileage: Lowest First' },
+  { value: 'deals', label: 'Best Deals' }
 ]
 
 const FILTER_CONFIG: FilterConfig[] = [
+  {
+    type: 'multiselect',
+    label: 'Source',
+    key: 'sources',
+    options: [
+      { value: 'autotrader', label: 'AutoTrader' },
+      { value: 'cargurus', label: 'CarGurus' },
+      { value: 'cars.com', label: 'Cars.com' },
+      { value: 'ebay', label: 'eBay Motors' },
+      { value: 'reddit', label: 'Reddit' }
+    ]
+  },
   {
     type: 'multiselect',
     label: 'Make',
@@ -34,7 +47,11 @@ const FILTER_CONFIG: FilterConfig[] = [
       { value: 'ferrari', label: 'Ferrari' },
       { value: 'lamborghini', label: 'Lamborghini' },
       { value: 'mclaren', label: 'McLaren' },
-      { value: 'tesla', label: 'Tesla' }
+      { value: 'tesla', label: 'Tesla' },
+      { value: 'toyota', label: 'Toyota' },
+      { value: 'honda', label: 'Honda' },
+      { value: 'ford', label: 'Ford' },
+      { value: 'chevrolet', label: 'Chevrolet' }
     ]
   },
   {
@@ -49,8 +66,8 @@ const FILTER_CONFIG: FilterConfig[] = [
     type: 'range',
     label: 'Year',
     key: 'year',
-    min: 1980,
-    max: 2026
+    min: 1950,
+    max: 2025
   },
   {
     type: 'range',
@@ -70,7 +87,8 @@ const FILTER_CONFIG: FilterConfig[] = [
       { value: 'suv', label: 'SUV' },
       { value: 'convertible', label: 'Convertible' },
       { value: 'wagon', label: 'Wagon' },
-      { value: 'truck', label: 'Truck' }
+      { value: 'truck', label: 'Truck' },
+      { value: 'hatchback', label: 'Hatchback' }
     ]
   },
   {
@@ -91,13 +109,56 @@ const FILTER_CONFIG: FilterConfig[] = [
       { value: 'gas', label: 'Gasoline' },
       { value: 'diesel', label: 'Diesel' },
       { value: 'electric', label: 'Electric' },
-      { value: 'hybrid', label: 'Hybrid' }
+      { value: 'hybrid', label: 'Hybrid' },
+      { value: 'plug-in-hybrid', label: 'Plug-in Hybrid' }
     ]
   },
   {
-    type: 'checkbox',
-    label: 'Clean Title Only',
-    key: 'cleanTitle'
+    type: 'multiselect',
+    label: 'Exterior Color',
+    key: 'exteriorColors',
+    options: [
+      { value: 'black', label: 'Black' },
+      { value: 'white', label: 'White' },
+      { value: 'silver', label: 'Silver' },
+      { value: 'gray', label: 'Gray' },
+      { value: 'red', label: 'Red' },
+      { value: 'blue', label: 'Blue' }
+    ]
+  },
+  {
+    type: 'multiselect',
+    label: 'Title Status',
+    key: 'titleStatus',
+    options: [
+      { value: 'clean', label: 'Clean' },
+      { value: 'salvage', label: 'Salvage' },
+      { value: 'rebuilt', label: 'Rebuilt' },
+      { value: 'lien', label: 'Lien' }
+    ]
+  },
+  {
+    type: 'multiselect',
+    label: 'Condition',
+    key: 'conditions',
+    options: [
+      { value: 'new', label: 'New' },
+      { value: 'excellent', label: 'Excellent' },
+      { value: 'very-good', label: 'Very Good' },
+      { value: 'good', label: 'Good' },
+      { value: 'fair', label: 'Fair' }
+    ]
+  },
+  {
+    type: 'multiselect',
+    label: 'Previous Owners',
+    key: 'owners',
+    options: [
+      { value: '1', label: '1 Owner' },
+      { value: '2', label: '2 Owners' },
+      { value: '3', label: '3 Owners' },
+      { value: '4+', label: '4+ Owners' }
+    ]
   },
   {
     type: 'checkbox',
@@ -148,9 +209,25 @@ const Cars: React.FC = () => {
     try {
       setLoading(true)
       const response = await api.getCars()
-      setListings(response as any)
-      setTotalItems(response.length)
-      setTotalPages(Math.ceil(response.length / 50))
+
+      // Transform backend data to match frontend interface
+      const transformedListings = response.map((car: any) => ({
+        ...car,
+        source: Array.isArray(car.sources) && car.sources.length > 0
+          ? car.sources[0]
+          : car.source || 'unknown',
+        title: car.name || `${car.make} ${car.model}`,
+        price: car.currentPrice || car.targetPrice || 0,
+        currency: 'USD',
+        url: car.url || '#',
+        images: car.images || [],
+        timestamp: car.lastChecked || car.created_at || new Date().toISOString(),
+        created_at: car.created_at || new Date().toISOString()
+      }))
+
+      setListings(transformedListings as any)
+      setTotalItems(transformedListings.length)
+      setTotalPages(Math.ceil(transformedListings.length / 50))
     } catch (error) {
       console.error('Failed to fetch listings:', error)
       toast.error('Failed to load car listings')
@@ -199,8 +276,67 @@ const Cars: React.FC = () => {
     toast.success('Alert set! (Modal to be implemented)')
   }
 
+  const handleAISearch = (aiFilters: any, message?: string) => {
+    // Convert AI filters to internal filter format
+    const convertedFilters: Record<string, any> = {}
+
+    if (aiFilters.make) {
+      convertedFilters.makes = [aiFilters.make.toLowerCase().replace(/\s+/g, '-')]
+    }
+
+    if (aiFilters.model) {
+      setSearchQuery(aiFilters.model)
+    } else {
+      setSearchQuery('')
+    }
+
+    if (aiFilters.price_min) {
+      convertedFilters.price_min = aiFilters.price_min
+    }
+
+    if (aiFilters.price_max) {
+      convertedFilters.price_max = aiFilters.price_max
+    }
+
+    if (aiFilters.year_min) {
+      convertedFilters.year_min = aiFilters.year_min
+    }
+
+    if (aiFilters.year_max) {
+      convertedFilters.year_max = aiFilters.year_max
+    }
+
+    if (aiFilters.mileage_max) {
+      convertedFilters.mileage_max = aiFilters.mileage_max
+    }
+
+    if (aiFilters.body_style) {
+      convertedFilters.bodyStyles = [aiFilters.body_style.toLowerCase().replace(/\s+/g, '-')]
+    }
+
+    if (aiFilters.transmission) {
+      convertedFilters.transmissions = [aiFilters.transmission.toLowerCase()]
+    }
+
+    if (aiFilters.fuel_type) {
+      convertedFilters.fuelTypes = [aiFilters.fuel_type.toLowerCase().replace(/\s+/g, '-')]
+    }
+
+    if (aiFilters.condition) {
+      convertedFilters.conditions = [aiFilters.condition.toLowerCase().replace(/\s+/g, '-')]
+    }
+
+    setFilters(convertedFilters)
+    setPage(1)
+
+    if (message) {
+      toast.success(message, { duration: 5000 })
+    }
+  }
+
   return (
     <div className="min-h-screen">
+      {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
           <div className="p-3 rounded-xl" style={{ backgroundColor: `${CATEGORY_COLOR}20` }}>
@@ -209,22 +345,44 @@ const Cars: React.FC = () => {
           <div>
             <h1 className="text-4xl font-bold text-white">Car Listings</h1>
             <p className="text-gray-400 mt-1">
-              {totalItems.toLocaleString()} cars tracked from premium dealers
+              {totalItems.toLocaleString()} cars tracked across all sources
             </p>
           </div>
         </div>
       </div>
 
+      {/* Search and Controls */}
       <div className="mb-6 space-y-4">
         <div className="flex flex-col lg:flex-row gap-4">
-          <SearchBar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder="Search by make, model, or keywords..."
+          {/* Mobile Filter Button */}
+          <button
+            onClick={() => setIsFilterOpen(true)}
+            className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg"
+          >
+            <FilterIcon size={18} />
+            <span>Filters</span>
+            {Object.keys(filters).length > 0 && (
+              <span
+                className="px-2 py-0.5 rounded-full text-xs"
+                style={{
+                  backgroundColor: `${CATEGORY_COLOR}30`,
+                  color: CATEGORY_COLOR
+                }}
+              >
+                {Object.keys(filters).length}
+              </span>
+            )}
+          </button>
+
+          {/* AI Search Bar */}
+          <AISearchBar
+            category="cars"
             categoryColor={CATEGORY_COLOR}
-            recentSearches={recentSearches}
-            onRecentSearchClick={setSearchQuery}
+            placeholder='Try: "porsche 911 under 50k" or "tesla model 3 low mileage"'
+            onSearch={handleAISearch}
           />
+
+          {/* Sort and View Controls */}
           <div className="flex gap-3">
             <SortDropdown
               options={SORT_OPTIONS}
@@ -276,17 +434,42 @@ const Cars: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className={clsx('grid gap-6', viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1')}>
-              {listings.map((listing) => (
-                <ListingCard
-                  key={listing.id}
-                  listing={listing}
-                  categoryColor={CATEGORY_COLOR}
-                  onTrack={handleTrack}
-                  onSetAlert={handleSetAlert}
-                />
-              ))}
-            </div>
+            <>
+              <div className={clsx('grid gap-6', viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1')}>
+                {listings.map((listing) => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    categoryColor={CATEGORY_COLOR}
+                    onTrack={handleTrack}
+                    onSetAlert={handleSetAlert}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-400">
+                    Page {page} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
