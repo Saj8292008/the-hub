@@ -858,6 +858,67 @@ async function findUsersForAlert(listing) {
   }
 }
 
+// ============================================================================
+// CHANNEL POSTER COMMANDS (Admin)
+// ============================================================================
+
+bot.onText(commandRegex('postchannel'), async (msg) => {
+  // Only allow admin to trigger
+  const adminChatId = process.env.TELEGRAM_ADMIN_CHAT_ID;
+  if (adminChatId && msg.chat.id.toString() !== adminChatId) {
+    return sendMessage(msg.chat.id, '⛔ Admin only command');
+  }
+
+  sendMessage(msg.chat.id, '📢 Triggering channel post...');
+
+  try {
+    const { getScheduler } = require('../schedulers/channelPosterScheduler');
+    const scheduler = getScheduler();
+
+    if (!scheduler) {
+      return sendMessage(msg.chat.id, '⚠️ Channel poster not initialized');
+    }
+
+    const result = await scheduler.triggerPost();
+    
+    if (result.posted > 0) {
+      return sendMessage(msg.chat.id, `✅ Posted ${result.posted} deals to @TheHubDeals`);
+    } else {
+      return sendMessage(msg.chat.id, `📭 No new deals to post (${result.reason || 'unknown'})`);
+    }
+  } catch (error) {
+    return sendMessage(msg.chat.id, `❌ Error: ${error.message}`);
+  }
+});
+
+bot.onText(commandRegex('channelstatus'), async (msg) => {
+  try {
+    const { getScheduler } = require('../schedulers/channelPosterScheduler');
+    const scheduler = getScheduler();
+
+    if (!scheduler) {
+      return sendMessage(msg.chat.id, '⚠️ Channel poster not initialized');
+    }
+
+    const status = scheduler.getStatus();
+    const statusText = `
+📢 *Channel Poster Status*
+
+Channel: ${status.channel}
+Status: ${status.isRunning ? '✅ Running' : '⏸️ Stopped'}
+Last run: ${status.stats.lastRun || 'Never'}
+
+📊 *Stats:*
+• Total runs: ${status.stats.totalRuns}
+• Total posted: ${status.stats.totalPosted}
+    `.trim();
+
+    return sendMessage(msg.chat.id, statusText);
+  } catch (error) {
+    return sendMessage(msg.chat.id, `❌ Error: ${error.message}`);
+  }
+});
+
 // Export bot and functions
 module.exports = {
   bot,

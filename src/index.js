@@ -57,6 +57,15 @@ async function main() {
       }
     }
 
+    // Initialize channel poster for @TheHubDeals
+    if (process.env.ENABLE_CHANNEL_POSTER !== 'false') {
+      logger.info('Initializing channel poster...');
+      const supabase = require('./db/supabase');
+      const { initScheduler: initChannelPoster } = require('./schedulers/channelPosterScheduler');
+      initChannelPoster(telegramBot, supabase.client);
+      logger.info('📢 Channel Poster: Active (@TheHubDeals)');
+    }
+
     // Start price poller with WebSocket support
     logger.info('Initializing price poller...');
     const poller = new PricePoller(telegramBot, io);
