@@ -321,15 +321,16 @@ class ScraperCoordinator {
       const truncate = (str, maxLen) => str ? String(str).substring(0, maxLen) : str;
       
       // Only include fields that exist in the watch_listings table
+      // Note: DB schema has model/location as VARCHAR(100)
       const sanitizedListings = listings.map(l => ({
         source: truncate(l.source, 50),
         title: l.title,
         price: l.price,
         currency: truncate(l.currency || 'USD', 10),
         brand: truncate(l.brand, 100),
-        model: truncate(l.model, 200),
+        model: truncate(l.model, 100),
         condition: truncate(l.condition, 50),
-        location: truncate(l.location, 200),
+        location: truncate(l.location, 100),
         url: l.url,
         images: l.images,
         timestamp: l.timestamp

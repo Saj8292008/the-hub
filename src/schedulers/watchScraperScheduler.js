@@ -190,15 +190,16 @@ class WatchScraperScheduler {
       logger.info(`Filtered ${listings.length} → ${validListings.length} valid listings`);
       
       // Only include fields that exist in the watch_listings table
+      // Note: DB schema has model as VARCHAR(100), not 200
       const sanitizedListings = validListings.map(l => ({
         source: truncate(l.source, 50),
         title: l.title,
         price: l.price,
         currency: truncate(l.currency || 'USD', 10),
         brand: truncate(l.brand, 100),
-        model: truncate(l.model, 200),
+        model: truncate(l.model, 100),  // DB has varchar(100)
         condition: truncate(l.condition, 50),
-        location: truncate(l.location, 200),
+        location: truncate(l.location, 100),  // Also varchar(100) likely
         url: l.url,
         images: l.images,
         timestamp: l.timestamp

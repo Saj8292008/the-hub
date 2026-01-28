@@ -92,9 +92,22 @@ class WatchUSeekScraper extends BaseScraper {
    * Parse a single forum thread
    */
   parseThread($, thread) {
-    // Title
-    const titleElement = thread.find('.structItem-title a');
-    const title = titleElement.text().trim();
+    // Find the title link - look for the <a> with actual text content
+    const titleContainer = thread.find('.structItem-title');
+    const links = titleContainer.find('a');
+    
+    let title = '';
+    let url = '';
+    
+    // Find the link that has the actual title text (not just icons)
+    links.each((i, el) => {
+      const linkText = $(el).text().trim();
+      const linkHref = $(el).attr('href');
+      if (linkText && linkText.length > 5 && linkHref && linkHref.includes('/threads/')) {
+        title = linkText;
+        url = linkHref;
+      }
+    });
 
     if (!title || title === '') {
       return null;
@@ -112,12 +125,11 @@ class WatchUSeekScraper extends BaseScraper {
     }
 
     // URL
-    const url = titleElement.attr('href');
     if (!url) {
       return null;
     }
 
-    const fullUrl = url.startsWith('http') ? url : this.baseUrl + '/' + url.replace(/^\//, '');
+    const fullUrl = url.startsWith('http') ? url : this.baseUrl + url;
 
     // Extract price from title
     const price = this.extractPrice(title);

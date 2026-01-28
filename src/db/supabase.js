@@ -345,15 +345,16 @@ class SupabaseClient {
     const truncate = (str, maxLen) => str ? String(str).substring(0, maxLen) : str;
 
     return this.query(async (client) => {
+      // Note: DB schema has model/location as VARCHAR(100)
       const records = listings.map(listing => ({
         source: truncate(listing.source, 50),
         title: listing.title,
         price: listing.price,
         currency: truncate(listing.currency || 'USD', 10),
         brand: truncate(listing.brand, 100),
-        model: truncate(listing.model, 200),
+        model: truncate(listing.model, 100),
         condition: truncate(listing.condition, 50),
-        location: truncate(listing.location, 200),
+        location: truncate(listing.location, 100),
         url: listing.url,
         images: listing.images,
         timestamp: listing.timestamp
@@ -377,18 +378,19 @@ class SupabaseClient {
     }
 
     // Helper to truncate strings to DB column limits
-    const truncate = (str, maxLen) => str ? str.substring(0, maxLen) : str;
+    const truncate = (str, maxLen) => str ? String(str).substring(0, maxLen) : str;
 
     return this.query(async (client) => {
+      // Note: DB schema has model/location as VARCHAR(100)
       const records = listings.map(listing => ({
         source: truncate(listing.source, 50),
         title: listing.title,  // TEXT type, no limit
         price: listing.price,
         currency: truncate(listing.currency || 'USD', 10),
         brand: truncate(listing.brand, 100),
-        model: truncate(listing.model, 200),
+        model: truncate(listing.model, 100),
         condition: truncate(listing.condition, 50),
-        location: truncate(listing.location, 200),
+        location: truncate(listing.location, 100),
         url: listing.url,  // TEXT type, no limit
         images: listing.images,
         timestamp: listing.timestamp || new Date().toISOString(),
