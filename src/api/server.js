@@ -233,6 +233,25 @@ const { router: scraperAdminRouter } = require('./scraperAdmin');
 app.use('/admin/scraper', scraperAdminRouter);
 
 // ============================================================================
+// DEAL ALERTS API
+// ============================================================================
+
+const dealAlertsRouter = require('./dealAlerts');
+const { initScheduler: initDealAlertScheduler } = require('../schedulers/dealAlertScheduler');
+
+// Make supabase available to the alerts router
+app.set('supabase', supabase.client);
+
+app.use('/api/alerts', dealAlertsRouter);
+
+// Initialize deal alert scheduler (will be connected to Telegram bot in index.js)
+if (process.env.ENABLE_DEAL_ALERTS !== 'false') {
+  // Scheduler will be fully initialized when telegram bot is available
+  // For now, just initialize with supabase
+  initDealAlertScheduler(supabase.client, null, '*/15 * * * *');
+}
+
+// ============================================================================
 // BLOG API ENDPOINTS
 // ============================================================================
 

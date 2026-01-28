@@ -461,6 +461,81 @@ bot.onText(commandRegex('update'), async (msg) => {
   }
 });
 
+// ============================================================================
+// DEALS COMMAND - Check for deals matching watchlist
+// ============================================================================
+
+bot.onText(commandRegex('deals'), async (msg) => {
+  sendMessage(msg.chat.id, '🔍 Searching for deals...');
+
+  try {
+    const DealAlertService = require('../services/alerts/DealAlertService');
+    const supabase = require('../db/supabase');
+    
+    if (!supabase.isAvailable()) {
+      return sendMessage(msg.chat.id, '❌ Deal alerts require Supabase database.');
+    }
+
+    const alertService = new DealAlertService(supabase.client, bot);
+    const deals = await alertService.findWatchDeals();
+
+    if (deals.length === 0) {
+      return sendMessage(msg.chat.id, '📭 No deals found matching your watchlist right now.\n\nMake sure you have items with target prices set!');
+    }
+
+    // Send top 5 deals
+    const topDeals = deals.slice(0, 5);
+    await sendMessage(msg.chat.id, `🔥 Found ${deals.length} deals! Showing top ${topDeals.length}:`);
+
+    for (const deal of topDeals) {
+      const message = alertService.formatDealMessage(deal);
+      await bot.sendMessage(msg.chat.id, message, { 
+        parse_mode: 'Markdown',
+        disable_web_page_preview: false 
+      });
+      // Small delay between messages
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    await alertService.recordAlert(topDeals[0].listing.id); // Record we showed these
+
+  } catch (error) {
+    return sendMessage(msg.chat.id, `❌ Error checking deals: ${error.message}`);
+  }
+});
+
+// ============================================================================
+// DEALSTATUS COMMAND - Check deal alert scheduler status
+// ============================================================================
+
+bot.onText(commandRegex('dealstatus'), async (msg) => {
+  try {
+    const { getScheduler } = require('../schedulers/dealAlertScheduler');
+    const scheduler = getScheduler();
+
+    if (!scheduler) {
+      return sendMessage(msg.chat.id, '⚠️ Deal alert scheduler not initialized');
+    }
+
+    const status = scheduler.getStatus();
+    const statusText = `
+🔔 *Deal Alert Status*
+
+Status: ${status.isRunning ? '✅ Running' : '⏸️ Stopped'}
+Last run: ${status.lastRun || 'Never'}
+
+📊 *Stats:*
+• Total runs: ${status.stats.totalRuns}
+• Deals found: ${status.stats.totalDealsFound}
+• Alerts sent: ${status.stats.totalAlertsSent}
+    `.trim();
+
+    return sendMessage(msg.chat.id, statusText);
+  } catch (error) {
+    return sendMessage(msg.chat.id, `❌ Error: ${error.message}`);
+  }
+});
+
 console.log('Telegram bot is running...');
 
 // Export bot for use in other modules
