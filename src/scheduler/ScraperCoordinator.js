@@ -320,9 +320,23 @@ class ScraperCoordinator {
       // Truncate strings to fit DB column limits
       const truncate = (str, maxLen) => str ? String(str).substring(0, maxLen) : str;
       
+      // Filter out listings without valid price or URL (DB constraints)
+      const validListings = listings.filter(l => {
+        if (!l.price || l.price <= 0) return false;
+        if (!l.url || l.url.includes('?listing_type=')) return false;
+        return true;
+      });
+      
+      if (validListings.length === 0) {
+        logger.info('No valid listings to save (all filtered - missing price/URL)');
+        return 0;
+      }
+      
+      logger.info(`Filtered ${listings.length} → ${validListings.length} valid listings`);
+      
       // Only include fields that exist in the watch_listings table
       // Note: DB schema has model/location as VARCHAR(100)
-      const sanitizedListings = listings.map(l => ({
+      const sanitizedListings = validListings.map(l => ({
         source: truncate(l.source, 50),
         title: l.title,
         price: l.price,
