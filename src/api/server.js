@@ -102,6 +102,16 @@ app.post('/watches', handleRoute((req) => watchTracker.addWatch(req.body)));
 app.put('/watches/:id', handleRoute((req) => watchTracker.updateWatch(req.params.id, req.body)));
 app.delete('/watches/:id', handleRoute((req) => watchTracker.deleteWatch(req.params.id)));
 
+// ============================================================================
+// TIER MANAGEMENT ROUTES
+// ============================================================================
+const tiersAPI = require('./tiers');
+
+app.get('/api/tiers', handleRoute((req) => tiersAPI.getAllTiers(req)));
+app.get('/api/tiers/me', handleRoute((req) => tiersAPI.getCurrentTier(req)));
+app.get('/api/tiers/usage', handleRoute((req) => tiersAPI.getUsage(req)));
+app.get('/api/tiers/check/:action', handleRoute((req) => tiersAPI.checkLimit(req)));
+
 // Car tracker endpoints
 app.get('/cars', handleRoute((req) => carTracker.listCars(req.query)));
 app.get('/cars/:id', handleRoute((req) => carTracker.getCar(req.params.id)));
