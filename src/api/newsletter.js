@@ -782,6 +782,51 @@ async function getRecentSubscribers(req) {
 }
 
 // ============================================================================
+// DEAL DIGEST GENERATION
+// ============================================================================
+
+/**
+ * Generate a deal digest for newsletter
+ * GET /api/newsletter/digest/:type (daily|weekly)
+ */
+async function generateDealDigest(req) {
+  const type = req.params?.type || 'daily';
+  
+  const DealDigestGenerator = require('../services/content/DealDigestGenerator');
+  const supabase = require('../db/supabase');
+  
+  if (!supabase.isAvailable()) {
+    throw new Error('Database not available');
+  }
+  
+  const generator = new DealDigestGenerator(supabase.client);
+  
+  let digest;
+  if (type === 'weekly') {
+    digest = await generator.generateWeeklyDigest();
+  } else {
+    digest = await generator.generateDailyDigest();
+  }
+  
+  if (!digest) {
+    return {
+      success: false,
+      message: 'No deals found for digest'
+    };
+  }
+  
+  const subject = generator.generateSubjectLine(digest.stats, type);
+  
+  return {
+    success: true,
+    digest: {
+      ...digest,
+      subject
+    }
+  };
+}
+
+// ============================================================================
 // EXPORTS
 // ============================================================================
 
@@ -808,5 +853,6 @@ module.exports = {
   generateNewsletter,
   getAnalyticsOverview,
   getGrowthAnalytics,
-  getRecentSubscribers
+  getRecentSubscribers,
+  generateDealDigest
 };
