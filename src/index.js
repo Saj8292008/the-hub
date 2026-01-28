@@ -66,6 +66,14 @@ async function main() {
       logger.info('📢 Channel Poster: Active (@TheHubDeals)');
     }
 
+    // Initialize sneaker price scheduler
+    if (process.env.ENABLE_SNEAKER_SCHEDULER !== 'false') {
+      logger.info('Initializing sneaker price scheduler...');
+      const { initScheduler: initSneakerScheduler } = require('./schedulers/sneakerPriceScheduler');
+      initSneakerScheduler(io, telegramBot);
+      logger.info('👟 Sneaker Price Scheduler: Active (every 4 hours)');
+    }
+
     // Start price poller with WebSocket support
     logger.info('Initializing price poller...');
     const poller = new PricePoller(telegramBot, io);
