@@ -460,6 +460,7 @@ app.post('/api/newsletter/generate', handleRoute((req) => newsletterAPI.generate
 
 app.get('/api/newsletter/analytics/overview', handleRoute((req) => newsletterAPI.getAnalyticsOverview(req)));
 app.get('/api/newsletter/analytics/growth', handleRoute((req) => newsletterAPI.getGrowthAnalytics(req)));
+app.get('/api/newsletter/admin/subscribers', handleRoute((req) => newsletterAPI.getRecentSubscribers(req)));
 
 // Newsletter Scheduler Control
 const NewsletterScheduler = require('../schedulers/newsletterScheduler');

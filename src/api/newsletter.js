@@ -119,6 +119,79 @@ async function subscribe(req) {
     // Don't fail the subscription, just log the error
   }
 
+  // ============================================================================
+  // INSTANT NOTIFICATIONS FOR NEW SUBSCRIBER
+  // ============================================================================
+
+  // 1. Console log
+  console.log(`📧 NEW SUBSCRIBER: ${email} (source: ${source || 'unknown'})`);
+
+  // 2. Get subscriber count for notifications
+  let totalSubscribers = 0;
+  try {
+    const { count } = await newsletterQueries.getSubscribers({ limit: 1 });
+    totalSubscribers = count || 0;
+  } catch (error) {
+    console.error('Error getting subscriber count:', error);
+  }
+
+  // 3. Send email notification to admin
+  const adminEmail = process.env.ADMIN_EMAIL || 'carmarsyd@icloud.com';
+  try {
+    await resendClient.sendEmail({
+      to: adminEmail,
+      subject: '🎉 New Newsletter Subscriber!',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #4CAF50;">🎉 New Subscriber Alert</h2>
+          <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 10px 0;"><strong>Email:</strong> ${email}</p>
+            <p style="margin: 10px 0;"><strong>Name:</strong> ${name || 'Not provided'}</p>
+            <p style="margin: 10px 0;"><strong>Source:</strong> ${source || 'unknown'}</p>
+            <p style="margin: 10px 0;"><strong>Time:</strong> ${new Date().toLocaleString('en-US', {
+              timeZone: 'America/Chicago',
+              dateStyle: 'full',
+              timeStyle: 'long'
+            })}</p>
+            <p style="margin: 10px 0;"><strong>Total Subscribers:</strong> ${totalSubscribers}</p>
+          </div>
+          <p style="color: #666; font-size: 12px;">This is an automated notification from The Hub.</p>
+        </div>
+      `,
+      text: `New Newsletter Subscriber!
+
+Email: ${email}
+Name: ${name || 'Not provided'}
+Source: ${source || 'unknown'}
+Time: ${new Date().toLocaleString()}
+Total Subscribers: ${totalSubscribers}`
+    });
+  } catch (error) {
+    console.error('Failed to send admin notification email:', error);
+  }
+
+  // 4. Send Telegram notification (if configured)
+  if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_ADMIN_CHAT_ID) {
+    try {
+      const TelegramBot = require('node-telegram-bot-api');
+      const bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN);
+
+      const message = `🎉 *New Newsletter Subscriber!*
+
+📧 Email: ${email}
+👤 Name: ${name || 'Not provided'}
+📍 Source: ${source || 'unknown'}
+🕐 Time: ${new Date().toLocaleString('en-US', { timeZone: 'America/Chicago' })}
+📊 Total Subscribers: ${totalSubscribers}`;
+
+      await bot.sendMessage(process.env.TELEGRAM_ADMIN_CHAT_ID, message, {
+        parse_mode: 'Markdown'
+      });
+    } catch (error) {
+      console.error('Failed to send Telegram notification:', error);
+    }
+  }
+
   return {
     success: true,
     message: 'Subscription successful! Check your email to confirm.',
@@ -638,6 +711,76 @@ async function getGrowthAnalytics(req) {
   };
 }
 
+/**
+ * Get recent subscribers for admin dashboard
+ * GET /api/newsletter/admin/subscribers
+ */
+async function getRecentSubscribers(req) {
+  const { limit = 10 } = req.query;
+
+  // Get recent subscribers
+  const { data: recentSubscribers, error: recentError } = await newsletterQueries.getSubscribers({
+    limit: parseInt(limit),
+    offset: 0
+  });
+
+  if (recentError) {
+    throw new Error(`Failed to fetch recent subscribers: ${recentError.message}`);
+  }
+
+  // Get statistics
+  const supabaseWrapper = require('../db/supabase');
+  const supabase = supabaseWrapper.client;
+
+  const { data: stats, error: statsError } = await supabase.rpc('get_subscriber_stats');
+
+  // If RPC doesn't exist, calculate manually
+  let statsData = {
+    total: 0,
+    today: 0,
+    this_week: 0,
+    confirmed: 0
+  };
+
+  if (statsError) {
+    // Calculate stats manually
+    const { count: total } = await newsletterQueries.getSubscribers({ limit: 1 });
+    const { count: confirmed } = await newsletterQueries.getSubscribers({
+      confirmed: true,
+      limit: 1
+    });
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const { data: allSubscribers } = await newsletterQueries.getSubscribers({ limit: 10000 });
+
+    const todayCount = allSubscribers?.filter(s =>
+      new Date(s.subscribed_at) >= today
+    ).length || 0;
+
+    const weekCount = allSubscribers?.filter(s =>
+      new Date(s.subscribed_at) >= weekAgo
+    ).length || 0;
+
+    statsData = {
+      total: total || 0,
+      today: todayCount,
+      this_week: weekCount,
+      confirmed: confirmed || 0
+    };
+  } else {
+    statsData = stats[0] || statsData;
+  }
+
+  return {
+    success: true,
+    recent: recentSubscribers || [],
+    stats: statsData
+  };
+}
+
 // ============================================================================
 // EXPORTS
 // ============================================================================
@@ -664,5 +807,6 @@ module.exports = {
   sendCampaignNow,
   generateNewsletter,
   getAnalyticsOverview,
-  getGrowthAnalytics
+  getGrowthAnalytics,
+  getRecentSubscribers
 };
