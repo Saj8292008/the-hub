@@ -554,6 +554,18 @@ app.post('/api/deal-scoring/scheduler/run-now', handleRoute(async () => {
 }));
 
 // ============================================================================
+// SHOULD I BUY? AI ANALYSIS ENDPOINT
+// ============================================================================
+
+const shouldIBuyAPI = require('./shouldIBuy');
+
+// Full listing analysis - POST /api/should-i-buy
+app.post('/api/should-i-buy', handleRoute((req) => shouldIBuyAPI.analyze(req)));
+
+// Quick price check - POST /api/should-i-buy/quick
+app.post('/api/should-i-buy/quick', handleRoute((req) => shouldIBuyAPI.quickCheck(req)));
+
+// ============================================================================
 // AI CONTENT GENERATION API ENDPOINTS
 // ============================================================================
 
