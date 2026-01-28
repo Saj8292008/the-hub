@@ -45,6 +45,18 @@ async function main() {
     const telegramBot = require('./bot/telegram');
     logger.info('📱 Telegram bot: Active');
 
+    // Initialize deal alert scheduler with Telegram bot
+    if (process.env.ENABLE_DEAL_ALERTS !== 'false') {
+      logger.info('Initializing deal alert scheduler...');
+      const { getScheduler: getDealAlertScheduler } = require('./schedulers/dealAlertScheduler');
+      const dealAlertScheduler = getDealAlertScheduler();
+      if (dealAlertScheduler) {
+        dealAlertScheduler.bot = telegramBot;
+        dealAlertScheduler.alertService.bot = telegramBot;
+        logger.info('🔔 Deal Alert Scheduler: Active (every 15 minutes)');
+      }
+    }
+
     // Start price poller with WebSocket support
     logger.info('Initializing price poller...');
     const poller = new PricePoller(telegramBot, io);
