@@ -578,6 +578,17 @@ app.post('/api/search/sneakers', handleRoute((req) => naturalSearchAPI.searchSne
 app.post('/api/search/cars', handleRoute((req) => naturalSearchAPI.searchCars(req)));
 
 // ============================================================================
+// PRICE HISTORY API
+// ============================================================================
+
+const priceHistoryAPI = require('./priceHistory');
+
+// Price history for charts
+app.get('/api/price-history', handleRoute((req) => priceHistoryAPI.getHistory(req)));
+app.get('/api/price-history/trending', handleRoute((req) => priceHistoryAPI.getTrending(req)));
+app.get('/api/price-history/:id', handleRoute((req) => priceHistoryAPI.getListingHistory(req)));
+
+// ============================================================================
 // SEO ENDPOINTS (Sitemap, RSS, Robots.txt)
 // ============================================================================
 
