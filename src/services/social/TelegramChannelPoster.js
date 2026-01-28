@@ -6,6 +6,7 @@
  */
 
 const logger = require('../../utils/logger');
+const { getAffiliateService } = require('../affiliate/AffiliateService');
 
 class TelegramChannelPoster {
   constructor(bot, supabase) {
@@ -15,6 +16,7 @@ class TelegramChannelPoster {
     this.minDealScore = 15; // Minimum score to post
     this.maxPostsPerHour = 3; // Don't spam
     this.postedListings = new Set(); // Track what we've posted
+    this.affiliateService = getAffiliateService();
   }
 
   /**
@@ -105,6 +107,9 @@ class TelegramChannelPoster {
       .replace(/\$[\d,]+/g, '')
       .trim();
 
+    // Get affiliate link if available
+    const dealUrl = this.affiliateService.transformUrl(listing.url, listing.source);
+
     let post = '';
     
     if (dealTag) {
@@ -122,7 +127,7 @@ class TelegramChannelPoster {
       post += `📋 Condition: ${listing.condition}\n`;
     }
     
-    post += `\n🔗 ${listing.url}\n\n`;
+    post += `\n🔗 ${dealUrl}\n\n`;
     post += `━━━━━━━━━━━━━━━\n`;
     post += `📱 @TheHubDeals | 🌐 thehub.deals`;
 
