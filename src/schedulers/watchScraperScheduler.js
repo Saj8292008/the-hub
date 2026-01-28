@@ -168,12 +168,48 @@ class WatchScraperScheduler {
    */
   async saveListings(listings) {
     try {
+      // Truncate strings to fit DB column limits
+      const truncate = (str, maxLen) => str ? String(str).substring(0, maxLen) : str;
+      
+      // Filter out listings without price or valid URL (DB constraints)
+      const validListings = listings.filter(l => {
+        if (!l.price || l.price <= 0) {
+          return false;
+        }
+        if (!l.url || l.url.includes('?listing_type=')) {
+          return false; // Invalid/generic URL
+        }
+        return true;
+      });
+      
+      if (validListings.length === 0) {
+        logger.info('No valid listings to save (all filtered out)');
+        return { data: [], error: null };
+      }
+      
+      logger.info(`Filtered ${listings.length} → ${validListings.length} valid listings`);
+      
+      // Only include fields that exist in the watch_listings table
+      const sanitizedListings = validListings.map(l => ({
+        source: truncate(l.source, 50),
+        title: l.title,
+        price: l.price,
+        currency: truncate(l.currency || 'USD', 10),
+        brand: truncate(l.brand, 100),
+        model: truncate(l.model, 200),
+        condition: truncate(l.condition, 50),
+        location: truncate(l.location, 200),
+        url: l.url,
+        images: l.images,
+        timestamp: l.timestamp
+      }));
+
       let result;
 
       if (supabase.isAvailable()) {
-        result = await supabase.addWatchListingsBatch(listings);
+        result = await supabase.addWatchListingsBatch(sanitizedListings);
       } else {
-        result = await localWatchListings.addWatchListingsBatch(listings);
+        result = await localWatchListings.addWatchListingsBatch(sanitizedListings);
       }
 
       if (result.error) {

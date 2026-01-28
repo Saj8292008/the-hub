@@ -317,15 +317,33 @@ class ScraperCoordinator {
    */
   async saveListings(listings) {
     try {
+      // Truncate strings to fit DB column limits
+      const truncate = (str, maxLen) => str ? String(str).substring(0, maxLen) : str;
+      
+      // Only include fields that exist in the watch_listings table
+      const sanitizedListings = listings.map(l => ({
+        source: truncate(l.source, 50),
+        title: l.title,
+        price: l.price,
+        currency: truncate(l.currency || 'USD', 10),
+        brand: truncate(l.brand, 100),
+        model: truncate(l.model, 200),
+        condition: truncate(l.condition, 50),
+        location: truncate(l.location, 200),
+        url: l.url,
+        images: l.images,
+        timestamp: l.timestamp
+      }));
+
       let savedCount = 0;
 
       if (supabase.isAvailable()) {
         // Batch upsert to Supabase
-        const result = await supabase.upsertWatchListingsBatch(listings);
+        const result = await supabase.upsertWatchListingsBatch(sanitizedListings);
         savedCount = result.data?.length || 0;
       } else {
         // Use local storage
-        const result = await localWatchListings.addWatchListingsBatch(listings);
+        const result = await localWatchListings.addWatchListingsBatch(sanitizedListings);
         savedCount = result.data?.length || 0;
       }
 

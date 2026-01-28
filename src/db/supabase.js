@@ -341,25 +341,67 @@ class SupabaseClient {
       return { data: [], error: null };
     }
 
+    // Helper to truncate strings to DB column limits
+    const truncate = (str, maxLen) => str ? String(str).substring(0, maxLen) : str;
+
     return this.query(async (client) => {
       const records = listings.map(listing => ({
-        source: listing.source,
+        source: truncate(listing.source, 50),
         title: listing.title,
         price: listing.price,
-        currency: listing.currency,
-        brand: listing.brand,
-        model: listing.model,
-        condition: listing.condition,
-        location: listing.location,
+        currency: truncate(listing.currency || 'USD', 10),
+        brand: truncate(listing.brand, 100),
+        model: truncate(listing.model, 200),
+        condition: truncate(listing.condition, 50),
+        location: truncate(listing.location, 200),
         url: listing.url,
         images: listing.images,
-        seller: listing.seller,
         timestamp: listing.timestamp
       }));
 
+      // Use upsert to handle duplicates gracefully
       return await client
         .from('watch_listings')
-        .insert(records)
+        .upsert(records, { onConflict: 'url', ignoreDuplicates: true })
+        .select();
+    });
+  }
+
+  /**
+   * Upsert watch listings (insert or update on URL conflict)
+   * This is used by scrapers to avoid duplicate entries
+   */
+  async upsertWatchListingsBatch(listings) {
+    if (!listings || listings.length === 0) {
+      return { data: [], error: null };
+    }
+
+    // Helper to truncate strings to DB column limits
+    const truncate = (str, maxLen) => str ? str.substring(0, maxLen) : str;
+
+    return this.query(async (client) => {
+      const records = listings.map(listing => ({
+        source: truncate(listing.source, 50),
+        title: listing.title,  // TEXT type, no limit
+        price: listing.price,
+        currency: truncate(listing.currency || 'USD', 10),
+        brand: truncate(listing.brand, 100),
+        model: truncate(listing.model, 200),
+        condition: truncate(listing.condition, 50),
+        location: truncate(listing.location, 200),
+        url: listing.url,  // TEXT type, no limit
+        images: listing.images,
+        timestamp: listing.timestamp || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+
+      // Upsert: insert new rows or update existing ones based on URL
+      return await client
+        .from('watch_listings')
+        .upsert(records, { 
+          onConflict: 'url',
+          ignoreDuplicates: false 
+        })
         .select();
     });
   }

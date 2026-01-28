@@ -1,9 +1,10 @@
 /**
  * Scraper Logs Database Queries
  * CRUD operations for scraper_logs table
+ * Uses Supabase client instead of raw pg pool
  */
 
-const { pool } = require('./supabase');
+const supabase = require('./supabase');
 const logger = require('../utils/logger');
 
 /**
@@ -22,37 +23,32 @@ async function logScraperRun({
   metadata = null
 }) {
   try {
-    const result = await pool.query(
-      `INSERT INTO scraper_logs (
-        category,
-        source,
-        status,
-        items_found,
-        items_new,
-        items_updated,
-        duration_ms,
-        error_message,
-        retry_count,
-        metadata
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING *`,
-      [
-        category,
-        source,
-        status,
-        items_found,
-        items_new,
-        items_updated,
-        duration_ms,
-        error_message,
-        retry_count,
-        metadata ? JSON.stringify(metadata) : null
-      ]
-    );
-
-    return { success: true, data: result.rows[0] };
+    if (!supabase.isAvailable()) {
+      // Silently skip if Supabase not available
+      return { success: false, error: 'Supabase not available' };
+    }
+    
+    const { data, error } = await supabase.client.from('scraper_logs').insert([{
+      category,
+      source,
+      status,
+      items_found,
+      items_new,
+      items_updated,
+      duration_ms,
+      error_message,
+      retry_count,
+      metadata
+    }]).select();
+    
+    if (error) {
+      logger.warn(`Failed to log scraper run: ${error.message}`);
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true, data: data?.[0] };
   } catch (error) {
-    logger.error('Failed to log scraper run:', error);
+    logger.warn(`Failed to log scraper run: ${error.message}`);
     return { success: false, error: error.message };
   }
 }
@@ -62,35 +58,36 @@ async function logScraperRun({
  */
 async function getRecentLogs(limit = 50, filters = {}) {
   try {
-    let query = 'SELECT * FROM scraper_logs WHERE 1=1';
-    const params = [];
-    let paramIndex = 1;
+    if (!supabase.isAvailable()) {
+      return { success: false, error: 'Supabase not available' };
+    }
+    
+    let query = supabase.client
+      .from('scraper_logs')
+      .select('*')
+      .order('timestamp', { ascending: false })
+      .limit(limit);
 
     if (filters.category) {
-      query += ` AND category = $${paramIndex++}`;
-      params.push(filters.category);
+      query = query.eq('category', filters.category);
     }
-
     if (filters.source) {
-      query += ` AND source = $${paramIndex++}`;
-      params.push(filters.source);
+      query = query.eq('source', filters.source);
     }
-
     if (filters.status) {
-      query += ` AND status = $${paramIndex++}`;
-      params.push(filters.status);
+      query = query.eq('status', filters.status);
     }
-
     if (filters.since) {
-      query += ` AND timestamp >= $${paramIndex++}`;
-      params.push(filters.since);
+      query = query.gte('timestamp', filters.since);
     }
 
-    query += ` ORDER BY timestamp DESC LIMIT $${paramIndex}`;
-    params.push(limit);
-
-    const result = await pool.query(query, params);
-    return { success: true, data: result.rows };
+    const { data, error } = await query;
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true, data };
   } catch (error) {
     logger.error('Failed to get scraper logs:', error);
     return { success: false, error: error.message };
@@ -98,64 +95,69 @@ async function getRecentLogs(limit = 50, filters = {}) {
 }
 
 /**
- * Get scraper statistics
+ * Get scraper statistics (simplified version without raw SQL)
  */
 async function getScraperStats(category = null, hours = 24) {
   try {
-    let query = `
-      SELECT
-        category,
-        source,
-        COUNT(*) as total_runs,
-        COUNT(*) FILTER (WHERE status = 'success') as successful_runs,
-        COUNT(*) FILTER (WHERE status = 'error') as failed_runs,
-        SUM(items_found) as total_items_found,
-        SUM(items_new) as total_items_new,
-        SUM(items_updated) as total_items_updated,
-        AVG(duration_ms) as avg_duration_ms,
-        MAX(timestamp) as last_run_at,
-        MIN(timestamp) as first_run_at
-      FROM scraper_logs
-      WHERE timestamp > NOW() - INTERVAL '${hours} hours'
-    `;
-
-    const params = [];
-    if (category) {
-      query += ' AND category = $1';
-      params.push(category);
+    if (!supabase.isAvailable()) {
+      return { success: false, error: 'Supabase not available' };
     }
-
-    query += ' GROUP BY category, source ORDER BY last_run_at DESC';
-
-    const result = await pool.query(query, params);
-    return { success: true, data: result.rows };
+    
+    const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    
+    let query = supabase.client
+      .from('scraper_logs')
+      .select('*')
+      .gte('timestamp', since);
+      
+    if (category) {
+      query = query.eq('category', category);
+    }
+    
+    const { data, error } = await query;
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    // Aggregate stats in JS
+    const stats = {};
+    for (const log of data || []) {
+      const key = `${log.category}:${log.source}`;
+      if (!stats[key]) {
+        stats[key] = {
+          category: log.category,
+          source: log.source,
+          total_runs: 0,
+          successful_runs: 0,
+          failed_runs: 0,
+          total_items_found: 0,
+          total_items_new: 0,
+          avg_duration_ms: 0,
+          last_run_at: null
+        };
+      }
+      stats[key].total_runs++;
+      if (log.status === 'success') stats[key].successful_runs++;
+      if (log.status === 'error') stats[key].failed_runs++;
+      stats[key].total_items_found += log.items_found || 0;
+      stats[key].total_items_new += log.items_new || 0;
+      stats[key].avg_duration_ms += log.duration_ms || 0;
+      if (!stats[key].last_run_at || log.timestamp > stats[key].last_run_at) {
+        stats[key].last_run_at = log.timestamp;
+      }
+    }
+    
+    // Calculate averages
+    for (const key in stats) {
+      if (stats[key].total_runs > 0) {
+        stats[key].avg_duration_ms = Math.round(stats[key].avg_duration_ms / stats[key].total_runs);
+      }
+    }
+    
+    return { success: true, data: Object.values(stats) };
   } catch (error) {
     logger.error('Failed to get scraper stats:', error);
-    return { success: false, error: error.message };
-  }
-}
-
-/**
- * Get last successful run time for each source
- */
-async function getLastRunTimes() {
-  try {
-    const result = await pool.query(`
-      SELECT DISTINCT ON (category, source)
-        category,
-        source,
-        timestamp as last_run_at,
-        status,
-        items_found,
-        duration_ms
-      FROM scraper_logs
-      WHERE status = 'success'
-      ORDER BY category, source, timestamp DESC
-    `);
-
-    return { success: true, data: result.rows };
-  } catch (error) {
-    logger.error('Failed to get last run times:', error);
     return { success: false, error: error.message };
   }
 }
@@ -165,25 +167,60 @@ async function getLastRunTimes() {
  */
 async function getRecentErrors(limit = 20) {
   try {
-    const result = await pool.query(
-      `SELECT
-        timestamp,
-        category,
-        source,
-        error_message,
-        retry_count,
-        duration_ms,
-        metadata
-      FROM scraper_logs
-      WHERE status = 'error'
-      ORDER BY timestamp DESC
-      LIMIT $1`,
-      [limit]
-    );
-
-    return { success: true, data: result.rows };
+    if (!supabase.isAvailable()) {
+      return { success: false, error: 'Supabase not available' };
+    }
+    
+    const { data, error } = await supabase.client
+      .from('scraper_logs')
+      .select('*')
+      .eq('status', 'error')
+      .order('timestamp', { ascending: false })
+      .limit(limit);
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true, data };
   } catch (error) {
     logger.error('Failed to get recent errors:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Get last successful run time for each source
+ */
+async function getLastRunTimes() {
+  try {
+    if (!supabase.isAvailable()) {
+      return { success: false, error: 'Supabase not available' };
+    }
+    
+    const { data, error } = await supabase.client
+      .from('scraper_logs')
+      .select('*')
+      .eq('status', 'success')
+      .order('timestamp', { ascending: false })
+      .limit(100);
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    // Get most recent per source
+    const lastRuns = {};
+    for (const log of data || []) {
+      const key = `${log.category}:${log.source}`;
+      if (!lastRuns[key]) {
+        lastRuns[key] = log;
+      }
+    }
+    
+    return { success: true, data: Object.values(lastRuns) };
+  } catch (error) {
+    logger.error('Failed to get last run times:', error);
     return { success: false, error: error.message };
   }
 }
@@ -193,21 +230,28 @@ async function getRecentErrors(limit = 20) {
  */
 async function getSuccessRate(source, hours = 24) {
   try {
-    const result = await pool.query(
-      `SELECT
-        COUNT(*) as total_runs,
-        COUNT(*) FILTER (WHERE status = 'success') as successful_runs,
-        ROUND(
-          (COUNT(*) FILTER (WHERE status = 'success')::DECIMAL / COUNT(*)) * 100,
-          2
-        ) as success_rate
-      FROM scraper_logs
-      WHERE source = $1
-        AND timestamp > NOW() - INTERVAL '${hours} hours'`,
-      [source]
-    );
-
-    return { success: true, data: result.rows[0] };
+    const statsResult = await getScraperStats(null, hours);
+    if (!statsResult.success) {
+      return statsResult;
+    }
+    
+    const sourceStats = statsResult.data.find(s => s.source === source);
+    if (!sourceStats) {
+      return { success: true, data: { total_runs: 0, successful_runs: 0, success_rate: 0 } };
+    }
+    
+    const successRate = sourceStats.total_runs > 0 
+      ? ((sourceStats.successful_runs / sourceStats.total_runs) * 100).toFixed(2)
+      : 0;
+    
+    return { 
+      success: true, 
+      data: { 
+        total_runs: sourceStats.total_runs, 
+        successful_runs: sourceStats.successful_runs, 
+        success_rate: parseFloat(successRate)
+      } 
+    };
   } catch (error) {
     logger.error('Failed to get success rate:', error);
     return { success: false, error: error.message };
@@ -219,13 +263,23 @@ async function getSuccessRate(source, hours = 24) {
  */
 async function cleanupOldLogs() {
   try {
-    const result = await pool.query(
-      `DELETE FROM scraper_logs
-       WHERE timestamp < NOW() - INTERVAL '30 days'
-       RETURNING id`
-    );
-
-    const deletedCount = result.rows.length;
+    if (!supabase.isAvailable()) {
+      return { success: false, error: 'Supabase not available' };
+    }
+    
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    
+    const { data, error } = await supabase.client
+      .from('scraper_logs')
+      .delete()
+      .lt('timestamp', thirtyDaysAgo)
+      .select('id');
+    
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
+    const deletedCount = data?.length || 0;
     logger.info(`Cleaned up ${deletedCount} old scraper logs`);
     return { success: true, deletedCount };
   } catch (error) {
@@ -239,28 +293,17 @@ async function cleanupOldLogs() {
  */
 async function getHealthSummary() {
   try {
-    // Get stats for last 24 hours
     const statsResult = await getScraperStats(null, 24);
     if (!statsResult.success) {
-      throw new Error(statsResult.error);
+      return statsResult;
     }
 
-    // Get recent errors
     const errorsResult = await getRecentErrors(10);
-    if (!errorsResult.success) {
-      throw new Error(errorsResult.error);
-    }
-
-    // Get last run times
     const lastRunResult = await getLastRunTimes();
-    if (!lastRunResult.success) {
-      throw new Error(lastRunResult.error);
-    }
 
-    // Calculate overall health
-    const stats = statsResult.data;
-    const totalRuns = stats.reduce((sum, s) => sum + parseInt(s.total_runs), 0);
-    const successfulRuns = stats.reduce((sum, s) => sum + parseInt(s.successful_runs), 0);
+    const stats = statsResult.data || [];
+    const totalRuns = stats.reduce((sum, s) => sum + s.total_runs, 0);
+    const successfulRuns = stats.reduce((sum, s) => sum + s.successful_runs, 0);
     const overallSuccessRate = totalRuns > 0 ? ((successfulRuns / totalRuns) * 100).toFixed(2) : 0;
 
     return {
@@ -273,8 +316,8 @@ async function getHealthSummary() {
           lastHours: 24
         },
         bySource: stats,
-        recentErrors: errorsResult.data,
-        lastRuns: lastRunResult.data
+        recentErrors: errorsResult.data || [],
+        lastRuns: lastRunResult.data || []
       }
     };
   } catch (error) {

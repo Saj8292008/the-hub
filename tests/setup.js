@@ -1,49 +1,34 @@
 /**
  * Test Setup and Configuration
- * Global setup for all tests
+ * Global setup for all tests using Mocha + Chai + Sinon
  */
 
 require('dotenv').config({ path: '.env.test' });
+const sinon = require('sinon');
+const chai = require('chai');
 
 // Set test environment
 process.env.NODE_ENV = 'test';
 process.env.PORT = '3001'; // Different port for testing
 
-// Mock console methods to reduce noise during tests
+// Make chai globally available
+global.expect = chai.expect;
+global.sinon = sinon;
+
+// Stub console methods to reduce noise during tests (keep error for debugging)
+const originalConsole = { ...console };
 global.console = {
   ...console,
-  log: jest.fn(),
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  // Keep error for debugging
-  error: console.error
+  log: () => {},
+  debug: () => {},
+  info: () => {},
+  warn: () => {},
+  error: originalConsole.error
 };
 
-// Global test timeout
-jest.setTimeout(10000);
-
-// Mock external services for unit tests
-jest.mock('../src/services/openai/client', () => ({
-  isAvailable: jest.fn(() => true),
-  chat: jest.fn(),
-  chatStream: jest.fn()
-}));
-
-jest.mock('../src/db/supabase', () => ({
-  isAvailable: jest.fn(() => true),
-  from: jest.fn(),
-  storage: jest.fn(),
-  auth: jest.fn()
-}));
-
-// Cleanup after all tests
-afterAll(async () => {
-  // Close any open connections
-  if (global.server) {
-    await new Promise(resolve => global.server.close(resolve));
-  }
-
-  // Clear all mocks
-  jest.clearAllMocks();
-});
+// Export for use in tests
+module.exports = {
+  chai,
+  sinon,
+  expect: chai.expect
+};
