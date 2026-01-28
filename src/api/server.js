@@ -519,6 +519,30 @@ app.post('/api/newsletter/scheduler/run-now', handleRoute(async () => {
   return { success: true, result };
 }));
 
+// Weekly Digest Scheduler Control
+const { createScheduler: createDigestScheduler, getScheduler: getDigestScheduler } = require('../schedulers/weeklyDigestScheduler');
+const weeklyDigestScheduler = createDigestScheduler(io);
+
+app.get('/api/digest/scheduler/status', handleRoute(async () => {
+  return weeklyDigestScheduler.getStatus();
+}));
+
+app.post('/api/digest/scheduler/start', handleRoute(async (req) => {
+  const schedule = req.body.schedule || '0 10 * * 0'; // Sundays 10am
+  weeklyDigestScheduler.start(schedule);
+  return { success: true, status: weeklyDigestScheduler.getStatus() };
+}));
+
+app.post('/api/digest/scheduler/stop', handleRoute(async () => {
+  weeklyDigestScheduler.stop();
+  return { success: true };
+}));
+
+app.post('/api/digest/scheduler/run-now', handleRoute(async () => {
+  const result = await weeklyDigestScheduler.forceRun();
+  return { success: true, result };
+}));
+
 // ============================================================================
 // DEAL SCORING API ENDPOINTS (AI Features)
 // ============================================================================
