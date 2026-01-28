@@ -461,6 +461,372 @@ Start tracking your first item now!`;
 });
 
 // ============================================================================
+// BEST COMMAND - Top Deals with Score Explanations
+// ============================================================================
+
+bot.onText(commandRegex('best'), async (msg, match) => {
+  const args = (match?.[1] || '').trim().toLowerCase();
+  const category = args || 'all';
+
+  try {
+    await sendMessage(msg.chat.id, '🔍 Finding today\'s best deals...');
+
+    // Get high-scored listings from database
+    let listings = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (supabase) {
+      try {
+        // Get watches
+        if (category === 'all' || category === 'watches') {
+          const { data: watchDeals } = await supabase
+            .from('watch_listings')
+            .select('*, score_breakdown')
+            .gte('deal_score', 70)
+            .gte('created_at', today.toISOString())
+            .order('deal_score', { ascending: false })
+            .limit(category === 'watches' ? 5 : 2);
+          
+          if (watchDeals?.length) {
+            listings.push(...watchDeals.map(d => ({ ...d, category: 'watches' })));
+          }
+        }
+
+        // Get sneakers
+        if (category === 'all' || category === 'sneakers') {
+          const { data: sneakerDeals } = await supabase
+            .from('sneaker_listings')
+            .select('*, score_breakdown')
+            .gte('deal_score', 70)
+            .gte('created_at', today.toISOString())
+            .order('deal_score', { ascending: false })
+            .limit(category === 'sneakers' ? 5 : 2);
+          
+          if (sneakerDeals?.length) {
+            listings.push(...sneakerDeals.map(d => ({ ...d, category: 'sneakers' })));
+          }
+        }
+
+        // Get cars
+        if (category === 'all' || category === 'cars') {
+          const { data: carDeals } = await supabase
+            .from('car_listings')
+            .select('*, score_breakdown')
+            .gte('deal_score', 70)
+            .gte('created_at', today.toISOString())
+            .order('deal_score', { ascending: false })
+            .limit(category === 'cars' ? 5 : 2);
+          
+          if (carDeals?.length) {
+            listings.push(...carDeals.map(d => ({ ...d, category: 'cars' })));
+          }
+        }
+      } catch (e) {
+        console.error('Error fetching deals:', e);
+      }
+    }
+
+    // Sort by deal_score
+    listings.sort((a, b) => (b.deal_score || 0) - (a.deal_score || 0));
+    const topDeals = listings.slice(0, 5);
+
+    if (!topDeals.length) {
+      return sendMessage(
+        msg.chat.id,
+        `📭 No hot deals found${category !== 'all' ? ` in ${category}` : ''} today.\n\n` +
+        `Deals are scored 0-100 based on:\n` +
+        `• Price vs market average\n` +
+        `• Seller reputation\n` +
+        `• Item condition\n` +
+        `• Listing quality\n\n` +
+        `Check back later or join ${channelId || '@TheHubDeals'} for instant alerts!`
+      );
+    }
+
+    let response = `🔥 *Top ${topDeals.length} Deals${category !== 'all' ? ` (${category})` : ''} Today*\n\n`;
+
+    topDeals.forEach((deal, index) => {
+      const name = deal.title || deal.model || deal.name || 'Item';
+      const truncatedName = name.length > 45 ? name.substring(0, 42) + '...' : name;
+      const price = deal.price ? `$${Number(deal.price).toLocaleString()}` : 'See listing';
+      const score = deal.deal_score || 0;
+      const categoryEmoji = deal.category === 'watches' ? '🕐' : deal.category === 'cars' ? '🚗' : deal.category === 'sneakers' ? '👟' : '📦';
+      
+      // Score badge
+      let scoreBadge = '';
+      if (score >= 90) scoreBadge = '🔥 HOT DEAL';
+      else if (score >= 80) scoreBadge = '✨ GREAT DEAL';
+      else if (score >= 70) scoreBadge = '👍 GOOD DEAL';
+
+      response += `${index + 1}. ${categoryEmoji} *${truncatedName}*\n`;
+      response += `   💰 ${price} • Score: ${score}/100 ${scoreBadge}\n`;
+      
+      // Explain WHY it's a good deal
+      const reasons = [];
+      const breakdown = deal.score_breakdown || {};
+      
+      if (breakdown.price >= 35) {
+        reasons.push('📉 Below market price');
+      } else if (breakdown.price >= 25) {
+        reasons.push('💵 Fair price');
+      }
+      
+      if (breakdown.condition >= 18) {
+        reasons.push('✨ Excellent condition');
+      } else if (breakdown.condition >= 14) {
+        reasons.push('👌 Good condition');
+      }
+      
+      if (breakdown.seller >= 12) {
+        reasons.push('⭐ Trusted seller');
+      }
+      
+      if (breakdown.quality >= 12) {
+        reasons.push('📸 Quality listing');
+      }
+      
+      if (breakdown.rarity >= 8) {
+        reasons.push('💎 High demand model');
+      }
+      
+      // Show top 3 reasons
+      if (reasons.length > 0) {
+        response += `   _${reasons.slice(0, 3).join(' • ')}_\n`;
+      }
+      
+      // Add price context if available
+      if (deal.market_avg && deal.price) {
+        const savings = Math.round(((deal.market_avg - deal.price) / deal.market_avg) * 100);
+        if (savings > 0) {
+          response += `   💡 *${savings}% below* market avg ($${Number(deal.market_avg).toLocaleString()})\n`;
+        }
+      }
+      
+      response += `   🔗 ${deal.url}\n\n`;
+    });
+
+    response += `━━━━━━━━━━━━━━━━━━━━━\n`;
+    response += `📊 *How Scores Work:*\n`;
+    response += `90+ = 🔥 Must-buy territory\n`;
+    response += `80-89 = ✨ Excellent value\n`;
+    response += `70-79 = 👍 Good deal\n\n`;
+    response += `💡 Use /track <query> to get alerts!`;
+
+    return bot.sendMessage(msg.chat.id, response, {
+      parse_mode: 'Markdown',
+      disable_web_page_preview: true
+    });
+
+  } catch (error) {
+    console.error('Best deals error:', error);
+    return sendMessage(msg.chat.id, `❌ Error fetching deals: ${error.message}`);
+  }
+});
+
+// ============================================================================
+// TRACK COMMAND - Personal Price Alerts
+// ============================================================================
+
+bot.onText(commandRegex('track'), async (msg, match) => {
+  const query = (match?.[1] || '').trim();
+
+  if (!query) {
+    return sendMessage(
+      msg.chat.id,
+      `📍 *Track an Item*\n\n` +
+      `Usage: /track <search query> [max price]\n\n` +
+      `*Examples:*\n` +
+      `• /track Rolex Submariner\n` +
+      `• /track Rolex Submariner 10000\n` +
+      `• /track Jordan 1 Chicago 300\n` +
+      `• /track Porsche 911 under 50000\n\n` +
+      `You'll get instant alerts when matching items are found!`
+    );
+  }
+
+  try {
+    const chatId = msg.chat.id;
+    const username = msg.from?.username || msg.from?.first_name || 'user';
+
+    // Parse query - check for max price
+    let maxPrice = null;
+    let searchQuery = query;
+    
+    // Check for "under X" pattern
+    const underMatch = query.match(/under\s*\$?(\d+)/i);
+    if (underMatch) {
+      maxPrice = parseInt(underMatch[1], 10);
+      searchQuery = query.replace(/under\s*\$?\d+/i, '').trim();
+    } else {
+      // Check if last word is a number
+      const words = query.split(/\s+/);
+      const lastWord = words[words.length - 1];
+      if (/^\d+$/.test(lastWord) && words.length > 1) {
+        maxPrice = parseInt(lastWord, 10);
+        searchQuery = words.slice(0, -1).join(' ');
+      }
+    }
+
+    // Store the track in Supabase
+    const trackData = {
+      chat_id: chatId,
+      username: username,
+      search_query: searchQuery.toLowerCase(),
+      max_price: maxPrice,
+      created_at: new Date().toISOString(),
+      is_active: true,
+      notify_telegram: true
+    };
+
+    // Check if already tracking this
+    const { data: existing } = await supabase
+      .from('telegram_tracks')
+      .select('id')
+      .eq('chat_id', chatId)
+      .ilike('search_query', searchQuery)
+      .single();
+
+    if (existing) {
+      // Update existing track
+      await supabase
+        .from('telegram_tracks')
+        .update({ max_price: maxPrice, is_active: true })
+        .eq('id', existing.id);
+      
+      return sendMessage(
+        msg.chat.id,
+        `✅ Updated track for "*${searchQuery}*"` +
+        (maxPrice ? `\nMax price: $${maxPrice.toLocaleString()}` : '') +
+        `\n\nYou'll get notified when matching deals are found!`
+      );
+    }
+
+    // Create new track
+    await supabase
+      .from('telegram_tracks')
+      .insert(trackData);
+
+    return sendMessage(
+      msg.chat.id,
+      `✅ Now tracking "*${searchQuery}*"` +
+      (maxPrice ? `\nMax price: $${maxPrice.toLocaleString()}` : '') +
+      `\n\nYou'll get notified when matching deals are found!\n\n` +
+      `📋 View your tracks: /mytracks\n` +
+      `🗑️ Remove a track: /removetrack`
+    );
+
+  } catch (error) {
+    console.error('Track command error:', error);
+    return sendMessage(msg.chat.id, `❌ Error: ${error.message}`);
+  }
+});
+
+// ============================================================================
+// MYTRACKS COMMAND - View Tracked Searches
+// ============================================================================
+
+bot.onText(commandRegex('mytracks'), async (msg) => {
+  try {
+    const chatId = msg.chat.id;
+
+    const { data: tracks, error } = await supabase
+      .from('telegram_tracks')
+      .select('*')
+      .eq('chat_id', chatId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    if (!tracks?.length) {
+      return sendMessage(
+        msg.chat.id,
+        `📭 *No Active Tracks*\n\n` +
+        `You don't have any tracked searches yet.\n\n` +
+        `Use /track to start:\n` +
+        `• /track Rolex Submariner\n` +
+        `• /track Jordan 1 300`
+      );
+    }
+
+    let response = `📋 *Your Tracked Searches* (${tracks.length})\n\n`;
+
+    tracks.forEach((track, index) => {
+      const priceLimit = track.max_price ? ` (≤$${track.max_price.toLocaleString()})` : '';
+      const matches = track.notify_count || 0;
+      const matchText = matches > 0 ? ` • ${matches} matches` : '';
+      
+      response += `${index + 1}. *${track.search_query}*${priceLimit}${matchText}\n`;
+    });
+
+    response += `\n🗑️ Remove: /removetrack <number>`;
+
+    return bot.sendMessage(msg.chat.id, response, { parse_mode: 'Markdown' });
+
+  } catch (error) {
+    console.error('Mytracks error:', error);
+    return sendMessage(msg.chat.id, `❌ Error: ${error.message}`);
+  }
+});
+
+// ============================================================================
+// REMOVETRACK COMMAND - Remove a Tracked Search
+// ============================================================================
+
+bot.onText(commandRegex('removetrack'), async (msg, match) => {
+  const indexStr = (match?.[1] || '').trim();
+
+  if (!indexStr) {
+    return sendMessage(
+      msg.chat.id,
+      `🗑️ *Remove a Track*\n\n` +
+      `Usage: /removetrack <number>\n\n` +
+      `First use /mytracks to see your tracks with their numbers.`
+    );
+  }
+
+  try {
+    const chatId = msg.chat.id;
+    const index = parseInt(indexStr, 10) - 1;
+
+    if (isNaN(index) || index < 0) {
+      return sendMessage(msg.chat.id, '❌ Please provide a valid track number.');
+    }
+
+    // Get user's tracks
+    const { data: tracks } = await supabase
+      .from('telegram_tracks')
+      .select('id, search_query')
+      .eq('chat_id', chatId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
+    if (!tracks || index >= tracks.length) {
+      return sendMessage(msg.chat.id, '❌ Track not found. Use /mytracks to see your tracks.');
+    }
+
+    const track = tracks[index];
+
+    // Deactivate the track
+    await supabase
+      .from('telegram_tracks')
+      .update({ is_active: false })
+      .eq('id', track.id);
+
+    return sendMessage(
+      msg.chat.id,
+      `✅ Removed track: *${track.search_query}*\n\n` +
+      `Use /track to add new searches.`
+    );
+
+  } catch (error) {
+    console.error('Removetrack error:', error);
+    return sendMessage(msg.chat.id, `❌ Error: ${error.message}`);
+  }
+});
+
+// ============================================================================
 // HELP COMMAND
 // ============================================================================
 
@@ -470,6 +836,11 @@ bot.onText(commandRegex('help'), async (msg) => {
 *Account* 👤
 /start - Welcome message
 /connect <email> - Link your account for alerts
+
+*🔥 Quick Commands*
+/best [category] - Today's best deals with explanations
+/track <query> - Set up price alerts
+/mytracks - View your tracked searches
 
 *Watches* 🕐
 /watches - List tracked watches
