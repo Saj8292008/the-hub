@@ -34,7 +34,7 @@ class WatchUSeekScraper extends BaseScraper {
     // query parameter is ignored for general scraping
     // but kept for consistent API with other scrapers
 
-    const { page = 1, order = 'post_date' } = options || {};
+    const { page = 1, order = 'post_date', fetchPrices = false, maxPriceFetches = 5 } = options || {};
 
     logger.info(`Scraping WatchUSeek Sales Corner (page ${page})`);
 
@@ -77,6 +77,38 @@ class WatchUSeekScraper extends BaseScraper {
       });
 
       logger.info(`Parsed ${listings.length} valid listings from WatchUSeek`);
+
+      // Optionally fetch prices from thread bodies for listings without prices
+      if (fetchPrices) {
+        const listingsWithoutPrice = listings.filter(l => !l.price);
+        const toFetch = listingsWithoutPrice.slice(0, maxPriceFetches);
+        
+        if (toFetch.length > 0) {
+          logger.info(`Fetching prices for ${toFetch.length} listings without price in title...`);
+          
+          for (const listing of toFetch) {
+            try {
+              // Rate limit: wait between requests
+              await new Promise(resolve => setTimeout(resolve, 2000));
+              
+              const details = await this.getThreadDetails(listing.url);
+              if (details.price) {
+                listing.price = details.price.amount;
+                listing.currency = details.price.currency;
+                logger.info(`Found price $${listing.price} for: ${listing.title.substring(0, 50)}`);
+              }
+              if (details.images?.length > 0) {
+                listing.images = details.images;
+              }
+              if (details.location) {
+                listing.location = details.location;
+              }
+            } catch (error) {
+              logger.warn(`Failed to fetch details for ${listing.url}: ${error.message}`);
+            }
+          }
+        }
+      }
 
       return {
         listings,
@@ -294,10 +326,14 @@ class WatchUSeekScraper extends BaseScraper {
       // Extract location if mentioned
       const location = this.extractLocationFromContent(content);
 
+      // Extract price from content
+      const price = this.extractPriceFromContent(content);
+
       return {
         content,
         images,
-        location
+        location,
+        price
       };
     }, 'WatchUSeek thread details');
   }
@@ -320,6 +356,36 @@ class WatchUSeekScraper extends BaseScraper {
     }
 
     return '';
+  }
+
+  /**
+   * Extract price from post content (used when title has no price)
+   */
+  extractPriceFromContent(content) {
+    // Common price patterns in post body
+    const patterns = [
+      /asking[:\s]*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/i,
+      /price[:\s]*\$\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/i,
+      /\$\s*(\d{1,3}(?:,\d{3})*)\s*(?:shipped|obo|firm|net)/i,
+      /(\d{1,3}(?:,\d{3})*)\s*USD/i,
+      /\$\s*(\d{4,5}(?:\.\d{2})?)\b/,  // $1000-99999 (typical watch prices)
+    ];
+
+    for (const pattern of patterns) {
+      const match = content.match(pattern);
+      if (match) {
+        const price = this.parsePrice(match[1]);
+        // Sanity check: watches usually $50 - $500,000
+        if (price >= 50 && price <= 500000) {
+          return {
+            amount: price,
+            currency: 'USD'
+          };
+        }
+      }
+    }
+
+    return null;
   }
 
   /**

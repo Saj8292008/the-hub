@@ -90,9 +90,11 @@ class WatchScraperScheduler {
           });
         }
       } else if (source === 'watchuseek') {
-        // WatchUSeek: scrape sales corner
+        // WatchUSeek: scrape sales corner and fetch prices from thread bodies
         result = await this.scraperManager.scrapeSource(source, null, {
-          page: 1
+          page: 1,
+          fetchPrices: true,    // Fetch prices from thread bodies
+          maxPriceFetches: 10   // Limit to avoid rate limiting
         });
       }
 

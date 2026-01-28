@@ -211,7 +211,9 @@ class ScraperCoordinator {
         });
       } else if (source === 'watchuseek') {
         result = await this.scraperManager.scrapeSource(source, null, {
-          page: 1
+          page: 1,
+          fetchPrices: true,    // Fetch prices from thread bodies
+          maxPriceFetches: 10   // Limit to avoid rate limiting
         });
       }
 
