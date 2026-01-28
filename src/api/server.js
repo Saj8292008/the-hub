@@ -578,6 +578,20 @@ app.post('/api/search/sneakers', handleRoute((req) => naturalSearchAPI.searchSne
 app.post('/api/search/cars', handleRoute((req) => naturalSearchAPI.searchCars(req)));
 
 // ============================================================================
+// SAVED SEARCHES API (Web UI for /track)
+// ============================================================================
+
+const savedSearchesAPI = require('./savedSearches');
+
+// Saved Searches CRUD
+app.get('/api/saved-searches', handleRoute((req) => savedSearchesAPI.list(req)));
+app.post('/api/saved-searches', handleRoute((req) => savedSearchesAPI.create(req)));
+app.put('/api/saved-searches/:id', handleRoute((req) => savedSearchesAPI.update(req)));
+app.delete('/api/saved-searches/:id', handleRoute((req) => savedSearchesAPI.delete(req)));
+app.post('/api/saved-searches/:id/toggle', handleRoute((req) => savedSearchesAPI.toggle(req)));
+app.get('/api/saved-searches/limits', handleRoute((req) => savedSearchesAPI.getLimits(req)));
+
+// ============================================================================
 // SEO ENDPOINTS (Sitemap, RSS, Robots.txt)
 // ============================================================================
 

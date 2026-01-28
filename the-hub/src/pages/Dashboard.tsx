@@ -26,6 +26,7 @@ import { SkeletonCard, SkeletonAlert, SkeletonWatchlistItem } from '../component
 import { RecentListingsWidget } from '../components/RecentListingsWidget'
 import { RecentBlogPosts } from '../components/RecentBlogPosts'
 import { ScraperDashboard } from '../components/ScraperDashboard'
+import SavedSearches from '../components/SavedSearches'
 import EmailCapture from '../components/newsletter/EmailCapture'
 
 interface Stats {
@@ -637,6 +638,11 @@ const Dashboard: React.FC = () => {
       {/* Scraper Monitor */}
       <section>
         <ScraperDashboard />
+      </section>
+
+      {/* Saved Searches - Price Alerts */}
+      <section>
+        <SavedSearches />
       </section>
 
       {/* Recent Activity Grid */}
