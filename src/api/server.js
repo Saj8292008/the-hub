@@ -391,6 +391,20 @@ if (process.env.ENABLE_DEAL_ALERTS !== 'false') {
 }
 
 // ============================================================================
+// ANALYTICS API (Price History, Deal Comparison, Arbitrage)
+// ============================================================================
+
+const analyticsRouter = require('./analytics');
+app.use('/api/analytics', analyticsRouter);
+
+// ============================================================================
+// REFERRAL API
+// ============================================================================
+
+const referralsRouter = require('./referrals');
+app.use('/api/referrals', referralsRouter);
+
+// ============================================================================
 // BLOG API ENDPOINTS
 // ============================================================================
 
