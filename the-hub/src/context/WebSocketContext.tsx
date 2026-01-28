@@ -27,7 +27,8 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
 
   useEffect(() => {
     // Connect to WebSocket server
-    const socketInstance = io('http://localhost:3002', {
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const socketInstance = io(API_URL, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5

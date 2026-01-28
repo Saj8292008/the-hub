@@ -1,5 +1,7 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
+const supabaseWrapper = require('../db/supabase');
+const supabase = supabaseWrapper.client;
 
 const WatchTracker = require('../trackers/watches');
 const CarTracker = require('../trackers/cars');
@@ -8,6 +10,7 @@ const SportsTracker = require('../trackers/sports');
 const AiTracker = require('../trackers/ai');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
+const channelId = process.env.TELEGRAM_CHANNEL_ID; // e.g., @TheHubDeals
 
 if (!token) {
   console.error('Missing TELEGRAM_BOT_TOKEN in .env');
@@ -366,11 +369,107 @@ bot.onText(commandRegex('settarget'), async (msg, match) => {
 });
 
 // ============================================================================
+// CONNECT COMMAND - Link Telegram account with user account
+// ============================================================================
+
+bot.onText(commandRegex('connect'), async (msg, match) => {
+  const email = (match?.[1] || '').trim().toLowerCase();
+
+  if (!email || !email.includes('@')) {
+    return sendMessage(msg.chat.id, '❌ Usage: /connect <your-email>\n\nExample: /connect user@example.com\n\nThis will link your Telegram account to receive personalized deal alerts.');
+  }
+
+  try {
+    // Check if user exists with this email
+    const { data: users, error: userError } = await supabase
+      .from('users')
+      .select('id, email, first_name, tier')
+      .eq('email', email)
+      .limit(1);
+
+    if (userError) throw userError;
+
+    if (!users || users.length === 0) {
+      return sendMessage(msg.chat.id, `❌ No account found with email: ${email}\n\nPlease sign up at ${process.env.FRONTEND_URL || 'https://thehub.com'} first.`);
+    }
+
+    const user = users[0];
+    const chatId = msg.chat.id;
+    const username = msg.from?.username || null;
+
+    // Update user with Telegram info
+    const { error: updateError } = await supabase
+      .from('users')
+      .update({
+        telegram_chat_id: chatId,
+        telegram_username: username,
+        telegram_notifications: true
+      })
+      .eq('id', user.id);
+
+    if (updateError) throw updateError;
+
+    // Log the connection
+    await supabase
+      .from('telegram_alerts')
+      .insert({
+        user_id: user.id,
+        chat_id: chatId,
+        alert_type: 'account_connected',
+        message: `Connected Telegram account @${username || 'user'} to ${email}`,
+        sent_at: new Date().toISOString()
+      });
+
+    const tierEmoji = user.tier === 'premium' ? '👑' : user.tier === 'pro' ? '⭐' : '✅';
+    return sendMessage(
+      msg.chat.id,
+      `${tierEmoji} *Account Connected!*\n\n` +
+      `Email: ${user.email}\n` +
+      `Name: ${user.first_name || 'User'}\n` +
+      `Tier: ${user.tier || 'free'}\n\n` +
+      `You'll now receive personalized deal alerts based on your preferences!\n\n` +
+      `📊 Set your preferences at ${process.env.FRONTEND_URL || 'https://thehub.com'}/settings`
+    );
+  } catch (error) {
+    console.error('Connect error:', error);
+    return sendMessage(msg.chat.id, `❌ Connection failed: ${error.message}`);
+  }
+});
+
+// ============================================================================
+// START COMMAND - Welcome message
+// ============================================================================
+
+bot.onText(commandRegex('start'), async (msg) => {
+  const welcomeText = `🎉 *Welcome to The Hub!*
+
+I'll send you personalized deal alerts for watches, cars, sneakers, and sports collectibles.
+
+*Quick Start:*
+📧 /connect <email> - Link your account
+📋 /help - See all commands
+🔥 Join our channel: ${channelId || '@TheHubDeals'}
+
+*Track Items:*
+🕐 /addwatch <brand model>
+🚗 /addcar <make model year>
+👟 /addsneaker <name>
+
+Start tracking your first item now!`;
+
+  return sendMessage(msg.chat.id, welcomeText);
+});
+
+// ============================================================================
 // HELP COMMAND
 // ============================================================================
 
 bot.onText(commandRegex('help'), async (msg) => {
   const helpText = `📋 *The Hub - Command Reference*
+
+*Account* 👤
+/start - Welcome message
+/connect <email> - Link your account for alerts
 
 *Watches* 🕐
 /watches - List tracked watches
@@ -398,10 +497,13 @@ bot.onText(commandRegex('help'), async (msg) => {
 /update - Manual price update
 /help - Show this message
 
+*Hot Deals Channel* 🔥
+Join ${channelId || '@TheHubDeals'} for instant alerts!
+
 *Examples*
+\`/connect user@example.com\`
 \`/addwatch Rolex Submariner\`
 \`/settarget watch rolex-submariner 8000\`
-\`/history watch rolex-submariner\`
   `.trim();
 
   return sendMessage(msg.chat.id, helpText);
@@ -463,5 +565,228 @@ bot.onText(commandRegex('update'), async (msg) => {
 
 console.log('Telegram bot is running...');
 
-// Export bot for use in other modules
-module.exports = bot;
+// ============================================================================
+// CHANNEL POSTING FUNCTIONS - For automated deal alerts
+// ============================================================================
+
+/**
+ * Post a hot deal to the public Telegram channel
+ * Called by scrapers when deal_score >= 8.5
+ */
+async function postDealToChannel(listing) {
+  if (!channelId) {
+    console.warn('⚠️ TELEGRAM_CHANNEL_ID not configured, skipping channel post');
+    return null;
+  }
+
+  try {
+    const {
+      title,
+      brand,
+      model,
+      price,
+      original_price,
+      deal_score,
+      url,
+      source,
+      category,
+      image_url
+    } = listing;
+
+    // Calculate savings
+    const savings = original_price ? original_price - price : null;
+    const savingsPercent = original_price ? Math.round(((original_price - price) / original_price) * 100) : null;
+
+    // Format message
+    const scoreEmoji = deal_score >= 9.5 ? '🔥🔥🔥' : deal_score >= 9.0 ? '🔥🔥' : '🔥';
+    const categoryEmoji = category === 'watches' ? '🕐' : category === 'cars' ? '🚗' : category === 'sneakers' ? '👟' : '🏆';
+
+    let message = `${scoreEmoji} *HOT DEAL ALERT* ${scoreEmoji}\n\n`;
+    message += `${categoryEmoji} ${brand || ''} ${model || title || 'Item'}\n\n`;
+    message += `💰 *Price:* $${price.toLocaleString()}`;
+
+    if (savings && savingsPercent) {
+      message += ` (${savingsPercent}% off)`;
+      message += `\n💸 *You Save:* $${savings.toLocaleString()}`;
+    }
+
+    message += `\n📊 *Deal Score:* ${deal_score}/10`;
+    message += `\n🏪 *Source:* ${source}`;
+    message += `\n\n🔗 [View Deal](${url})`;
+
+    // Send with image if available
+    if (image_url) {
+      await bot.sendPhoto(channelId, image_url, {
+        caption: message,
+        parse_mode: 'Markdown'
+      });
+    } else {
+      await bot.sendMessage(channelId, message, {
+        parse_mode: 'Markdown',
+        disable_web_page_preview: false
+      });
+    }
+
+    // Log to database
+    await supabase
+      .from('telegram_posts')
+      .insert({
+        listing_id: listing.id,
+        channel_id: channelId,
+        message_text: message,
+        deal_score,
+        posted_at: new Date().toISOString()
+      });
+
+    console.log(`✅ Posted deal to channel: ${brand} ${model} ($${price})`);
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Failed to post to channel:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Send personalized alert to a specific user
+ * Called when a deal matches user preferences
+ */
+async function sendPersonalizedAlert(userId, listing) {
+  try {
+    // Get user's Telegram info
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('telegram_chat_id, telegram_notifications, telegram_preferences, tier, email')
+      .eq('id', userId)
+      .single();
+
+    if (userError || !user) {
+      console.warn(`User ${userId} not found or has no Telegram linked`);
+      return null;
+    }
+
+    if (!user.telegram_chat_id || !user.telegram_notifications) {
+      return null; // User hasn't connected Telegram or disabled notifications
+    }
+
+    // Check rate limiting for free users (3 alerts/day)
+    if (user.tier === 'free' || !user.tier) {
+      const { data: todayAlerts } = await supabase
+        .from('telegram_alerts')
+        .select('id')
+        .eq('user_id', userId)
+        .gte('sent_at', new Date(new Date().setHours(0, 0, 0, 0)).toISOString())
+        .eq('alert_type', 'deal_alert');
+
+      if (todayAlerts && todayAlerts.length >= 3) {
+        console.log(`⏭️ Rate limit reached for free user ${user.email}`);
+        return null; // Rate limit exceeded
+      }
+    }
+
+    // Format message
+    const {
+      title,
+      brand,
+      model,
+      price,
+      original_price,
+      deal_score,
+      url,
+      category
+    } = listing;
+
+    const categoryEmoji = category === 'watches' ? '🕐' : category === 'cars' ? '🚗' : category === 'sneakers' ? '👟' : '🏆';
+    const savings = original_price ? original_price - price : null;
+
+    let message = `🎯 *Personalized Deal Alert*\n\n`;
+    message += `${categoryEmoji} ${brand || ''} ${model || title}\n\n`;
+    message += `💰 Price: $${price.toLocaleString()}`;
+
+    if (savings) {
+      message += ` (save $${savings.toLocaleString()})`;
+    }
+
+    message += `\n📊 Score: ${deal_score}/10`;
+    message += `\n\n🔗 [View Deal](${url})`;
+
+    // Send message
+    await bot.sendMessage(user.telegram_chat_id, message, {
+      parse_mode: 'Markdown',
+      disable_web_page_preview: false
+    });
+
+    // Log alert
+    await supabase
+      .from('telegram_alerts')
+      .insert({
+        user_id: userId,
+        chat_id: user.telegram_chat_id,
+        listing_id: listing.id,
+        alert_type: 'deal_alert',
+        message: message,
+        sent_at: new Date().toISOString()
+      });
+
+    console.log(`✅ Sent personalized alert to ${user.email}`);
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Failed to send personalized alert:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Find users who should receive alerts for a listing
+ * Based on telegram_preferences (categories, min_score, max_price)
+ */
+async function findUsersForAlert(listing) {
+  try {
+    const { category, deal_score, price } = listing;
+
+    // Query users who:
+    // 1. Have Telegram connected
+    // 2. Have notifications enabled
+    // 3. Have this category in their preferences
+    // 4. Deal score >= their min_score preference
+    // 5. Price <= their max_price preference (if set)
+    const { data: users, error } = await supabase
+      .from('users')
+      .select('id, email, telegram_preferences, tier')
+      .not('telegram_chat_id', 'is', null)
+      .eq('telegram_notifications', true);
+
+    if (error) throw error;
+
+    const matchedUsers = users.filter(user => {
+      const prefs = user.telegram_preferences || {
+        categories: ['watches', 'cars', 'sneakers', 'sports'],
+        min_score: 8.0,
+        max_price: null
+      };
+
+      // Check category
+      if (!prefs.categories.includes(category)) return false;
+
+      // Check score
+      if (deal_score < (prefs.min_score || 8.0)) return false;
+
+      // Check price
+      if (prefs.max_price && price > prefs.max_price) return false;
+
+      return true;
+    });
+
+    return matchedUsers;
+  } catch (error) {
+    console.error('Error finding users for alert:', error);
+    return [];
+  }
+}
+
+// Export bot and functions
+module.exports = {
+  bot,
+  postDealToChannel,
+  sendPersonalizedAlert,
+  findUsersForAlert
+};

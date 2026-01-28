@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
+import { AuthProvider } from './contexts/AuthContext'
+import { NotificationProvider } from './contexts/NotificationContext'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Analytics from './pages/Analytics'
@@ -16,56 +18,88 @@ import BlogPost from './pages/BlogPost'
 import BlogAdmin from './pages/BlogAdmin'
 import BlogEditor from './pages/BlogEditor'
 import AdminSettings from './pages/AdminSettings'
+import NewsletterAdmin from './pages/NewsletterAdmin'
+import NewsletterUnsubscribe from './pages/NewsletterUnsubscribe'
+import ScraperDebug from './pages/ScraperDebug'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
+import VerifyEmail from './pages/VerifyEmail'
+import Premium from './pages/Premium'
+import PremiumSuccess from './pages/PremiumSuccess'
 import { ConnectionStatus } from './components/ConnectionStatus'
 
 function App() {
   return (
     <HelmetProvider>
-      <Router>
-        <Toaster
-          position="bottom-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#1f2937',
-              color: '#fff',
-              borderRadius: '10px',
-              padding: '16px'
-            },
-            success: {
-              iconTheme: {
-                primary: '#10b981',
-                secondary: '#fff'
+      <AuthProvider>
+        <NotificationProvider>
+          <Router>
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#1f2937',
+                color: '#fff',
+                borderRadius: '10px',
+                padding: '16px'
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: '#fff'
+                }
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: '#fff'
+                }
               }
-            },
-            error: {
-              iconTheme: {
-                primary: '#ef4444',
-                secondary: '#fff'
-              }
-            }
-          }}
-        />
-        <ConnectionStatus />
-        <Layout>
+            }}
+          />
+          <ConnectionStatus />
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/watch-listings" element={<WatchListings />} />
-            <Route path="/watches" element={<Watches />} />
-            <Route path="/cars" element={<Cars />} />
-            <Route path="/sneakers" element={<Sneakers />} />
-            <Route path="/sports" element={<Sports />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/admin" element={<BlogAdmin />} />
-            <Route path="/blog/editor/:id" element={<BlogEditor />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/integrations" element={<Integrations />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/admin" element={<AdminSettings />} />
+            {/* Auth Routes (No Layout) */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/premium/success" element={<PremiumSuccess />} />
+            <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
+
+            {/* App Routes (With Layout) */}
+            <Route path="/*" element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/watch-listings" element={<WatchListings />} />
+                  <Route path="/watches" element={<Watches />} />
+                  <Route path="/cars" element={<Cars />} />
+                  <Route path="/sneakers" element={<Sneakers />} />
+                  <Route path="/sports" element={<Sports />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/category/:category" element={<Blog />} />
+                  <Route path="/blog/admin" element={<BlogAdmin />} />
+                  <Route path="/blog/editor/:id" element={<BlogEditor />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/newsletter/admin" element={<NewsletterAdmin />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/integrations" element={<Integrations />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/admin" element={<AdminSettings />} />
+                  <Route path="/admin/scraper-debug" element={<ScraperDebug />} />
+                </Routes>
+              </Layout>
+            } />
           </Routes>
-        </Layout>
-      </Router>
+          </Router>
+        </NotificationProvider>
+      </AuthProvider>
     </HelmetProvider>
   )
 }

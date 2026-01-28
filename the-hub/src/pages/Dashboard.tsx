@@ -14,12 +14,19 @@ import {
   Package,
   Zap,
   AlertTriangle,
-  Trophy
+  Trophy,
+  User,
+  LogOut,
+  Crown
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext'
 import api from '../services/api'
 import { SkeletonCard, SkeletonAlert, SkeletonWatchlistItem } from '../components/SkeletonLoader'
 import { RecentListingsWidget } from '../components/RecentListingsWidget'
+import { RecentBlogPosts } from '../components/RecentBlogPosts'
 import { ScraperDashboard } from '../components/ScraperDashboard'
+import EmailCapture from '../components/newsletter/EmailCapture'
 
 interface Stats {
   watches: number
@@ -51,11 +58,38 @@ interface WatchlistItem {
 }
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate()
+  const { user, logout, isAuthenticated } = useAuth()
+
   const [stats, setStats] = useState<Stats>({ watches: 0, cars: 0, sneakers: 0, sports: 0, aiModels: 0 })
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
+
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
+  const getTierBadge = (tier?: string) => {
+    switch (tier) {
+      case 'premium':
+        return { label: 'Premium', color: 'from-purple-500 to-purple-600', icon: Crown }
+      case 'pro':
+        return { label: 'Pro', color: 'from-blue-500 to-blue-600', icon: Crown }
+      case 'enterprise':
+        return { label: 'Enterprise', color: 'from-amber-500 to-amber-600', icon: Crown }
+      default:
+        return { label: 'Free', color: 'from-gray-600 to-gray-700', icon: User }
+    }
+  }
+
+  const tierBadge = getTierBadge(user?.tier)
 
   // Helper to get alert type badge
   const getAlertTypeBadge = (alertType?: string) => {
@@ -278,6 +312,40 @@ const Dashboard: React.FC = () => {
       <header className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl"></div>
         <div className="relative">
+          {/* User info bar */}
+          {isAuthenticated && user && (
+            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-800/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
+                  <User className="text-white" size={20} />
+                </div>
+                <div>
+                  <p className="text-white font-medium">
+                    Welcome back, {user.firstName || user.email?.split('@')[0]}!
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {/* Tier Badge */}
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r ${tierBadge.color} text-white text-sm font-medium`}>
+                  <tierBadge.icon size={14} />
+                  {tierBadge.label}
+                </div>
+                {/* Logout Button */}
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition-colors"
+                >
+                  <LogOut size={16} />
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Title and subtitle */}
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
             <div>
@@ -571,9 +639,18 @@ const Dashboard: React.FC = () => {
         <ScraperDashboard />
       </section>
 
-      {/* Recent Scraped Listings */}
-      <section>
+      {/* Recent Activity Grid */}
+      <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        {/* Recent Scraped Listings */}
         <RecentListingsWidget />
+
+        {/* Recent Blog Posts */}
+        <RecentBlogPosts />
+      </section>
+
+      {/* Newsletter Signup */}
+      <section>
+        <EmailCapture source="homepage" variant="hero" />
       </section>
     </div>
   )

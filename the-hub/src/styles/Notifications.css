@@ -1,0 +1,196 @@
+/* Notification Container - Fixed positioning with highest z-index */
+.notifications-container {
+  position: fixed;
+  top: 80px; /* Below header which is ~60-70px */
+  right: 20px;
+  z-index: 9999; /* Highest z-index to ensure visibility */
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  pointer-events: none; /* Allow clicks through container */
+}
+
+/* Individual Notification - Solid white background, no transparency */
+.notification {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+  pointer-events: auto; /* Re-enable clicks on notifications */
+
+  /* Solid white background - NO transparency */
+  background: #ffffff;
+  opacity: 1; /* Explicitly set to 1, no transparency */
+
+  /* Slide-in animation */
+  animation: slideInRight 0.3s ease-out;
+
+  /* Ensure text is dark and readable */
+  color: #1a202c;
+
+  min-width: 320px;
+  max-width: 400px;
+  border-left: 4px solid;
+}
+
+/* Slide-in animation from right */
+@keyframes slideInRight {
+  from {
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Slide-out animation when removing */
+.notification-removing {
+  animation: slideOutRight 0.3s ease-in forwards;
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(calc(100% + 40px));
+    opacity: 0;
+  }
+}
+
+/* Notification Icon */
+.notification-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Notification Content */
+.notification-content {
+  flex: 1;
+  min-width: 0; /* Allow text truncation */
+}
+
+.notification-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 4px;
+  color: #1a202c; /* Dark text for readability */
+}
+
+.notification-message {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #2d3748; /* Slightly lighter dark text */
+  word-wrap: break-word;
+}
+
+/* Close Button */
+.notification-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #718096;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.notification-close:hover {
+  background: #e2e8f0;
+  color: #2d3748;
+}
+
+/* Success Notification */
+.notification-success {
+  border-left-color: #10b981;
+}
+
+.notification-success .notification-icon {
+  background: #10b981;
+}
+
+/* Error Notification */
+.notification-error {
+  border-left-color: #ef4444;
+}
+
+.notification-error .notification-icon {
+  background: #ef4444;
+}
+
+/* Warning Notification */
+.notification-warning {
+  border-left-color: #f59e0b;
+}
+
+.notification-warning .notification-icon {
+  background: #f59e0b;
+}
+
+/* Info Notification */
+.notification-info {
+  border-left-color: #3b82f6;
+}
+
+.notification-info .notification-icon {
+  background: #3b82f6;
+}
+
+/* Responsive - Mobile adjustments */
+@media (max-width: 768px) {
+  .notifications-container {
+    top: 70px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+  }
+
+  .notification {
+    min-width: 0;
+    max-width: none;
+  }
+}
+
+/* Ensure notifications stack properly with multiple */
+.notification + .notification {
+  margin-top: 0; /* Gap handled by container */
+}
+
+/* Hover effect for better UX */
+.notification:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Focus styles for accessibility */
+.notification-close:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Prevent notification text selection */
+.notification {
+  user-select: none;
+  -webkit-user-select: none;
+}

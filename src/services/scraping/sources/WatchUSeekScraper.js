@@ -20,7 +20,7 @@ class WatchUSeekScraper extends BaseScraper {
     });
 
     this.baseUrl = 'https://www.watchuseek.com';
-    this.salesForumUrl = 'https://www.watchuseek.com/forums/watch-sales-corner.164/';
+    this.salesForumUrl = 'https://www.watchuseek.com/forums/watches-private-sellers-and-sponsors.29/';
   }
 
   /**
@@ -323,7 +323,7 @@ class WatchUSeekScraper extends BaseScraper {
       const searchUrl = `${this.baseUrl}/search/${encodeURIComponent(query)}`;
       const params = new URLSearchParams({
         'o': 'date', // Order by date
-        'c[node]': '164' // Sales Corner forum ID
+        'c[node]': '29' // Watches - Private Sellers and Sponsors forum ID
       });
 
       if (page > 1) {

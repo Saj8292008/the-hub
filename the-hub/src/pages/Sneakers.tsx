@@ -176,21 +176,27 @@ const Sneakers: React.FC = () => {
   const fetchListings = async () => {
     try {
       setLoading(true)
-      const response = await api.getSneakers()
+
+      // Call scraper sneaker listings endpoint instead of watchlist
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3002'}/scraper/sneaker-listings?limit=100`)
+      const data = await response.json()
 
       // Transform backend data to match frontend interface
-      const transformedListings = response.map((sneaker: any) => ({
+      const transformedListings = data.map((sneaker: any) => ({
         ...sneaker,
-        source: Array.isArray(sneaker.sources) && sneaker.sources.length > 0
-          ? sneaker.sources[0]
-          : sneaker.source || 'unknown',
-        title: sneaker.name || `${sneaker.brand} ${sneaker.model}`,
-        price: sneaker.currentPrice || sneaker.targetPrice || 0,
-        currency: 'USD',
+        source: sneaker.source || 'unknown',
+        title: sneaker.title || `${sneaker.brand} ${sneaker.model} ${sneaker.colorway || ''}`.trim(),
+        price: sneaker.price || 0,
+        currency: sneaker.currency || 'USD',
         url: sneaker.url || '#',
         images: sneaker.images || [],
-        timestamp: sneaker.lastChecked || sneaker.created_at || new Date().toISOString(),
-        created_at: sneaker.created_at || new Date().toISOString()
+        timestamp: sneaker.timestamp || sneaker.created_at || new Date().toISOString(),
+        created_at: sneaker.created_at || new Date().toISOString(),
+        condition: sneaker.condition,
+        location: sneaker.location,
+        seller: sneaker.seller_name,
+        deal_score: sneaker.deal_score,
+        score_breakdown: sneaker.score_breakdown
       }))
 
       setListings(transformedListings as any)

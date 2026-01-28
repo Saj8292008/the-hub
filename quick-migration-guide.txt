@@ -1,0 +1,16 @@
+QUICK DATABASE MIGRATION - DO THIS NOW (2 minutes)
+
+1. Open: https://supabase.com/dashboard
+2. Sign in
+3. Select your project (sysvawxchniqelifyenl.supabase.co)
+4. Click "SQL Editor" in left sidebar
+5. Click "New Query"
+6. Copy ENTIRE contents from: /Users/sydneyjackson/the-hub/database/migrations/create_newsletter_system.sql
+7. Paste into SQL Editor
+8. Click "Run" button
+9. Wait for success messages (ignore "already exists" warnings)
+
+DONE! Tables are created.
+
+Test it worked:
+node -e "require('./src/db/supabase').client.from('newsletter_subscribers').select('*').limit(1).then(r => console.log(r.error ? '❌ FAILED' : '✅ SUCCESS - Tables exist'))"

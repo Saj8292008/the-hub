@@ -208,21 +208,27 @@ const Cars: React.FC = () => {
   const fetchListings = async () => {
     try {
       setLoading(true)
-      const response = await api.getCars()
+
+      // Call scraper car listings endpoint instead of watchlist
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3002'}/scraper/car-listings?limit=100`)
+      const data = await response.json()
 
       // Transform backend data to match frontend interface
-      const transformedListings = response.map((car: any) => ({
+      const transformedListings = data.map((car: any) => ({
         ...car,
-        source: Array.isArray(car.sources) && car.sources.length > 0
-          ? car.sources[0]
-          : car.source || 'unknown',
-        title: car.name || `${car.make} ${car.model}`,
-        price: car.currentPrice || car.targetPrice || 0,
-        currency: 'USD',
+        source: car.source || 'unknown',
+        title: car.title || `${car.make} ${car.model} ${car.year || ''}`.trim(),
+        price: car.price || 0,
+        currency: car.currency || 'USD',
         url: car.url || '#',
         images: car.images || [],
-        timestamp: car.lastChecked || car.created_at || new Date().toISOString(),
-        created_at: car.created_at || new Date().toISOString()
+        timestamp: car.timestamp || car.created_at || new Date().toISOString(),
+        created_at: car.created_at || new Date().toISOString(),
+        condition: car.condition,
+        location: car.location,
+        seller: car.seller_name,
+        deal_score: car.deal_score,
+        score_breakdown: car.score_breakdown
       }))
 
       setListings(transformedListings as any)

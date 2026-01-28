@@ -1,338 +1,657 @@
-import React, { useEffect, useState } from 'react'
-import { Bell, Shield, Sliders, MessageSquare, RefreshCw, CheckCircle, XCircle, Save } from 'lucide-react'
-import api from '../services/api'
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useNotifications } from '../contexts/NotificationContext';
+import '../styles/Settings.css';
 
-interface Config {
-  notifications?: {
-    priceAlerts: boolean
-    telegramEnabled: boolean
-  }
-  polling?: {
-    schedule: string
-    enabled: boolean
-  }
-  telegram?: {
-    botUsername: string
-    chatId: string
-    status: string
-  }
+interface UserSettings {
+  email: string;
+  firstName: string;
+  lastName: string;
+  emailNotifications: boolean;
+  newsletter: boolean;
+  priceAlerts: boolean;
+  dealScoreThreshold: number;
+  emailFrequency: string;
+  telegramConnected: boolean;
+  telegramChatId: string | null;
+  telegramUsername: string | null;
+  telegramPreferences: {
+    categories: string[];
+    minScore: number;
+    maxPrice: number | null;
+  };
+  watchlistAlertThreshold: number;
+  interests: string[];
+  tier: string;
+  stripeCustomerId: string | null;
+  subscriptionEndsAt: string | null;
 }
 
 const Settings: React.FC = () => {
-  const [config, setConfig] = useState<Config>({})
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [apiHealth, setApiHealth] = useState<string>('Checking...')
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { success, error } = useNotifications();
+  const [activeTab, setActiveTab] = useState('account');
+  const [settings, setSettings] = useState<UserSettings>({
+    email: '',
+    firstName: '',
+    lastName: '',
+    emailNotifications: true,
+    newsletter: true,
+    priceAlerts: true,
+    dealScoreThreshold: 8.0,
+    emailFrequency: 'daily',
+    telegramConnected: false,
+    telegramChatId: null,
+    telegramUsername: null,
+    telegramPreferences: {
+      categories: ['watches', 'cars', 'sneakers', 'sports'],
+      minScore: 8.0,
+      maxPrice: null
+    },
+    watchlistAlertThreshold: 10,
+    interests: ['watches', 'cars', 'sneakers', 'sports'],
+    tier: 'free',
+    stripeCustomerId: null,
+    subscriptionEndsAt: null
+  });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchConfig()
-    checkHealth()
-  }, [])
-
-  const checkHealth = async () => {
-    try {
-      const health = await api.healthCheck()
-      setApiHealth(health.status)
-    } catch {
-      setApiHealth('Offline')
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
     }
-  }
+    loadSettings();
+  }, [isAuthenticated]);
 
-  const fetchConfig = async () => {
+  const loadSettings = async () => {
     try {
-      setLoading(true)
-      // In a real implementation, this would fetch from an API endpoint
-      // For now, we'll use default values that match the .env configuration
-      setConfig({
-        notifications: {
-          priceAlerts: true,
-          telegramEnabled: true
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/settings`, {
+        credentials: 'include'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load settings');
+      }
+
+      const data = await response.json();
+      setSettings(data);
+      setLoading(false);
+    } catch (err) {
+      console.error('Failed to load settings:', err);
+      error('Failed to load settings');
+      setLoading(false);
+    }
+  };
+
+  const saveSettings = async () => {
+    setSaving(true);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/settings`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
         },
-        polling: {
-          schedule: '0 * * * *', // Every hour
-          enabled: true
-        },
-        telegram: {
-          botUsername: 'TheHubBot',
-          chatId: '8427035818',
-          status: apiHealth === 'OK' ? 'Connected' : 'Disconnected'
-        }
-      })
-    } catch (error) {
-      console.error('Failed to fetch config:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+        body: JSON.stringify(settings)
+      });
 
-  const handleSave = async () => {
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+
+      success('Settings saved successfully!');
+    } catch (err) {
+      console.error('Failed to save settings:', err);
+      error('Failed to save settings');
+    }
+    setSaving(false);
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const currentPassword = formData.get('currentPassword') as string;
+    const newPassword = formData.get('newPassword') as string;
+
     try {
-      setSaving(true)
-      // In a real implementation, this would save to an API endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
-    } catch (error) {
-      console.error('Failed to save settings:', error)
-    } finally {
-      setSaving(false)
-    }
-  }
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/settings/change-password`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
 
-  const updateNotificationSetting = (key: string, value: boolean) => {
-    setConfig(prev => ({
-      ...prev,
-      notifications: {
-        priceAlerts: prev.notifications?.priceAlerts ?? false,
-        telegramEnabled: prev.notifications?.telegramEnabled ?? false,
-        ...prev.notifications,
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to change password');
+      }
+
+      success('Password changed successfully!');
+      e.currentTarget.reset();
+    } catch (err: any) {
+      error(err.message || 'Failed to change password');
+    }
+  };
+
+  const connectTelegram = () => {
+    const botUsername = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || 'thehub_deals_bot';
+    window.open(`https://t.me/${botUsername}?start=connect_${user?.id}`, '_blank');
+    success('Opening Telegram bot. Send /connect to link your account.');
+  };
+
+  const disconnectTelegram = async () => {
+    if (!confirm('Disconnect Telegram? You\'ll stop receiving alerts.')) return;
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/settings/disconnect-telegram`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      if (!response.ok) throw new Error('Failed to disconnect');
+
+      setSettings({ ...settings, telegramConnected: false, telegramChatId: null });
+      success('Telegram disconnected');
+    } catch (err) {
+      error('Failed to disconnect Telegram');
+    }
+  };
+
+  const manageSubscription = async () => {
+    error('Stripe billing portal not yet implemented');
+    // TODO: Implement Stripe portal session
+  };
+
+  const deleteAccount = async () => {
+    const confirmation = prompt('This will permanently delete your account. Type "DELETE" to confirm:');
+    if (confirmation !== 'DELETE') return;
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/settings/delete-account`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+
+      if (!response.ok) throw new Error('Failed to delete account');
+
+      // Log out and redirect
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include'
+      });
+
+      window.location.href = '/';
+    } catch (err) {
+      error('Failed to delete account');
+    }
+  };
+
+  const exportData = async () => {
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${API_URL}/api/settings/export-data`, {
+        credentials: 'include'
+      });
+
+      if (!response.ok) throw new Error('Failed to export data');
+
+      const data = await response.json();
+
+      // Download as JSON file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `the-hub-data-${Date.now()}.json`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      success('Data exported successfully!');
+    } catch (err) {
+      error('Failed to export data');
+    }
+  };
+
+
+  const updateSetting = (key: string, value: any) => {
+    setSettings({ ...settings, [key]: value });
+  };
+
+  const updateTelegramPreference = (key: string, value: any) => {
+    setSettings({
+      ...settings,
+      telegramPreferences: {
+        ...settings.telegramPreferences,
         [key]: value
       }
-    }))
-  }
+    });
+  };
 
-  const parseCronSchedule = (cron: string): string => {
-    if (cron === '0 * * * *') return 'Every hour'
-    if (cron === '*/30 * * * *') return 'Every 30 minutes'
-    if (cron === '0 */6 * * *') return 'Every 6 hours'
-    if (cron === '0 0 * * 1') return 'Weekly (Mondays)'
-    return cron
-  }
+  const toggleCategory = (category: string, field: 'interests' | 'telegramCategories') => {
+    if (field === 'interests') {
+      const interests = settings.interests.includes(category)
+        ? settings.interests.filter(c => c !== category)
+        : [...settings.interests, category];
+      updateSetting('interests', interests);
+    } else {
+      const categories = settings.telegramPreferences.categories.includes(category)
+        ? settings.telegramPreferences.categories.filter(c => c !== category)
+        : [...settings.telegramPreferences.categories, category];
+      updateTelegramPreference('categories', categories);
+    }
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <p className="text-gray-400">Loading settings...</p>
+      <div className="settings-page">
+        <div className="loading">Loading settings...</div>
       </div>
-    )
+    );
   }
 
   return (
-    <div className="space-y-8">
-      <header className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold">Settings</h2>
-          <p className="text-gray-400 mt-1">
-            Control notifications, cadence, and integrations.
-          </p>
-        </div>
+    <div className="settings-page">
+      <h1>Settings</h1>
+
+      {/* Tabs */}
+      <div className="tabs">
         <button
-          onClick={handleSave}
-          disabled={saving || saved}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${
-            saved
-              ? 'bg-emerald-600 text-white'
-              : saving
-              ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-              : 'bg-primary-600 text-white hover:bg-primary-700'
-          }`}
+          className={activeTab === 'account' ? 'active' : ''}
+          onClick={() => setActiveTab('account')}
         >
-          {saved ? (
-            <>
-              <CheckCircle size={16} />
-              Saved
-            </>
-          ) : saving ? (
-            <>
-              <RefreshCw size={16} className="animate-spin" />
-              Saving...
-            </>
-          ) : (
-            <>
-              <Save size={16} />
-              Save Changes
-            </>
-          )}
+          Account
         </button>
-      </header>
+        <button
+          className={activeTab === 'notifications' ? 'active' : ''}
+          onClick={() => setActiveTab('notifications')}
+        >
+          Notifications
+        </button>
+        <button
+          className={activeTab === 'telegram' ? 'active' : ''}
+          onClick={() => setActiveTab('telegram')}
+        >
+          Telegram
+        </button>
+        <button
+          className={activeTab === 'watchlist' ? 'active' : ''}
+          onClick={() => setActiveTab('watchlist')}
+        >
+          Watchlist
+        </button>
+        <button
+          className={activeTab === 'subscription' ? 'active' : ''}
+          onClick={() => setActiveTab('subscription')}
+        >
+          Subscription
+        </button>
+        <button
+          className={activeTab === 'privacy' ? 'active' : ''}
+          onClick={() => setActiveTab('privacy')}
+        >
+          Privacy
+        </button>
+      </div>
 
-      {/* Telegram Bot Section */}
-      <section className="rounded-2xl border border-gray-800 bg-gradient-to-br from-primary-900/20 to-gray-900 p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600/20 text-primary-400">
-            <MessageSquare size={20} />
+      {/* Tab Content */}
+      <div className="tab-content">
+
+        {/* ACCOUNT TAB */}
+        {activeTab === 'account' && (
+          <div className="account-settings">
+            <h2>Account Settings</h2>
+
+            <div className="setting-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                value={settings.email}
+                onChange={(e) => updateSetting('email', e.target.value)}
+              />
+            </div>
+
+            <div className="setting-group">
+              <label>First Name</label>
+              <input
+                type="text"
+                value={settings.firstName}
+                onChange={(e) => updateSetting('firstName', e.target.value)}
+              />
+            </div>
+
+            <div className="setting-group">
+              <label>Last Name</label>
+              <input
+                type="text"
+                value={settings.lastName}
+                onChange={(e) => updateSetting('lastName', e.target.value)}
+              />
+            </div>
+
+            <div className="setting-group">
+              <h3>Change Password</h3>
+              <form onSubmit={handlePasswordChange}>
+                <input
+                  type="password"
+                  name="currentPassword"
+                  placeholder="Current password"
+                  required
+                />
+                <input
+                  type="password"
+                  name="newPassword"
+                  placeholder="New password (min 8 characters)"
+                  minLength={8}
+                  required
+                />
+                <button type="submit" className="btn-secondary">Change Password</button>
+              </form>
+            </div>
+
+            <div className="setting-group danger-zone">
+              <h3>Danger Zone</h3>
+              <button className="btn-danger" onClick={deleteAccount}>
+                Delete Account
+              </button>
+              <p className="help-text">This action cannot be undone.</p>
+            </div>
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold">Telegram Bot</h3>
-              <span className={`flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                config.telegram?.status === 'Connected'
-                  ? 'bg-emerald-500/10 text-emerald-400'
-                  : 'bg-rose-500/10 text-rose-400'
-              }`}>
-                {config.telegram?.status === 'Connected' ? (
-                  <CheckCircle size={12} />
-                ) : (
-                  <XCircle size={12} />
+        )}
+
+        {/* NOTIFICATIONS TAB */}
+        {activeTab === 'notifications' && (
+          <div className="notification-settings">
+            <h2>Notification Preferences</h2>
+
+            <div className="setting-group toggle">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={settings.newsletter}
+                  onChange={(e) => updateSetting('newsletter', e.target.checked)}
+                />
+                <span>Newsletter Subscription</span>
+              </label>
+              <p className="help-text">Receive daily/weekly deal digests via email</p>
+            </div>
+
+            <div className="setting-group toggle">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={settings.priceAlerts}
+                  onChange={(e) => updateSetting('priceAlerts', e.target.checked)}
+                />
+                <span>Price Drop Alerts</span>
+              </label>
+              <p className="help-text">Get notified when tracked items drop in price</p>
+            </div>
+
+            <div className="setting-group">
+              <label>Email Frequency</label>
+              <select
+                value={settings.emailFrequency}
+                onChange={(e) => updateSetting('emailFrequency', e.target.value)}
+              >
+                <option value="realtime">Real-time</option>
+                <option value="daily">Daily Digest</option>
+                <option value="weekly">Weekly Roundup</option>
+              </select>
+            </div>
+
+            <div className="setting-group">
+              <label>Deal Score Threshold: {settings.dealScoreThreshold}/10</label>
+              <input
+                type="range"
+                min="7.0"
+                max="10.0"
+                step="0.5"
+                value={settings.dealScoreThreshold}
+                onChange={(e) => updateSetting('dealScoreThreshold', parseFloat(e.target.value))}
+              />
+              <p className="help-text">Only notify me about deals with this score or higher</p>
+            </div>
+
+            <div className="setting-group">
+              <label>Interested Categories</label>
+              <div className="checkbox-group">
+                {['watches', 'cars', 'sneakers', 'sports'].map(cat => (
+                  <label key={cat}>
+                    <input
+                      type="checkbox"
+                      checked={settings.interests?.includes(cat)}
+                      onChange={() => toggleCategory(cat, 'interests')}
+                    />
+                    <span>{cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TELEGRAM TAB */}
+        {activeTab === 'telegram' && (
+          <div className="telegram-settings">
+            <h2>Telegram Integration</h2>
+
+            <div className="connection-status">
+              {settings.telegramConnected ? (
+                <>
+                  <div className="status-badge connected">✓ Connected</div>
+                  <p>Receiving personalized deal alerts on Telegram</p>
+                  {settings.telegramUsername && (
+                    <p className="telegram-username">@{settings.telegramUsername}</p>
+                  )}
+                  <button className="btn-secondary" onClick={disconnectTelegram}>
+                    Disconnect Telegram
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div className="status-badge disconnected">✗ Not Connected</div>
+                  <p>Connect Telegram to receive instant deal alerts</p>
+                  <button className="btn-primary" onClick={connectTelegram}>
+                    Connect Telegram
+                  </button>
+                  <p className="help-text">
+                    Click to open our bot and follow the connection instructions
+                  </p>
+                </>
+              )}
+            </div>
+
+            {settings.telegramConnected && (
+              <>
+                <div className="setting-group">
+                  <label>Alert Categories</label>
+                  <div className="checkbox-group">
+                    {['watches', 'cars', 'sneakers', 'sports'].map(cat => (
+                      <label key={cat}>
+                        <input
+                          type="checkbox"
+                          checked={settings.telegramPreferences?.categories?.includes(cat)}
+                          onChange={() => toggleCategory(cat, 'telegramCategories')}
+                        />
+                        <span>{cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="setting-group">
+                  <label>Minimum Deal Score: {settings.telegramPreferences?.minScore || 8.0}/10</label>
+                  <input
+                    type="range"
+                    min="7.0"
+                    max="10.0"
+                    step="0.5"
+                    value={settings.telegramPreferences?.minScore || 8.0}
+                    onChange={(e) => updateTelegramPreference('minScore', parseFloat(e.target.value))}
+                  />
+                </div>
+
+                <div className="setting-group">
+                  <label>Max Price (optional)</label>
+                  <input
+                    type="number"
+                    placeholder="No limit"
+                    value={settings.telegramPreferences?.maxPrice || ''}
+                    onChange={(e) => updateTelegramPreference('maxPrice', e.target.value ? parseInt(e.target.value) : null)}
+                  />
+                  <p className="help-text">Only alert me about items under this price</p>
+                </div>
+
+                <div className="info-box">
+                  <p><strong>Alert Limits:</strong></p>
+                  <p>
+                    {settings.tier === 'premium'
+                      ? '✨ Premium: Unlimited instant alerts'
+                      : '🆓 Free: 3 alerts per day (upgrade for unlimited)'}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* WATCHLIST TAB */}
+        {activeTab === 'watchlist' && (
+          <div className="watchlist-settings">
+            <h2>Watchlist Preferences</h2>
+
+            <div className="setting-group">
+              <label>Default Price Alert Threshold</label>
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={settings.watchlistAlertThreshold}
+                onChange={(e) => updateSetting('watchlistAlertThreshold', parseInt(e.target.value))}
+              />
+              <p className="help-text">Alert me when price drops by this percentage</p>
+            </div>
+
+            <div className="info-box">
+              <p><strong>Watchlist Limits:</strong></p>
+              <p>
+                {settings.tier === 'premium'
+                  ? '✨ Premium: Unlimited tracked items'
+                  : '🆓 Free: 5 items (upgrade for unlimited)'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* SUBSCRIPTION TAB */}
+        {activeTab === 'subscription' && (
+          <div className="subscription-settings">
+            <h2>Subscription</h2>
+
+            {settings.tier === 'premium' ? (
+              <div className="subscription-card">
+                <div className="plan-badge premium">✨ Premium</div>
+                <h3>$14.99/month</h3>
+                {settings.subscriptionEndsAt && (
+                  <p>Next billing: {new Date(settings.subscriptionEndsAt).toLocaleDateString()}</p>
                 )}
-                {config.telegram?.status}
-              </span>
-            </div>
-            <p className="text-sm text-gray-400 mb-4">
-              Command interface for tracking items and receiving alerts
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <p className="text-gray-500 mb-1">Bot Username</p>
-                <p className="text-white font-mono">@{config.telegram?.botUsername}</p>
+
+                <ul className="benefits">
+                  <li>✓ Unlimited watchlist items</li>
+                  <li>✓ Unlimited Telegram alerts</li>
+                  <li>✓ Priority customer support</li>
+                  <li>✓ Advanced analytics</li>
+                  <li>✓ Early access to new features</li>
+                </ul>
+
+                <button className="btn-primary" onClick={manageSubscription}>
+                  Manage Subscription
+                </button>
+                <p className="help-text">Update payment method, view invoices, or cancel</p>
               </div>
-              <div>
-                <p className="text-gray-500 mb-1">Chat ID</p>
-                <p className="text-white font-mono">{config.telegram?.chatId}</p>
+            ) : (
+              <div className="subscription-card free">
+                <div className="plan-badge free">🆓 Free</div>
+                <h3>Current Plan</h3>
+
+                <ul className="limitations">
+                  <li>⚠️ 5 watchlist items max</li>
+                  <li>⚠️ 3 Telegram alerts per day</li>
+                  <li>⚠️ Basic features only</li>
+                </ul>
+
+                <button
+                  className="btn-primary btn-upgrade"
+                  onClick={() => window.location.href = '/premium'}
+                >
+                  Upgrade to Premium - $14.99/mo
+                </button>
+
+                <div className="premium-benefits">
+                  <h4>Get with Premium:</h4>
+                  <ul>
+                    <li>✨ Unlimited watchlist items</li>
+                    <li>✨ Unlimited Telegram alerts</li>
+                    <li>✨ Priority support</li>
+                    <li>✨ Advanced analytics</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-gray-800">
-              <p className="text-xs text-gray-500">
-                Available commands: /help, /addwatch, /addcar, /addsneaker, /prices, /settarget, /update, /history
-              </p>
-            </div>
+            )}
           </div>
-        </div>
-      </section>
+        )}
 
-      <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Notifications */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600/20 text-primary-400">
-              <Bell size={18} />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Notifications</h3>
-              <p className="text-xs text-gray-400">Alert preferences</p>
-            </div>
-          </div>
-          <div className="mt-6 space-y-4 text-sm text-gray-300">
-            <label className="flex items-center justify-between cursor-pointer">
-              <span>Price drop alerts</span>
-              <input
-                type="checkbox"
-                checked={config.notifications?.priceAlerts ?? true}
-                onChange={(e) => updateNotificationSetting('priceAlerts', e.target.checked)}
-                className="h-4 w-4 rounded cursor-pointer"
-              />
-            </label>
-            <label className="flex items-center justify-between cursor-pointer">
-              <span>Telegram notifications</span>
-              <input
-                type="checkbox"
-                checked={config.notifications?.telegramEnabled ?? true}
-                onChange={(e) => updateNotificationSetting('telegramEnabled', e.target.checked)}
-                className="h-4 w-4 rounded cursor-pointer"
-              />
-            </label>
-            <div className="pt-4 border-t border-gray-800">
-              <p className="text-xs text-gray-500">
-                Alerts are sent when tracked items hit target prices
-              </p>
-            </div>
-          </div>
-        </div>
+        {/* PRIVACY TAB */}
+        {activeTab === 'privacy' && (
+          <div className="privacy-settings">
+            <h2>Privacy & Data</h2>
 
-        {/* Polling Cadence */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600/20 text-primary-400">
-              <Sliders size={18} />
+            <div className="setting-group">
+              <h3>Export Your Data</h3>
+              <p>Download all your data including watchlist, alerts, and preferences</p>
+              <button className="btn-secondary" onClick={exportData}>
+                Download Data (JSON)
+              </button>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold">Cadence</h3>
-              <p className="text-xs text-gray-400">Background jobs</p>
-            </div>
-          </div>
-          <div className="mt-6 space-y-4 text-sm text-gray-300">
-            <div className="flex items-center justify-between">
-              <span>Price polling</span>
-              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-400 font-semibold">
-                {parseCronSchedule(config.polling?.schedule || '0 * * * *')}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Status</span>
-              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                config.polling?.enabled
-                  ? 'bg-emerald-500/10 text-emerald-400'
-                  : 'bg-gray-800 text-gray-400'
-              }`}>
-                {config.polling?.enabled ? 'Active' : 'Paused'}
-              </span>
-            </div>
-            <div className="pt-4 border-t border-gray-800">
-              <p className="text-xs text-gray-500">
-                Automatic price updates run at the top of every hour
-              </p>
-            </div>
-          </div>
-        </div>
 
-        {/* API & System */}
-        <div className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-600/20 text-primary-400">
-              <Shield size={18} />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">System</h3>
-              <p className="text-xs text-gray-400">API and backend</p>
-            </div>
-          </div>
-          <div className="mt-6 space-y-4 text-sm text-gray-300">
-            <div className="flex items-center justify-between">
-              <span>API Status</span>
-              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                apiHealth === 'OK'
-                  ? 'bg-emerald-500/10 text-emerald-400'
-                  : 'bg-rose-500/10 text-rose-400'
-              }`}>
-                {apiHealth}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>API Endpoint</span>
-              <span className="rounded-full bg-gray-800 px-3 py-1 text-xs font-mono">
-                :3001
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span>Database</span>
-              <span className="rounded-full bg-gray-800 px-3 py-1 text-xs">
-                Local config
-              </span>
+            <div className="setting-group">
+              <h3>Data Collection</h3>
+              <p>We collect minimal data to provide our service:</p>
+              <ul>
+                <li>Email and account info</li>
+                <li>Watchlist and price alerts</li>
+                <li>Usage analytics (anonymous)</li>
+              </ul>
+              <p>We never sell your data. Read our <a href="/privacy">Privacy Policy</a>.</p>
             </div>
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Data Sources Info */}
-      <section className="rounded-2xl border border-gray-800 bg-gray-900/60 p-6">
-        <h3 className="text-lg font-semibold mb-4">Data Sources</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
-            <span className="text-gray-300">Chrono24 (Watches)</span>
-            <span className="text-emerald-400 text-xs font-semibold">Active</span>
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
-            <span className="text-gray-300">AutoTrader (Cars)</span>
-            <span className="text-emerald-400 text-xs font-semibold">Active</span>
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
-            <span className="text-gray-300">StockX (Sneakers)</span>
-            <span className="text-emerald-400 text-xs font-semibold">Active</span>
-          </div>
-          <div className="flex items-center justify-between p-3 rounded-lg bg-gray-800/50">
-            <span className="text-gray-300">ESPN API (Sports)</span>
-            <span className="text-emerald-400 text-xs font-semibold">Active</span>
-          </div>
-        </div>
-        <div className="mt-4 p-3 rounded-lg bg-primary-900/20 border border-primary-800/30">
-          <p className="text-xs text-gray-400">
-            All data sources use web scraping or public APIs. No API keys required. Rate limiting is automatically applied to prevent blocking.
-          </p>
-        </div>
-      </section>
+      </div>
+
+      {/* Save Button */}
+      <div className="save-bar">
+        <button
+          className="btn-primary btn-save"
+          onClick={saveSettings}
+          disabled={saving}
+        >
+          {saving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;

@@ -92,8 +92,7 @@ class BaseScraper {
       url: rawData.url || '',
       images: rawData.images || [],
       seller: rawData.seller || '',
-      timestamp: rawData.timestamp || new Date(),
-      raw_data: rawData
+      timestamp: rawData.timestamp || new Date()
     };
   }
 

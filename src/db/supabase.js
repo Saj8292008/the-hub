@@ -4,7 +4,8 @@ require('dotenv').config();
 class SupabaseClient {
   constructor() {
     this.supabaseUrl = process.env.SUPABASE_URL;
-    this.supabaseKey = process.env.SUPABASE_ANON_KEY;
+    // Use service role key for backend operations (bypasses RLS)
+    this.supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
     
     if (!this.supabaseUrl || !this.supabaseKey) {
       console.warn('⚠️  Supabase credentials not found. Using local config.json fallback.');
@@ -290,7 +291,7 @@ class SupabaseClient {
       let query = client
         .from('watch_listings')
         .select('*')
-        .order('timestamp', { ascending: false });
+        .order('timestamp', { ascending: false});
 
       // Apply filters
       if (filters.source) {
@@ -329,8 +330,7 @@ class SupabaseClient {
           url: listingData.url,
           images: listingData.images,
           seller: listingData.seller,
-          timestamp: listingData.timestamp,
-          raw_data: listingData.raw_data
+          timestamp: listingData.timestamp
         }])
         .select();
     });
@@ -354,8 +354,7 @@ class SupabaseClient {
         url: listing.url,
         images: listing.images,
         seller: listing.seller,
-        timestamp: listing.timestamp,
-        raw_data: listing.raw_data
+        timestamp: listing.timestamp
       }));
 
       return await client
@@ -524,8 +523,72 @@ class SupabaseClient {
     console.log('\n' + '='.repeat(80));
     console.log(tableCreationSQL);
     console.log('='.repeat(80) + '\n');
-    
+
     return tableCreationSQL;
+  }
+
+  // ============================================================================
+  // CAR LISTINGS METHODS (Scraped Listings)
+  // ============================================================================
+
+  async getCarListings(filters = {}) {
+    return this.query(async (client) => {
+      let query = client
+        .from('car_listings')
+        .select('*')
+        .order('timestamp', { ascending: false });
+
+      // Apply filters
+      if (filters.source) {
+        query = query.eq('source', filters.source);
+      }
+      if (filters.make) {
+        query = query.ilike('make', `%${filters.make}%`);
+      }
+      if (filters.minPrice) {
+        query = query.gte('price', filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        query = query.lte('price', filters.maxPrice);
+      }
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+
+      return await query;
+    });
+  }
+
+  // ============================================================================
+  // SNEAKER LISTINGS METHODS (Scraped Listings)
+  // ============================================================================
+
+  async getSneakerListings(filters = {}) {
+    return this.query(async (client) => {
+      let query = client
+        .from('sneaker_listings')
+        .select('*')
+        .order('timestamp', { ascending: false });
+
+      // Apply filters
+      if (filters.source) {
+        query = query.eq('source', filters.source);
+      }
+      if (filters.brand) {
+        query = query.ilike('brand', `%${filters.brand}%`);
+      }
+      if (filters.minPrice) {
+        query = query.gte('price', filters.minPrice);
+      }
+      if (filters.maxPrice) {
+        query = query.lte('price', filters.maxPrice);
+      }
+      if (filters.limit) {
+        query = query.limit(filters.limit);
+      }
+
+      return await query;
+    });
   }
 }
 

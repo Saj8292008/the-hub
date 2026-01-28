@@ -3,6 +3,7 @@ const ScraperManager = require('../services/scraping/ScraperManager');
 const supabase = require('../db/supabase');
 const localWatchListings = require('../db/localWatchListings');
 const logger = require('../utils/logger');
+const { logScraperRun } = require('../db/scraperLogsQueries');
 
 /**
  * Watch Scraper Scheduler
@@ -54,7 +55,15 @@ class WatchScraperScheduler {
    * Scrape a specific source
    */
   async scrapeSource(source, options = {}) {
+    const startTime = Date.now();
     logger.info(`Starting scheduled scrape for ${source}`);
+
+    let itemsFound = 0;
+    let itemsNew = 0;
+    let itemsUpdated = 0;
+    let status = 'success';
+    let errorMessage = null;
+    let retryCount = 0;
 
     try {
       let result;
@@ -88,11 +97,17 @@ class WatchScraperScheduler {
       }
 
       const listings = result.listings || result || [];
-      logger.info(`Scraped ${listings.length} listings from ${source}`);
+      itemsFound = listings.length;
+      logger.info(`Scraped ${itemsFound} listings from ${source}`);
 
       // Save to database
       if (listings.length > 0) {
-        await this.saveListings(listings);
+        const saveResult = await this.saveListings(listings);
+
+        // Track new vs updated items
+        if (saveResult && saveResult.data) {
+          itemsNew = saveResult.data.length; // All saved items are considered new for now
+        }
 
         // Broadcast to WebSocket
         if (this.io) {
@@ -102,12 +117,49 @@ class WatchScraperScheduler {
             timestamp: new Date()
           });
         }
+      } else {
+        status = 'no_results';
       }
 
-      return { source, count: listings.length, success: true };
+      const duration = Date.now() - startTime;
+
+      // Log to database
+      await logScraperRun({
+        category: 'watches',
+        source,
+        status,
+        items_found: itemsFound,
+        items_new: itemsNew,
+        items_updated: itemsUpdated,
+        duration_ms: duration,
+        error_message: null,
+        retry_count: 0,
+        metadata: { watchlistCount: this.watchlist.length }
+      });
+
+      return { source, count: itemsFound, success: true, duration };
     } catch (error) {
-      logger.error(`Failed to scrape ${source}: ${error.message}`);
-      return { source, count: 0, success: false, error: error.message };
+      const duration = Date.now() - startTime;
+      errorMessage = error.message;
+      status = 'error';
+
+      logger.error(`Failed to scrape ${source}: ${errorMessage}`);
+
+      // Log error to database
+      await logScraperRun({
+        category: 'watches',
+        source,
+        status: 'error',
+        items_found: 0,
+        items_new: 0,
+        items_updated: 0,
+        duration_ms: duration,
+        error_message: errorMessage,
+        retry_count: retryCount,
+        metadata: { watchlistCount: this.watchlist.length }
+      });
+
+      return { source, count: 0, success: false, error: errorMessage, duration };
     }
   }
 

@@ -1,0 +1,256 @@
+/* Email Capture Widget Styles */
+
+.email-capture {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  transition: transform 0.2s;
+}
+
+.email-capture:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+}
+
+/* Default variant */
+.email-capture-default {
+  padding: 40px;
+  margin: 40px 0;
+}
+
+/* Inline variant (for blog posts) */
+.email-capture-inline {
+  padding: 30px;
+  margin: 30px 0;
+  background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+}
+
+/* Sidebar variant */
+.email-capture-sidebar {
+  padding: 24px;
+  margin: 0;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+/* Hero variant (homepage) */
+.email-capture-hero {
+  padding: 60px 40px;
+  margin: 60px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-size: 1.1em;
+}
+
+/* Content */
+.email-capture-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.email-capture-title {
+  margin: 0 0 12px 0;
+  font-size: 1.5em;
+  font-weight: 700;
+  color: white;
+}
+
+.email-capture-hero .email-capture-title {
+  font-size: 2em;
+}
+
+.email-capture-sidebar .email-capture-title {
+  font-size: 1.2em;
+}
+
+.email-capture-description {
+  margin: 0 0 24px 0;
+  font-size: 1em;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+/* Form */
+.email-capture-form {
+  margin-bottom: 16px;
+}
+
+.email-capture-input-group {
+  display: flex;
+  gap: 10px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.email-capture-sidebar .email-capture-input-group {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.email-capture-input {
+  flex: 1;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.email-capture-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.email-capture-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.email-capture-button {
+  padding: 14px 30px;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.email-capture-inline .email-capture-button {
+  color: #4ecdc4;
+}
+
+.email-capture-sidebar .email-capture-button {
+  color: #ff6b6b;
+  width: 100%;
+}
+
+.email-capture-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.email-capture-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.email-capture-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Loading state */
+.email-capture-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-radius: 50%;
+  border-top-color: #667eea;
+  animation: spin 0.6s linear infinite;
+}
+
+.email-capture-inline .spinner {
+  border-top-color: #4ecdc4;
+}
+
+.email-capture-sidebar .spinner {
+  border-top-color: #ff6b6b;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Message */
+.email-capture-message {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 12px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.email-capture-message-success {
+  background: rgba(16, 185, 129, 0.2);
+  color: #d1fae5;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.email-capture-message-error {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fecaca;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Privacy text */
+.email-capture-privacy {
+  margin: 16px 0 0 0;
+  font-size: 13px;
+  opacity: 0.85;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .email-capture-default {
+    padding: 30px 20px;
+    margin: 30px 0;
+  }
+
+  .email-capture-hero {
+    padding: 40px 20px;
+  }
+
+  .email-capture-title {
+    font-size: 1.3em;
+  }
+
+  .email-capture-hero .email-capture-title {
+    font-size: 1.6em;
+  }
+
+  .email-capture-input-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .email-capture-button {
+    width: 100%;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .email-capture-input {
+    background: #f9fafb;
+    color: #111827;
+  }
+}
