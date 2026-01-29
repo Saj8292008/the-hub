@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import Layout from './components/Layout'
+import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Analytics from './pages/Analytics'
 import Integrations from './pages/Integrations'
@@ -62,6 +63,9 @@ function App() {
           />
           <ConnectionStatus />
           <Routes>
+            {/* Landing Page (No Layout) */}
+            <Route path="/" element={<Landing />} />
+
             {/* Auth Routes (No Layout) */}
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
@@ -76,7 +80,7 @@ function App() {
             <Route path="/*" element={
               <Layout>
                 <Routes>
-                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/watch-listings" element={<WatchListings />} />
                   <Route path="/watches" element={<Watches />} />
                   <Route path="/cars" element={<Cars />} />
