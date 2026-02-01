@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "lastUpdated": "2026-02-01T13:27:34.339Z",
+  "tasks": [
+    {
+      "id": "reddit-posting",
+      "title": "Build Reddit posting capability",
+      "description": "Create script to post to Reddit subreddits for user acquisition",
+      "priority": "high",
+      "status": "in-progress",
+      "category": "growth",
+      "createdAt": "2026-02-01T07:30:00Z",
+      "assignedAt": "2026-02-01T07:30:00Z"
+    },
+    {
+      "id": "real-subscribers",
+      "title": "Get first 10 real newsletter subscribers",
+      "description": "Currently only test accounts. Need real users.",
+      "priority": "high",
+      "status": "pending",
+      "category": "growth",
+      "createdAt": "2026-02-01T07:30:00Z"
+    },
+    {
+      "id": "telegram-growth",
+      "title": "Grow Telegram channel to 100 members",
+      "description": "Post deals, engage community, cross-promote",
+      "priority": "medium",
+      "status": "pending",
+      "category": "growth",
+      "createdAt": "2026-02-01T07:30:00Z"
+    },
+    {
+      "id": "deal-quality",
+      "title": "Improve deal scoring accuracy",
+      "description": "Current scoring misses some good deals, flags some bad ones",
+      "priority": "medium",
+      "status": "pending",
+      "category": "product",
+      "createdAt": "2026-02-01T07:30:00Z"
+    },
+    {
+      "id": "chrono24-scraper",
+      "title": "Add Chrono24 as data source",
+      "description": "Major watch marketplace, would significantly increase inventory",
+      "priority": "medium",
+      "status": "pending",
+      "category": "product",
+      "createdAt": "2026-02-01T07:30:00Z"
+    }
+  ],
+  "completed": [],
+  "discovered": [
+    {
+      "id": "scraper-stale-1769952454211",
+      "title": "Scrapers may be failing - low deal count",
+      "description": "Only null new deals in 24h. Check scrapers.",
+      "priority": "high",
+      "category": "reliability",
+      "createdAt": "2026-02-01T13:27:34.339Z",
+      "status": "discovered"
+    },
+    {
+      "id": "growth-subscribers",
+      "title": "Only null confirmed subscribers - need growth",
+      "description": "Focus on user acquisition: Reddit posts, Telegram, SEO",
+      "priority": "high",
+      "category": "growth",
+      "createdAt": "2026-02-01T13:27:34.339Z",
+      "status": "discovered"
+    }
+  ]
+}
