@@ -1,0 +1,30 @@
+{
+  "lastUpdated": "2026-02-01T13:32:18.587Z",
+  "facts": [
+    {
+      "id": "fact-1769952738542",
+      "category": "syd",
+      "fact": "Posted to Reddit for The Hub (subreddit unknown) - need to track",
+      "source": "conversation",
+      "addedAt": "2026-02-01T13:32:18.542Z",
+      "confirmedAt": null
+    }
+  ],
+  "activities": [
+    {
+      "id": "act-1769952738586",
+      "activity": "Built autonomous tooling - work-finder, reporter, reddit-manager, memory-keeper",
+      "outcome": null,
+      "timestamp": "2026-02-01T13:32:18.586Z"
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-1769952738497",
+      "question": "Which subreddit did you post to? Need to track karma/engagement",
+      "context": null,
+      "addedAt": "2026-02-01T13:32:18.497Z",
+      "answered": false
+    }
+  ]
+}
