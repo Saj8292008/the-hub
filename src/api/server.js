@@ -393,6 +393,13 @@ app.set('supabase', supabase.client);
 
 app.use('/api/alerts', dealAlertsRouter);
 
+// ============================================================================
+// REDDIT WTB MONITOR API
+// ============================================================================
+
+const wtbRouter = require('./routes/wtb');
+app.use('/api/wtb', wtbRouter);
+
 // Initialize deal alert scheduler (will be connected to Telegram bot in index.js)
 if (process.env.ENABLE_DEAL_ALERTS !== 'false') {
   // Scheduler will be fully initialized when telegram bot is available
@@ -528,6 +535,30 @@ app.post('/api/newsletter/scheduler/run-now', handleRoute(async () => {
   const result = await newsletterScheduler.forceRun();
   return { success: true, result };
 }));
+
+// ============================================================================
+// MISSION CONTROL DASHBOARD API
+// ============================================================================
+const dashboardRouter = require('./dashboard');
+app.use('/api/dashboard', dashboardRouter);
+
+// ============================================================================
+// AFFILIATE MANAGEMENT API
+// ============================================================================
+const affiliatesRouter = require('./affiliates');
+app.use('/api/affiliates', affiliatesRouter);
+
+// ============================================================================
+// PROJECTS DASHBOARD API
+// ============================================================================
+const projectsRouter = require('./projects');
+app.use('/api/projects', projectsRouter);
+
+// ============================================================================
+// TELEGRAM BOT API ROUTES
+// ============================================================================
+const telegramAPI = require('./telegram');
+app.use('/api/telegram', telegramAPI);
 
 // ============================================================================
 // DEAL SCORING API ENDPOINTS (AI Features)
