@@ -3,7 +3,8 @@ const axios = require('axios');
 const logger = require('../../../utils/logger');
 
 /**
- * Reddit r/Watchexchange Scraper
+ * Reddit Watch Scraper
+ * Scrapes r/Watchexchange AND r/watch_swap for more inventory
  * Uses Reddit's JSON API (no auth required for public posts)
  * Rate limit: ~60 requests per minute
  */
@@ -18,7 +19,9 @@ class RedditScraper extends BaseScraper {
       reservoirRefreshInterval: 60 * 1000
     });
 
-    this.subreddit = 'Watchexchange';
+    // Scrape multiple subreddits for more inventory
+    this.subreddits = ['Watchexchange', 'watch_swap'];
+    this.subreddit = 'Watchexchange'; // Default for backwards compatibility
     this.baseUrl = 'https://www.reddit.com';
   }
 
@@ -32,7 +35,7 @@ class RedditScraper extends BaseScraper {
    * @returns {Array} Normalized watch listings
    */
   async scrape(query, options = {}) {
-    // query parameter is ignored for Reddit (always scrapes r/Watchexchange)
+    // query parameter is ignored for Reddit (scrapes configured subreddits)
     // but kept for consistent API with other scrapers
 
     const {
@@ -42,11 +45,38 @@ class RedditScraper extends BaseScraper {
       after = null
     } = options || {};
 
-    logger.info(`Scraping Reddit r/${this.subreddit} (${sort}, limit: ${limit})`);
+    // Scrape all configured subreddits
+    const allListings = [];
+    
+    for (const subreddit of this.subreddits) {
+      try {
+        const result = await this.scrapeSubreddit(subreddit, { sort, time, limit, after });
+        allListings.push(...result.listings);
+      } catch (error) {
+        logger.error(`Error scraping r/${subreddit}: ${error.message}`);
+        // Continue with other subreddits even if one fails
+      }
+    }
+
+    logger.info(`Total: ${allListings.length} listings from ${this.subreddits.length} subreddits`);
+
+    return {
+      listings: allListings,
+      pagination: {} // Pagination is per-subreddit, so we don't return it for combined results
+    };
+  }
+
+  /**
+   * Scrape a single subreddit
+   */
+  async scrapeSubreddit(subreddit, options = {}) {
+    const { sort = 'new', time = 'week', limit = 25, after = null } = options;
+
+    logger.info(`Scraping Reddit r/${subreddit} (${sort}, limit: ${limit})`);
 
     return this.executeWithRetry(async () => {
       // Build URL
-      let url = `${this.baseUrl}/r/${this.subreddit}/${sort}.json`;
+      let url = `${this.baseUrl}/r/${subreddit}/${sort}.json`;
       const params = new URLSearchParams({ limit: Math.min(limit, 100) });
 
       if (sort === 'top' && time) {
@@ -72,18 +102,18 @@ class RedditScraper extends BaseScraper {
       }
 
       const posts = response.data.data.children;
-      logger.info(`Found ${posts.length} posts from Reddit`);
+      logger.info(`Found ${posts.length} posts from r/${subreddit}`);
 
       // Filter and parse [WTS] posts
       const listings = [];
       for (const post of posts) {
-        const listing = this.parsePost(post.data);
+        const listing = this.parsePost(post.data, subreddit);
         if (listing) {
           listings.push(listing);
         }
       }
 
-      logger.info(`Parsed ${listings.length} valid [WTS] listings`);
+      logger.info(`Parsed ${listings.length} valid [WTS] listings from r/${subreddit}`);
 
       return {
         listings,
@@ -97,8 +127,10 @@ class RedditScraper extends BaseScraper {
 
   /**
    * Parse a single Reddit post
+   * @param {Object} post - Reddit post data
+   * @param {string} subreddit - Source subreddit (for tracking)
    */
-  parsePost(post) {
+  parsePost(post, subreddit = 'Watchexchange') {
     // Only process [WTS] (Watch for Sale) posts
     const title = post.title || '';
     if (!title.toUpperCase().includes('[WTS]')) {

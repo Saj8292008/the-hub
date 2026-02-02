@@ -22,6 +22,8 @@ import AdminSettings from './pages/AdminSettings'
 import NewsletterAdmin from './pages/NewsletterAdmin'
 import NewsletterUnsubscribe from './pages/NewsletterUnsubscribe'
 import ScraperDebug from './pages/ScraperDebug'
+import MissionControl from './pages/MissionControl'
+import Projects from './pages/Projects'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import ForgotPassword from './pages/ForgotPassword'
@@ -29,6 +31,7 @@ import ResetPassword from './pages/ResetPassword'
 import VerifyEmail from './pages/VerifyEmail'
 import Premium from './pages/Premium'
 import PremiumSuccess from './pages/PremiumSuccess'
+import About from './pages/About'
 import { ConnectionStatus } from './components/ConnectionStatus'
 
 function App() {
@@ -65,6 +68,7 @@ function App() {
           <Routes>
             {/* Landing Page (No Layout) */}
             <Route path="/" element={<Landing />} />
+            <Route path="/about" element={<About />} />
 
             {/* Auth Routes (No Layout) */}
             <Route path="/login" element={<Login />} />
@@ -97,6 +101,8 @@ function App() {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/admin" element={<AdminSettings />} />
                   <Route path="/admin/scraper-debug" element={<ScraperDebug />} />
+                  <Route path="/mission-control" element={<MissionControl />} />
+                  <Route path="/projects" element={<Projects />} />
                 </Routes>
               </Layout>
             } />

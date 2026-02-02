@@ -51,27 +51,45 @@ function formatPrice(price) {
   }).format(price);
 }
 
+function getScoreDisplay(score) {
+  if (!score) return { emoji: '📊', label: 'Unrated', fires: '' };
+  if (score >= 9) return { emoji: '🔥🔥🔥', label: 'INCREDIBLE DEAL', fires: '🔥🔥🔥' };
+  if (score >= 8) return { emoji: '🔥🔥', label: 'HOT DEAL', fires: '🔥🔥' };
+  if (score >= 7) return { emoji: '🔥', label: 'Great Value', fires: '🔥' };
+  if (score >= 6) return { emoji: '👍', label: 'Good Deal', fires: '' };
+  if (score >= 5) return { emoji: '👀', label: 'Worth a Look', fires: '' };
+  return { emoji: '📊', label: 'Market Price', fires: '' };
+}
+
+function getScoreBar(score) {
+  if (!score) return '';
+  const filled = Math.round(score);
+  const empty = 10 - filled;
+  return '█'.repeat(filled) + '░'.repeat(empty);
+}
+
 function formatDeal(listing) {
   const emoji = listing.source === 'reddit' ? '🔴' : 
                 listing.source === 'chrono24' ? '⌚' :
                 listing.source === 'watchuseek' ? '📰' : '📦';
   
   const timeAgo = getTimeAgo(new Date(listing.created_at));
+  const scoreInfo = getScoreDisplay(listing.deal_score);
   
-  let message = `${emoji} <b>DEAL FOUND</b>\n\n`;
+  let message = `${emoji} <b>DEAL FOUND</b>`;
+  if (scoreInfo.fires) message += ` ${scoreInfo.fires}`;
+  message += `\n\n`;
   message += `<b>${listing.title}</b>\n\n`;
   message += `💰 <b>${formatPrice(listing.price)}</b>\n`;
-  message += `📍 Source: ${listing.source}\n`;
-  message += `⏰ Posted: ${timeAgo}\n`;
+  message += `📍 ${listing.source} • ⏰ ${timeAgo}\n`;
   
   if (listing.deal_score) {
-    const scoreEmoji = listing.deal_score >= 8 ? '🔥' : 
-                       listing.deal_score >= 6 ? '👍' : '📊';
-    message += `${scoreEmoji} Score: ${listing.deal_score}/10\n`;
+    message += `\n${scoreInfo.emoji} <b>${scoreInfo.label}</b>\n`;
+    message += `<code>${getScoreBar(listing.deal_score)}</code> ${listing.deal_score}/10\n`;
   }
   
   if (listing.url) {
-    message += `\n🔗 <a href="${listing.url}">View Listing</a>`;
+    message += `\n🔗 <a href="${listing.url}">View Listing →</a>`;
   }
   
   return message;

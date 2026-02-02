@@ -1,0 +1,43 @@
+{
+  "posts": [
+    {
+      "id": "post-1769955528763",
+      "subreddit": "r/Flipping",
+      "url": "https://www.reddit.com/r/Flipping/comments/1qszmir/free_deal_aggregator_for_watches_sneakers_cars/",
+      "title": "Free deal aggregator for watches, sneakers, cars",
+      "postedAt": "2026-02-01T14:18:48.763Z",
+      "karma": 0,
+      "comments": 0,
+      "lastChecked": null
+    }
+  ],
+  "subreddits": {
+    "r/Watches": {
+      "members": 320000,
+      "posted": false,
+      "rules": "Check self-promo policy"
+    },
+    "r/WatchExchange": {
+      "members": 180000,
+      "posted": false,
+      "rules": "META tag for tools"
+    },
+    "r/Sneakers": {
+      "members": 2300000,
+      "posted": false,
+      "rules": "Very strict on promo"
+    },
+    "r/Flipping": {
+      "members": 400000,
+      "posted": true,
+      "rules": "Allows tools if valuable",
+      "lastPostUrl": "https://www.reddit.com/r/Flipping/comments/1qszmir/free_deal_aggregator_for_watches_sneakers_cars/"
+    },
+    "r/Entrepreneur": {
+      "members": 1200000,
+      "posted": false,
+      "rules": "Build stories welcome"
+    }
+  },
+  "lastUpdated": "2026-02-01T14:18:48.763Z"
+}

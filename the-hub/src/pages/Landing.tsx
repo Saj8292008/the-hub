@@ -11,9 +11,13 @@ import {
   ChevronRight,
   Check,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  MessageCircle,
+  Users
 } from 'lucide-react'
 import EmailCapture from '../components/newsletter/EmailCapture'
+
+const TELEGRAM_LINK = 'https://t.me/hubtest123'
 
 const Landing: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -105,20 +109,27 @@ const Landing: React.FC = () => {
             Get instant alerts when prices drop.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <a 
+              href={TELEGRAM_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold text-lg hover:opacity-90 transition-all hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25"
+            >
+              <MessageCircle className="w-5 h-5" /> Join Telegram - Free Alerts
+            </a>
             <Link 
               to="/signup" 
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl font-semibold text-lg hover:opacity-90 transition-all hover:scale-105 flex items-center justify-center gap-2"
-            >
-              Start for free <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
-              to="/premium" 
               className="w-full sm:w-auto px-8 py-4 bg-gray-800 border border-gray-700 rounded-xl font-semibold text-lg hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
             >
-              View pricing
+              Create Account <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
+          
+          {/* Social Proof for Telegram */}
+          <p className="text-sm text-gray-500 mb-16">
+            <span className="text-blue-400 font-medium">🔥 Get deals 2 hours before Reddit</span> — Join our Telegram for instant alerts
+          </p>
 
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 max-w-3xl mx-auto">
@@ -248,31 +259,43 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* Telegram CTA Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-purple-600/30 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-12 text-center">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-cyan-500/30 rounded-3xl blur-3xl"></div>
+            <div className="relative bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl p-12 text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full mb-6">
+                <Users className="w-4 h-4" />
+                <span className="text-sm font-medium">Free community</span>
+              </div>
               <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-                Ready to find your next deal?
+                Get deals before everyone else
               </h2>
               <p className="text-lg text-blue-100 mb-8 max-w-xl mx-auto">
-                Join thousands of collectors and resellers who use The Hub to stay ahead.
+                Our Telegram community gets hot deals <span className="font-bold">2+ hours before they hit Reddit</span>. 
+                Real-time alerts. Zero spam.
               </p>
-              <Link 
-                to="/signup" 
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-gray-900 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all hover:scale-105"
-              >
-                Get started free <ChevronRight className="w-5 h-5" />
-              </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a 
+                  href={TELEGRAM_LINK}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-white text-gray-900 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all hover:scale-105"
+                >
+                  <MessageCircle className="w-5 h-5" /> Join Telegram Free
+                </a>
+              </div>
+              <p className="text-sm text-blue-100/70 mt-6">
+                🔔 Instant alerts • 📊 Price analysis • 💬 Community tips
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
+      <footer className="border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8 mb-16 sm:mb-0">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2">
@@ -282,8 +305,8 @@ const Landing: React.FC = () => {
               <span className="font-semibold">The Hub</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-500">
-              <a href="https://t.me/hubtest123" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition-colors">
-                Telegram
+              <a href={TELEGRAM_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-gray-300 transition-colors flex items-center gap-1">
+                <MessageCircle className="w-4 h-4" /> Telegram
               </a>
               <Link to="/blog" className="hover:text-gray-300 transition-colors">
                 Blog
@@ -298,6 +321,18 @@ const Landing: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Sticky Mobile Telegram CTA */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gray-950/95 backdrop-blur-sm border-t border-gray-800 sm:hidden z-50">
+        <a 
+          href={TELEGRAM_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl font-semibold text-white shadow-lg"
+        >
+          <MessageCircle className="w-5 h-5" /> Join Telegram - Get Free Alerts
+        </a>
+      </div>
     </div>
   )
 }

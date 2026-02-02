@@ -919,6 +919,131 @@ Last run: ${status.stats.lastRun || 'Never'}
   }
 });
 
+// ============================================================================
+// NEWSLETTER SUBSCRIPTION (Telegram → Newsletter Funnel)
+// ============================================================================
+
+const pendingSubscriptions = new Map(); // chatId -> { state, email }
+
+bot.onText(commandRegex('subscribe'), async (msg) => {
+  const chatId = msg.chat.id;
+  
+  pendingSubscriptions.set(chatId, { state: 'awaiting_email' });
+  
+  const message = `
+📧 *Subscribe to The Hub Newsletter*
+
+Get a weekly digest of the best deals — watches, sneakers, cars & sports collectibles.
+
+*Reply with your email address* to subscribe.
+
+(Type /cancel to abort)
+  `.trim();
+  
+  return bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+});
+
+bot.onText(commandRegex('cancel'), async (msg) => {
+  const chatId = msg.chat.id;
+  
+  if (pendingSubscriptions.has(chatId)) {
+    pendingSubscriptions.delete(chatId);
+    return sendMessage(chatId, '❌ Subscription cancelled.');
+  }
+});
+
+// Handle email input for subscription flow
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+  const text = msg.text?.trim();
+  
+  // Skip if it's a command
+  if (!text || text.startsWith('/')) return;
+  
+  // Check if we're waiting for an email from this chat
+  const pending = pendingSubscriptions.get(chatId);
+  if (!pending || pending.state !== 'awaiting_email') return;
+  
+  // Validate email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(text)) {
+    return bot.sendMessage(chatId, '⚠️ That doesn\'t look like a valid email. Please try again or /cancel.');
+  }
+  
+  // Try to subscribe
+  try {
+    const response = await fetch(`http://localhost:${process.env.PORT || 3000}/api/newsletter/subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: text,
+        source: 'telegram-bot',
+        categories: ['watches', 'sneakers', 'cars', 'sports'],
+        frequency: 'weekly'
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok || result.message?.includes('already subscribed')) {
+      pendingSubscriptions.delete(chatId);
+      
+      const successMsg = `
+✅ *You're in!*
+
+Email: ${text}
+
+You'll receive our weekly digest with the top deals.
+
+💡 *Pro tip:* Check your inbox for a confirmation email to verify your subscription.
+
+Keep getting instant alerts here on Telegram too! 🔔
+      `.trim();
+      
+      return bot.sendMessage(chatId, successMsg, { parse_mode: 'Markdown' });
+    } else {
+      throw new Error(result.error || 'Subscription failed');
+    }
+  } catch (error) {
+    console.error('Newsletter subscription error:', error);
+    return bot.sendMessage(chatId, `❌ Error: ${error.message}. Please try again or visit the-hub-psi.vercel.app to subscribe.`);
+  }
+});
+
+// ============================================================================
+// HELP COMMAND - Show all available commands
+// ============================================================================
+
+bot.onText(commandRegex('help'), async (msg) => {
+  const helpText = `
+🤖 *The Hub Bot Commands*
+
+*Tracking:*
+/watches - List tracked watches
+/addwatch <model> - Add a watch
+/sneakers - List tracked sneakers  
+/addsneaker <model> - Add a sneaker
+/cars - List tracked cars
+/addcar <make model> - Add a car
+
+*Deals:*
+/deals - Get today's top deals
+/hotdeals - Show highest scored deals
+
+*Newsletter:*
+/subscribe - Sign up for weekly email digest
+
+*Account:*
+/link <email> - Link your Hub account
+/settings - View your alert preferences
+/help - Show this message
+
+📢 Join @thehubdeals for instant deal alerts!
+  `.trim();
+  
+  return bot.sendMessage(msg.chat.id, helpText, { parse_mode: 'Markdown' });
+});
+
 // Export bot and functions
 module.exports = {
   bot,

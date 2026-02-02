@@ -1,0 +1,130 @@
+{
+  "lastUpdated": "2026-01-31T16:40:00.000Z",
+  "updatedBy": "Jay",
+  "projects": [
+    {
+      "id": "the-hub",
+      "name": "The Hub",
+      "emoji": "🏠",
+      "status": "live",
+      "priority": "high",
+      "path": "/Users/sydneyjackson/the-hub",
+      "description": "The unified deal aggregator for watches, sneakers, and cars. One place to find the best deals, track prices, and never miss an opportunity.",
+      "eta": "Feb 2026",
+      "goals": [
+        { "id": "watch-scraping", "name": "Watch scraping (Reddit, eBay, WatchUSeek)", "status": "done", "notes": "Reddit (2 subs), WatchUSeek working, eBay blocked" },
+        { "id": "deal-scoring", "name": "AI-powered deal scoring", "status": "done", "notes": "Scores deals automatically" },
+        { "id": "newsletter", "name": "Newsletter system", "status": "done", "notes": "Daily sends at 8am" },
+        { "id": "telegram-bot", "name": "Telegram bot & channel", "status": "done", "notes": "@hubtest123 with interactive buttons" },
+        { "id": "discord-bot", "name": "Discord bot", "status": "blocked", "notes": "Need token from Syd" },
+        { "id": "mission-control", "name": "System status dashboard", "status": "done", "notes": "/mission-control" },
+        { "id": "projects-dashboard", "name": "Projects dashboard", "status": "done", "notes": "/projects - Henry-style" },
+        { "id": "auth", "name": "User authentication", "status": "done", "notes": "Login/signup working" },
+        { "id": "premium", "name": "Premium tiers", "status": "done", "notes": "Stripe integration" },
+        { "id": "r-watch-swap", "name": "Add r/watch_swap scraping", "status": "done", "notes": "2x inventory!" },
+        { "id": "sneakers", "name": "Sneaker vertical", "status": "in-progress", "notes": "Basic structure, needs data sources" },
+        { "id": "cars", "name": "Car vertical", "status": "in-progress", "notes": "Basic structure, needs scrapers" }
+      ],
+      "nextUp": [
+        "Get Discord bot token",
+        "Price history/estimates",
+        "Faster scraping",
+        "Grow Telegram to 50 members"
+      ]
+    },
+    {
+      "id": "second-brain",
+      "name": "2nd Brain System",
+      "emoji": "🧠",
+      "status": "active",
+      "priority": "high",
+      "path": "/Users/sydneyjackson/second-brain",
+      "description": "Jay becomes Syd's external memory. Everything learned, researched, or decided gets captured and is semantically searchable.",
+      "eta": "Feb 2026",
+      "goals": [
+        { "id": "daily-research", "name": "Daily research reports (2pm)", "status": "done", "notes": "Cron job set up" },
+        { "id": "concepts", "name": "Concept documentation", "status": "in-progress", "notes": "Adding as we learn" },
+        { "id": "journal", "name": "Daily journal entries", "status": "in-progress", "notes": "memory/YYYY-MM-DD.md" },
+        { "id": "competitive-research", "name": "Competitive research", "status": "done", "notes": "WatchRecon analysis complete" }
+      ],
+      "nextUp": [
+        "Semantic search over notes",
+        "Auto-capture from conversations"
+      ]
+    },
+    {
+      "id": "jay-systems",
+      "name": "Jay AI Partner",
+      "emoji": "🤖",
+      "status": "active",
+      "priority": "high",
+      "path": "/Users/sydneyjackson/clawd",
+      "description": "A proactive AI business partner that thinks like an owner. Finds work, surfaces opportunities, and builds while Syd sleeps.",
+      "eta": "Ongoing",
+      "goals": [
+        { "id": "morning-briefs", "name": "Morning briefs (7am)", "status": "done", "notes": "Weather, stocks, sports, overnight work" },
+        { "id": "monitoring", "name": "Proactive system monitoring", "status": "done", "notes": "Heartbeats + hourly health checks" },
+        { "id": "night-builds", "name": "Night build sessions", "status": "done", "notes": "Building while Syd sleeps" },
+        { "id": "henry-training", "name": "Henry training", "status": "done", "notes": "Studied Alex Finn's approach" },
+        { "id": "grow-like-henry", "name": "Grow like Henry", "status": "in-progress", "notes": "Today's mission!" }
+      ],
+      "nextUp": [
+        "More proactive opportunity finding",
+        "Better autonomous decision making",
+        "Surprise with progress daily"
+      ]
+    },
+    {
+      "id": "content-engine",
+      "name": "Content Engine",
+      "emoji": "📝",
+      "status": "in-progress",
+      "priority": "medium",
+      "path": "/Users/sydneyjackson/the-hub",
+      "description": "Turn ONE piece of content into MANY automatically. Syd creates a video or post — Jay generates derivative content for all channels.",
+      "eta": "Mar 2026",
+      "goals": [
+        { "id": "telegram-content", "name": "Telegram content scheduler", "status": "done", "notes": "8 content types scheduled" },
+        { "id": "newsletter-auto", "name": "Newsletter automation", "status": "done", "notes": "AI-generated content" },
+        { "id": "blog-generation", "name": "Blog post generation", "status": "in-progress", "notes": "Scripts exist, needs refinement" },
+        { "id": "social-repurposing", "name": "Social media repurposing", "status": "todo", "notes": "Turn deals into tweets, etc." }
+      ],
+      "nextUp": [
+        "YouTube to blog pipeline",
+        "Deal → social post automation"
+      ]
+    }
+  ],
+  "ideas": [
+    { "id": "chrome-ext", "name": "Chrome extension for deals", "category": "The Hub", "priority": "medium", "notes": "Quick price check overlay" },
+    { "id": "mobile-app", "name": "Mobile app", "category": "The Hub", "priority": "low", "notes": "Future - web first" },
+    { "id": "affiliate", "name": "Affiliate revenue", "category": "The Hub", "priority": "medium", "notes": "WatchBox, Chrono24 partnerships" },
+    { "id": "price-history", "name": "Price history charts", "category": "The Hub", "priority": "high", "notes": "Like WatchCharts" },
+    { "id": "search-alerts", "name": "User search alerts", "category": "The Hub", "priority": "high", "notes": "Email when matching deals found" }
+  ],
+  "recentCompletions": [
+    { "date": "2026-01-31", "project": "The Hub", "what": "Added r/watch_swap to Reddit scraper (2x inventory)" },
+    { "date": "2026-01-31", "project": "Jay", "what": "Competitive research on WatchRecon" },
+    { "date": "2026-01-31", "project": "The Hub", "what": "Projects Dashboard (Henry-style)" },
+    { "date": "2026-01-31", "project": "The Hub", "what": "Mission Control dashboard" },
+    { "date": "2026-01-31", "project": "The Hub", "what": "Fixed Telegram bot bug" },
+    { "date": "2026-01-31", "project": "Jay", "what": "Henry training document" },
+    { "date": "2026-01-31", "project": "Jay", "what": "Server health monitoring" },
+    { "date": "2026-01-30", "project": "The Hub", "what": "Telegram interactive features" },
+    { "date": "2026-01-30", "project": "The Hub", "what": "Telegram content scheduler" },
+    { "date": "2026-01-29", "project": "The Hub", "what": "Newsletter automation" }
+  ],
+  "weeklyGoals": {
+    "week": "Jan 27 - Feb 2, 2026",
+    "goals": [
+      { "name": "Launch The Hub", "done": true },
+      { "name": "Newsletter automation", "done": true },
+      { "name": "Telegram bot features", "done": true },
+      { "name": "Mission Control", "done": true },
+      { "name": "Projects dashboard", "done": true },
+      { "name": "Grow like Henry", "done": false },
+      { "name": "50 Telegram members", "done": false },
+      { "name": "First paying customer", "done": false }
+    ]
+  }
+}

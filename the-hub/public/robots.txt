@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://the-hub-psi.vercel.app/sitemap.xml

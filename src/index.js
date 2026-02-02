@@ -45,14 +45,38 @@ async function main() {
     const telegramBot = require('./bot/telegram');
     logger.info('📱 Telegram bot: Active');
 
+    // Initialize Telegram API with bot
+    const telegramAPI = require('./api/telegram');
+    telegramAPI.setBot(telegramBot);
+    logger.info('📱 Telegram Content Manager: Active');
+
+    // Initialize Telegram Interactive features
+    const TelegramInteractive = require('./bot/telegramInteractive');
+    new TelegramInteractive(telegramBot.bot || telegramBot);
+    logger.info('📱 Telegram Interactive: Active');
+
+    // Start Discord bot
+    logger.info('Loading Discord bot...');
+    const discordBot = require('./bot/discord');
+    discordBot.initialize()
+      .then((success) => {
+        if (success) {
+          logger.info('🎮 Discord bot: Active');
+        } else {
+          logger.info('🎮 Discord bot: Skipped (no token configured)');
+        }
+      })
+      .catch(err => logger.warn('🎮 Discord bot: Failed to start -', err.message));
+
     // Initialize deal alert scheduler with Telegram bot
+    // Note: telegramBot exports { bot, postDealToChannel, ... }, so use telegramBot.bot
     if (process.env.ENABLE_DEAL_ALERTS !== 'false') {
       logger.info('Initializing deal alert scheduler...');
       const { getScheduler: getDealAlertScheduler } = require('./schedulers/dealAlertScheduler');
       const dealAlertScheduler = getDealAlertScheduler();
       if (dealAlertScheduler) {
-        dealAlertScheduler.bot = telegramBot;
-        dealAlertScheduler.alertService.bot = telegramBot;
+        dealAlertScheduler.bot = telegramBot.bot;
+        dealAlertScheduler.alertService.bot = telegramBot.bot;
         logger.info('🔔 Deal Alert Scheduler: Active (every 15 minutes)');
       }
     }
@@ -62,7 +86,7 @@ async function main() {
       logger.info('Initializing channel poster...');
       const supabase = require('./db/supabase');
       const { initScheduler: initChannelPoster } = require('./schedulers/channelPosterScheduler');
-      initChannelPoster(telegramBot, supabase.client);
+      initChannelPoster(telegramBot.bot, supabase.client);
       logger.info('📢 Channel Poster: Active (@TheHubDeals)');
     }
 
@@ -70,13 +94,13 @@ async function main() {
     if (process.env.ENABLE_SNEAKER_SCHEDULER !== 'false') {
       logger.info('Initializing sneaker price scheduler...');
       const { initScheduler: initSneakerScheduler } = require('./schedulers/sneakerPriceScheduler');
-      initSneakerScheduler(io, telegramBot);
+      initSneakerScheduler(io, telegramBot.bot);
       logger.info('👟 Sneaker Price Scheduler: Active (every 4 hours)');
     }
 
     // Start price poller with WebSocket support
     logger.info('Initializing price poller...');
-    const poller = new PricePoller(telegramBot, io);
+    const poller = new PricePoller(telegramBot.bot, io);
     const schedule = process.env.POLL_SCHEDULE || '0 * * * *'; // Default: every hour
 
     poller.start(schedule);
@@ -86,7 +110,7 @@ async function main() {
     let scraperCoordinator = null;
     if (process.env.ENABLE_SCRAPER_SCHEDULER === 'true') {
       logger.info('Initializing scraper coordinator...');
-      scraperCoordinator = new ScraperCoordinator(io, telegramBot);
+      scraperCoordinator = new ScraperCoordinator(io, telegramBot.bot);
       scraperCoordinator.start();
       logger.info('🔍 Scraper Coordinator: Active');
 
@@ -116,6 +140,9 @@ async function main() {
       if (scraperCoordinator) {
         await scraperCoordinator.shutdown();
       }
+
+      // Disconnect Discord bot
+      await discordBot.shutdown();
 
       logger.info('✅ Graceful shutdown complete');
       process.exit(0);

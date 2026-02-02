@@ -4,6 +4,16 @@ Ready to post when you want. These are written to fit each subreddit's culture.
 
 ---
 
+## 📊 Post History
+
+### 2026-02-01 - r/Flipping Self-Promotion Thread
+- **Thread:** Weekly Shameless Self Promotion Thread
+- **Status:** ✅ Posted as comment
+- **URL:** https://www.reddit.com/r/Flipping/comments/1qsvl12/weekly_shameless_self_promotion_thread/
+- **Note:** Original standalone post was removed by mods (Rule 11: self-promo only in Sunday thread)
+
+---
+
 ## r/Watches (320k members)
 
 **Title:** Built a free tool that monitors Reddit + Chrono24 for watch deals
