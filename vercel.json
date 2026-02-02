@@ -1,6 +1,0 @@
-{
-  "buildCommand": "cd the-hub && npm install && npm run build",
-  "outputDirectory": "the-hub/dist",
-  "framework": "vite",
-  "installCommand": "cd the-hub && npm install"
-}
