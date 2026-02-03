@@ -1,58 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
   <url>
     <loc>https://the-hub-psi.vercel.app/</loc>
+    <lastmod>2026-02-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://the-hub-psi.vercel.app/watches</loc>
+    <lastmod>2026-02-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://the-hub-psi.vercel.app/sneakers</loc>
+    <lastmod>2026-02-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://the-hub-psi.vercel.app/cars</loc>
+    <lastmod>2026-02-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://the-hub-psi.vercel.app/sports</loc>
+    <lastmod>2026-02-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://the-hub-psi.vercel.app/blog</loc>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-02-03</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://the-hub-psi.vercel.app/blog/best-rolex-submariner-alternatives</loc>
+    <loc>https://the-hub-psi.vercel.app/about</loc>
+    <lastmod>2026-02-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Blog Posts - Watches -->
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/best-watches-under-5000</loc>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://the-hub-psi.vercel.app/blog/how-to-buy-used-watches-online-safely</loc>
+    <loc>https://the-hub-psi.vercel.app/blog/how-to-spot-fake-rolex</loc>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://the-hub-psi.vercel.app/blog/watch-market-trends-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/best-rolex-submariner-alternatives</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/how-to-buy-used-watches-online-safely</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/vintage-seiko-watches-under-500</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/rolex-submariner-deals-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/spot-fake-luxury-watches-guide</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/omega-speedmaster-price-guide-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/watches-that-hold-value-investment-guide</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog Posts - Sneakers -->
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/stockx-vs-goat-sneakers</loc>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://the-hub-psi.vercel.app/blog/stockx-vs-goat-vs-ebay-sneakers</loc>
+    <lastmod>2026-02-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://the-hub-psi.vercel.app/about</loc>
+    <loc>https://the-hub-psi.vercel.app/blog/jordan-1-price-guide-2026</loc>
+    <lastmod>2026-02-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/best-sneaker-resale-platforms-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/underrated-sneakers-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/yeezy-vs-dunk-resale-value-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/how-to-cop-limited-sneakers-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Blog Posts - Cars -->
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/bmw-m3-vs-m4-2026-comparison</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/classic-cars-appreciating-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/how-to-find-dealer-demo-cars</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/tesla-model-3-vs-model-y-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the-hub-psi.vercel.app/blog/best-used-sports-cars-under-30k-2026</loc>
+    <lastmod>2026-02-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

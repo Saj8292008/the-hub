@@ -4,6 +4,7 @@
 const telegramBot = require('../bot/telegram');
 const discordBot = require('../bot/discord');
 const logger = require('../utils/logger');
+const { convertToAffiliateLink } = require('../utils/affiliateLinks');
 
 class DealPoster {
   /**
@@ -83,7 +84,7 @@ ${deal.originalPrice ? `💸 <s>$${deal.originalPrice.toLocaleString()}</s> (${t
 
 🏷️ <b>Source:</b> ${deal.source || 'The Hub'}
 ${deal.description ? `\n📝 ${deal.description}\n` : ''}
-<a href="${deal.url || 'https://the-hub-psi.vercel.app'}">🔗 View Deal</a>
+<a href="${convertToAffiliateLink(deal.url) || 'https://the-hub-psi.vercel.app'}">🔗 View Deal</a>
 
 #TheHub #Deals ${deal.category ? `#${deal.category}` : ''}
     `.trim();

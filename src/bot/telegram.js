@@ -2,6 +2,7 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const supabaseWrapper = require('../db/supabase');
 const supabase = supabaseWrapper.client;
+const { convertToAffiliateLink } = require('../utils/affiliateLinks');
 
 const WatchTracker = require('../trackers/watches');
 const CarTracker = require('../trackers/cars');
@@ -687,7 +688,10 @@ async function postDealToChannel(listing) {
 
     message += `\n📊 *Deal Score:* ${deal_score}/10`;
     message += `\n🏪 *Source:* ${source}`;
-    message += `\n\n🔗 [View Deal](${url})`;
+    
+    // Convert URL to affiliate link for monetization
+    const affiliateUrl = convertToAffiliateLink(url) || url;
+    message += `\n\n🔗 [View Deal](${affiliateUrl})`;
 
     // Send with image if available
     if (image_url) {
@@ -782,7 +786,10 @@ async function sendPersonalizedAlert(userId, listing) {
     }
 
     message += `\n📊 Score: ${deal_score}/10`;
-    message += `\n\n🔗 [View Deal](${url})`;
+    
+    // Convert URL to affiliate link for monetization
+    const affiliateUrl = convertToAffiliateLink(url) || url;
+    message += `\n\n🔗 [View Deal](${affiliateUrl})`;
 
     // Send message
     await bot.sendMessage(user.telegram_chat_id, message, {
