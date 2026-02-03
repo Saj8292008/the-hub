@@ -20,6 +20,18 @@ const AFFILIATE_CONFIG = {
     tag: process.env.AMAZON_AFFILIATE_TAG || process.env.AMAZON_ASSOCIATE_TAG || '',
     // Amazon link format: https://www.amazon.com/dp/B0xxx?tag=YOUR_TAG
   },
+  awin: {
+    enabled: !!process.env.AWIN_AFFILIATE_ID,
+    affiliateId: process.env.AWIN_AFFILIATE_ID || '',
+    // Awin link format: https://www.awin1.com/cread.php?awinmid=MERCHANT&awinaffid=YOUR_ID&ued=ENCODED_URL
+    // Merchant IDs for common stores (add more as needed)
+    merchants: {
+      'stockx.com': '89141',
+      'fossil.com': '6435',
+      'nordstrom.com': '2767',
+      'footlocker.com': '2498'
+    }
+  },
   chrono24: {
     enabled: !!process.env.CHRONO24_REF_ID,
     refId: process.env.CHRONO24_REF_ID || ''
@@ -71,6 +83,30 @@ function convertAmazonLink(url) {
 }
 
 /**
+ * Convert URL to Awin affiliate link (for supported merchants)
+ */
+function convertAwinLink(url) {
+  if (!AFFILIATE_CONFIG.awin.enabled || !AFFILIATE_CONFIG.awin.affiliateId) {
+    return url;
+  }
+
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase().replace('www.', '');
+    
+    // Check if this merchant is supported
+    const merchantId = AFFILIATE_CONFIG.awin.merchants[hostname];
+    if (!merchantId) return url;
+
+    // Build Awin tracking link
+    const encodedUrl = encodeURIComponent(url);
+    return `https://www.awin1.com/cread.php?awinmid=${merchantId}&awinaffid=${AFFILIATE_CONFIG.awin.affiliateId}&ued=${encodedUrl}`;
+  } catch (e) {
+    return url;
+  }
+}
+
+/**
  * Convert any supported URL to affiliate link
  */
 function convertToAffiliateLink(url) {
@@ -88,7 +124,11 @@ function convertToAffiliateLink(url) {
       return convertAmazonLink(url);
     }
 
-    // Add more converters as we add programs
+    // Try Awin for supported merchants (StockX, Fossil, Nordstrom, Foot Locker, etc.)
+    const awinResult = convertAwinLink(url);
+    if (awinResult !== url) {
+      return awinResult;
+    }
 
     return url;
   } catch (e) {
@@ -126,6 +166,12 @@ function getAffiliateStatus() {
         enabled: AFFILIATE_CONFIG.amazon.enabled,
         configured: !!AFFILIATE_CONFIG.amazon.tag
       },
+      awin: {
+        name: 'Awin (ShareASale)',
+        enabled: AFFILIATE_CONFIG.awin.enabled,
+        configured: !!AFFILIATE_CONFIG.awin.affiliateId,
+        merchants: Object.keys(AFFILIATE_CONFIG.awin.merchants || {})
+      },
       chrono24: {
         name: 'Chrono24',
         enabled: AFFILIATE_CONFIG.chrono24.enabled,
@@ -151,6 +197,7 @@ module.exports = {
   convertToAffiliateLink,
   convertEbayLink,
   convertAmazonLink,
+  convertAwinLink,
   processTextForAffiliateLinks,
   getAffiliateStatus,
   setAffiliateEnabled,
