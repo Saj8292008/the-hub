@@ -24,12 +24,31 @@ const AFFILIATE_CONFIG = {
     enabled: !!process.env.AWIN_AFFILIATE_ID,
     affiliateId: process.env.AWIN_AFFILIATE_ID || '',
     // Awin link format: https://www.awin1.com/cread.php?awinmid=MERCHANT&awinaffid=YOUR_ID&ued=ENCODED_URL
-    // Merchant IDs for common stores (add more as needed)
     merchants: {
+      // Sneakers & Footwear
       'stockx.com': '89141',
+      'footlocker.com': '2498',
+      'finishline.com': '2627',
+      'champssports.com': '2572',
+      'eastbay.com': '2559',
+      
+      // Watches
       'fossil.com': '6435',
-      'nordstrom.com': '2767',
-      'footlocker.com': '2498'
+      'timex.com': '6779',
+      'ashford.com': '4174',
+      'citizenwatch.com': '7498',
+      'mvmt.com': '8175',
+      
+      // Auto & Cars
+      'autozone.com': '10082',
+      'advanceautoparts.com': '10120',
+      'tirerack.com': '4660',
+      'carparts.com': '78498',
+      'carid.com': '30498',
+      'weathertech.com': '41898',
+      
+      // Fashion & Retail
+      'nordstrom.com': '2767'
     }
   },
   chrono24: {
