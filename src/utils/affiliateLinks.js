@@ -3,11 +3,11 @@
  * Converts regular links to affiliate links for revenue
  */
 
-// Affiliate program configs (add keys when approved)
+// Affiliate program configs (auto-enables when keys are set)
 const AFFILIATE_CONFIG = {
   ebay: {
-    enabled: false, // Enable when EPN approved
-    campaignId: process.env.EBAY_CAMPAIGN_ID || '',
+    enabled: !!process.env.EBAY_CAMPAIGN_ID, // Auto-enable when configured
+    campaignId: process.env.EBAY_CAMPAIGN_ID || process.env.EBAY_AFFILIATE_ID || '',
     // EPN link format: https://www.ebay.com/itm/123?mkcid=1&mkrid=711-53200-19255-0&campid=YOUR_CAMPAIGN&toolid=10001
     baseParams: {
       mkcid: '1',
@@ -16,12 +16,12 @@ const AFFILIATE_CONFIG = {
     }
   },
   amazon: {
-    enabled: false, // Enable when Associates approved
-    tag: process.env.AMAZON_ASSOCIATE_TAG || '',
+    enabled: !!process.env.AMAZON_AFFILIATE_TAG, // Auto-enable when tag is set
+    tag: process.env.AMAZON_AFFILIATE_TAG || process.env.AMAZON_ASSOCIATE_TAG || '',
     // Amazon link format: https://www.amazon.com/dp/B0xxx?tag=YOUR_TAG
   },
   chrono24: {
-    enabled: false,
+    enabled: !!process.env.CHRONO24_REF_ID,
     refId: process.env.CHRONO24_REF_ID || ''
   }
 };

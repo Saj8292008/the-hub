@@ -549,6 +549,12 @@ const affiliatesRouter = require('./affiliates');
 app.use('/api/affiliates', affiliatesRouter);
 
 // ============================================================================
+// AMAZON DEALS API
+// ============================================================================
+const amazonRouter = require('./amazon');
+app.use('/api/amazon', amazonRouter);
+
+// ============================================================================
 // PROJECTS DASHBOARD API
 // ============================================================================
 const projectsRouter = require('./projects');
