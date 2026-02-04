@@ -166,8 +166,23 @@ Pitch: "Free premium access + affiliate commission"
 
 ## Resources
 
-- Marketing content bank: `/memory/hub-marketing-content.md`
-- Affiliate checklist: `/docs/AFFILIATE-SIGNUP-CHECKLIST.md`
+### Strategy & Planning
+- **Growth Playbook:** This document (GROWTH-PLAYBOOK.md)
+- **Content Calendar:** `/docs/CONTENT-CALENDAR.md` - Detailed weekly/monthly plan
+- **Affiliate Checklist:** `/docs/AFFILIATE-SIGNUP-CHECKLIST.md`
+
+### Marketing Content
+- **Reddit Posts:** `/docs/REDDIT-POSTS.md` - Ready-to-use posts
+- **Reddit Extended:** `/docs/REDDIT-POSTS-EXTENDED.md` - Additional posts + comment templates
+- **Twitter Launch:** `/docs/TWITTER-LAUNCH.md` - Account setup + strategy
+- **Twitter Threads:** `/docs/TWITTER-THREADS.md` - 5 ready-to-post threads
+
+### Outreach & Partnerships
+- **Influencer Targets:** `/docs/INFLUENCER-TARGETS.md` - 10 micro-influencers + outreach strategy
+- **Partnership Emails:** `/docs/email-sequences/partnership-outreach.md` - Cold email sequences
+- **Welcome Sequence:** `/docs/email-sequences/welcome-sequence.md` - 7-email onboarding
+
+### Product
 - Comparison pages: `/the-hub/src/pages/Compare.tsx`
 - Deal pages: `/the-hub/src/pages/Deals.tsx`
 
