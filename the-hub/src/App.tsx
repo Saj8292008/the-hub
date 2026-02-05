@@ -32,6 +32,9 @@ import VerifyEmail from './pages/VerifyEmail'
 import Premium from './pages/Premium'
 import PremiumSuccess from './pages/PremiumSuccess'
 import About from './pages/About'
+import Compare from './pages/Compare'
+import Deals from './pages/Deals'
+import { Resellers, Collectors, Dealers } from './pages/for'
 import { ConnectionStatus } from './components/ConnectionStatus'
 
 function App() {
@@ -69,6 +72,20 @@ function App() {
             {/* Landing Page (No Layout) */}
             <Route path="/" element={<Landing />} />
             <Route path="/about" element={<About />} />
+            
+            {/* Segment Landing Pages (SEO) */}
+            <Route path="/for/resellers" element={<Resellers />} />
+            <Route path="/for/collectors" element={<Collectors />} />
+            <Route path="/for/dealers" element={<Dealers />} />
+            
+            {/* Comparison Pages (SEO) */}
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/compare/:competitor" element={<Compare />} />
+            
+            {/* Programmatic Deal Pages (SEO) */}
+            <Route path="/deals" element={<Deals />} />
+            <Route path="/deals/:brand" element={<Deals />} />
+            <Route path="/deals/category/:category" element={<Deals />} />
 
             {/* Auth Routes (No Layout) */}
             <Route path="/login" element={<Login />} />
