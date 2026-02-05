@@ -1,6 +1,10 @@
 /**
  * Tier Configuration
  * Defines limits and features for each subscription tier
+ * 
+ * Pricing aligned with freemium research (2026-02-05):
+ * - Pro: $9/mo - Time savings, early access, exclusivity
+ * - Premium: $19/mo - Automation, data, competitive edge
  */
 
 const TIERS = {
@@ -8,6 +12,10 @@ const TIERS = {
     name: 'Free',
     displayName: 'Free Tier',
     price: 0,
+    priceMonthly: 0,
+    priceYearly: 0,
+    stripePriceIdMonthly: null,
+    stripePriceIdYearly: null,
     limits: {
       tracks: 3,
       alertsPerDay: 5,
@@ -15,7 +23,8 @@ const TIERS = {
       aiFeatures: 'basic',
       exportData: false,
       prioritySupport: false,
-      realTimeAlerts: false
+      realTimeAlerts: false,
+      earlyAccess: false
     },
     features: [
       '3 tracked searches',
@@ -23,42 +32,47 @@ const TIERS = {
       'Basic deal scoring',
       'Email digest (weekly)',
       'Community access'
-    ]
+    ],
+    description: 'Perfect for casual deal hunters'
   },
   
   pro: {
     name: 'Pro',
-    displayName: 'Pro Tier',
-    priceMonthly: 9.99,
-    priceYearly: 99,
+    displayName: 'Pro',
+    priceMonthly: 9,
+    priceYearly: 89,  // ~$7.42/mo - 2 months free
     stripePriceIdMonthly: process.env.STRIPE_PRO_MONTHLY_PRICE_ID,
     stripePriceIdYearly: process.env.STRIPE_PRO_YEARLY_PRICE_ID,
     limits: {
-      tracks: 20,
-      alertsPerDay: 50,
+      tracks: 25,
+      alertsPerDay: 100,
       priceHistory: true,
       aiFeatures: 'advanced',
       exportData: true,
       prioritySupport: false,
-      realTimeAlerts: true
+      realTimeAlerts: true,
+      earlyAccess: true,
+      alertDelay: 0  // Real-time (vs 15 min for free)
     },
     features: [
-      '20 tracked searches',
-      '50 daily alerts',
-      'Real-time Telegram alerts',
+      '25 tracked searches',
+      '100 daily alerts',
+      'Real-time alerts (no delay)',
       'Price history charts',
-      'Advanced AI analysis',
+      'Advanced AI deal scoring',
       'Export data (CSV)',
       'Ad-free experience',
-      'Priority email digest'
-    ]
+      'Early deal access'
+    ],
+    description: 'For serious deal hunters who want speed',
+    badge: 'Popular'
   },
   
   premium: {
     name: 'Premium',
-    displayName: 'Premium Tier',
-    priceMonthly: 19.99,
-    priceYearly: 199,
+    displayName: 'Premium',
+    priceMonthly: 19,
+    priceYearly: 189,  // ~$15.75/mo - 2 months free
     stripePriceIdMonthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID,
     stripePriceIdYearly: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID,
     limits: {
@@ -68,19 +82,25 @@ const TIERS = {
       aiFeatures: 'full',
       exportData: true,
       prioritySupport: true,
-      realTimeAlerts: true
+      realTimeAlerts: true,
+      earlyAccess: true,
+      alertDelay: 0,
+      apiAccess: true
     },
     features: [
       'Unlimited tracked searches',
       'Unlimited daily alerts',
-      'Real-time Telegram alerts',
+      'Real-time alerts (no delay)',
       'Price history charts',
       'Full AI suite ("Should I Buy?")',
       'Export data (CSV/JSON)',
-      'Priority support',
+      'Priority support (24h response)',
       'Early access to features',
-      'API access (coming soon)'
-    ]
+      'API access',
+      'Custom alert filters'
+    ],
+    description: 'For resellers and power users',
+    badge: 'Best Value'
   },
   
   // Enterprise tier (contact sales)
@@ -88,6 +108,10 @@ const TIERS = {
     name: 'Enterprise',
     displayName: 'Enterprise',
     price: null, // Contact sales
+    priceMonthly: null,
+    priceYearly: null,
+    stripePriceIdMonthly: null,
+    stripePriceIdYearly: null,
     limits: {
       tracks: Infinity,
       alertsPerDay: Infinity,
@@ -104,11 +128,12 @@ const TIERS = {
       'Everything in Premium',
       'Dedicated account manager',
       'Custom integrations',
-      'API access',
+      'Volume API access',
       'White-label option',
       'SLA guarantees',
-      'Volume discounts'
-    ]
+      'Team accounts'
+    ],
+    description: 'For teams and businesses'
   }
 };
 
@@ -148,6 +173,59 @@ function isHigherTier(tier1, tier2) {
   return compareTiers(tier1, tier2) > 0;
 }
 
+// Get tier name from Stripe price ID
+function getTierFromPriceId(priceId) {
+  if (!priceId) return null;
+  
+  for (const [tierName, config] of Object.entries(TIERS)) {
+    if (config.stripePriceIdMonthly === priceId || config.stripePriceIdYearly === priceId) {
+      return tierName;
+    }
+  }
+  return null;
+}
+
+// Get all available Stripe prices for checkout
+function getStripePrices() {
+  const prices = [];
+  
+  for (const [tierName, config] of Object.entries(TIERS)) {
+    if (tierName === 'free' || tierName === 'enterprise') continue;
+    
+    if (config.stripePriceIdMonthly) {
+      prices.push({
+        id: config.stripePriceIdMonthly,
+        tier: tierName,
+        name: `${config.displayName} Monthly`,
+        amount: config.priceMonthly * 100, // cents
+        currency: 'usd',
+        interval: 'month'
+      });
+    }
+    
+    if (config.stripePriceIdYearly) {
+      prices.push({
+        id: config.stripePriceIdYearly,
+        tier: tierName,
+        name: `${config.displayName} Yearly`,
+        amount: config.priceYearly * 100, // cents
+        currency: 'usd',
+        interval: 'year'
+      });
+    }
+  }
+  
+  return prices;
+}
+
+// Validate a price ID belongs to a valid tier
+function validatePriceId(priceId) {
+  const tier = getTierFromPriceId(priceId);
+  if (!tier) return { valid: false, error: 'Invalid price ID' };
+  if (tier === 'free') return { valid: false, error: 'Cannot subscribe to free tier' };
+  return { valid: true, tier };
+}
+
 module.exports = {
   TIERS,
   DEFAULT_TIER,
@@ -156,5 +234,8 @@ module.exports = {
   tierHasFeature,
   getTierNames,
   compareTiers,
-  isHigherTier
+  isHigherTier,
+  getTierFromPriceId,
+  getStripePrices,
+  validatePriceId
 };

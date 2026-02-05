@@ -1,6 +1,8 @@
 /**
  * Stripe Webhook Handler
  * Processes subscription lifecycle events from Stripe
+ * 
+ * Handles Pro and Premium tier subscriptions
  */
 
 const express = require('express');
@@ -8,6 +10,7 @@ const router = express.Router();
 const stripe = require('../lib/stripe');
 const { pool } = require('../db/supabase');
 const logger = require('../utils/logger');
+const { getTierFromPriceId } = require('../services/tiers/tierConfig');
 
 /**
  * POST /api/webhooks/stripe
@@ -79,26 +82,41 @@ router.post('/stripe', express.raw({ type: 'application/json' }), async (req, re
  * Fired when a new subscription is purchased
  */
 async function handleCheckoutCompleted(session) {
-  const userId = session.metadata.userId;
+  const userId = session.metadata?.userId;
   const customerId = session.customer;
+  let tier = session.metadata?.tier;
 
   if (!userId) {
     logger.error('No userId in checkout session metadata');
     return;
   }
 
-  // Upgrade user to premium
+  // If tier not in metadata, try to get it from the subscription
+  if (!tier && session.subscription) {
+    try {
+      const subscription = await stripe.subscriptions.retrieve(session.subscription);
+      const priceId = subscription.items.data[0]?.price?.id;
+      tier = getTierFromPriceId(priceId) || 'premium';
+    } catch (e) {
+      logger.warn(`Could not retrieve subscription to determine tier: ${e.message}`);
+      tier = 'premium'; // Default fallback
+    }
+  }
+
+  tier = tier || 'premium'; // Final fallback
+
+  // Upgrade user to the appropriate tier
   await pool.query(
     `UPDATE users
-     SET tier = 'premium',
-         stripe_customer_id = $1,
+     SET tier = $1,
+         stripe_customer_id = $2,
          subscription_starts_at = NOW(),
          subscription_ends_at = NOW() + INTERVAL '30 days'
-     WHERE id = $2`,
-    [customerId, userId]
+     WHERE id = $3`,
+    [tier, customerId, userId]
   );
 
-  logger.info(`✅ User ${userId} upgraded to premium (checkout completed)`);
+  logger.info(`✅ User ${userId} upgraded to ${tier} (checkout completed)`);
 }
 
 /**
@@ -122,17 +140,24 @@ async function handleSubscriptionCreated(subscription) {
   const user = userResult.rows[0];
   const periodEnd = new Date(subscription.current_period_end * 1000);
 
+  // Determine tier from subscription metadata or price ID
+  let tier = subscription.metadata?.tier;
+  if (!tier) {
+    const priceId = subscription.items.data[0]?.price?.id;
+    tier = getTierFromPriceId(priceId) || 'premium';
+  }
+
   // Update subscription info
   await pool.query(
     `UPDATE users
-     SET tier = 'premium',
+     SET tier = $1,
          subscription_starts_at = NOW(),
-         subscription_ends_at = $1
-     WHERE id = $2`,
-    [periodEnd, user.id]
+         subscription_ends_at = $2
+     WHERE id = $3`,
+    [tier, periodEnd, user.id]
   );
 
-  logger.info(`✅ Subscription created for user ${user.id}`);
+  logger.info(`✅ Subscription created for user ${user.id} (tier: ${tier})`);
 }
 
 /**
@@ -156,13 +181,27 @@ async function handleSubscriptionUpdated(subscription) {
   const user = userResult.rows[0];
   const periodEnd = new Date(subscription.current_period_end * 1000);
 
-  // Update subscription end date
-  await pool.query(
-    'UPDATE users SET subscription_ends_at = $1 WHERE id = $2',
-    [periodEnd, user.id]
-  );
+  // Determine tier from subscription metadata or price ID (handles plan changes)
+  let newTier = subscription.metadata?.tier;
+  if (!newTier) {
+    const priceId = subscription.items.data[0]?.price?.id;
+    newTier = getTierFromPriceId(priceId);
+  }
 
-  logger.info(`✅ Subscription updated for user ${user.id} (ends: ${periodEnd.toISOString()})`);
+  // Only update tier if we could determine it
+  if (newTier && newTier !== user.tier) {
+    await pool.query(
+      'UPDATE users SET tier = $1, subscription_ends_at = $2 WHERE id = $3',
+      [newTier, periodEnd, user.id]
+    );
+    logger.info(`✅ User ${user.id} tier changed: ${user.tier} → ${newTier} (ends: ${periodEnd.toISOString()})`);
+  } else {
+    await pool.query(
+      'UPDATE users SET subscription_ends_at = $1 WHERE id = $2',
+      [periodEnd, user.id]
+    );
+    logger.info(`✅ Subscription updated for user ${user.id} (ends: ${periodEnd.toISOString()})`);
+  }
 }
 
 /**
@@ -206,7 +245,7 @@ async function handlePaymentSucceeded(invoice) {
 
   // Get the user by customer ID
   const userResult = await pool.query(
-    'SELECT id FROM users WHERE stripe_customer_id = $1',
+    'SELECT id, tier FROM users WHERE stripe_customer_id = $1',
     [customerId]
   );
 
@@ -218,17 +257,22 @@ async function handlePaymentSucceeded(invoice) {
   const user = userResult.rows[0];
 
   // Extend subscription based on invoice period
-  const periodEnd = new Date(invoice.lines.data[0].period.end * 1000);
+  const lineItem = invoice.lines.data[0];
+  const periodEnd = new Date(lineItem.period.end * 1000);
+
+  // Determine tier from invoice line item price
+  const priceId = lineItem.price?.id;
+  const tier = getTierFromPriceId(priceId) || user.tier || 'premium';
 
   await pool.query(
     `UPDATE users
-     SET tier = 'premium',
-         subscription_ends_at = $1
-     WHERE id = $2`,
-    [periodEnd, user.id]
+     SET tier = $1,
+         subscription_ends_at = $2
+     WHERE id = $3`,
+    [tier, periodEnd, user.id]
   );
 
-  logger.info(`💰 Payment succeeded for user ${user.id} (subscription extended to ${periodEnd.toISOString()})`);
+  logger.info(`💰 Payment succeeded for user ${user.id} (tier: ${tier}, extended to ${periodEnd.toISOString()})`);
 }
 
 /**

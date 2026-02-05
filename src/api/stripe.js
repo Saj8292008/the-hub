@@ -1,6 +1,8 @@
 /**
  * Stripe API Routes
  * Handles subscription checkout, billing portal, and status
+ * 
+ * Supports multiple tiers: Pro ($9/mo), Premium ($19/mo)
  */
 
 const express = require('express');
@@ -9,6 +11,13 @@ const stripe = require('../lib/stripe');
 const { pool } = require('../db/supabase');
 const { authenticateToken } = require('../middleware/auth');
 const logger = require('../utils/logger');
+const { 
+  TIERS, 
+  getTierFromPriceId, 
+  getStripePrices, 
+  validatePriceId,
+  getTierConfig 
+} = require('../services/tiers/tierConfig');
 
 // Check if Stripe is configured
 const checkStripeConfigured = (req, res, next) => {
@@ -24,6 +33,8 @@ const checkStripeConfigured = (req, res, next) => {
 /**
  * POST /api/stripe/create-checkout-session
  * Create a Stripe Checkout session for subscription
+ * 
+ * Supports: Pro and Premium tiers (monthly/yearly)
  */
 router.post('/create-checkout-session', authenticateToken, checkStripeConfigured, async (req, res) => {
   try {
@@ -33,9 +44,18 @@ router.post('/create-checkout-session', authenticateToken, checkStripeConfigured
       return res.status(400).json({ error: 'Price ID is required' });
     }
 
+    // Validate price ID belongs to a valid tier
+    const validation = validatePriceId(priceId);
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const targetTier = validation.tier;
+    logger.info(`User ${req.userId} requesting checkout for tier: ${targetTier}`);
+
     // Get user
     const userResult = await pool.query(
-      'SELECT id, email, stripe_customer_id FROM users WHERE id = $1',
+      'SELECT id, email, stripe_customer_id, tier FROM users WHERE id = $1',
       [req.userId]
     );
 
@@ -44,6 +64,16 @@ router.post('/create-checkout-session', authenticateToken, checkStripeConfigured
     }
 
     const user = userResult.rows[0];
+
+    // Check if user already has an active subscription
+    if (user.stripe_customer_id && (user.tier === 'pro' || user.tier === 'premium')) {
+      // User already subscribed - redirect to billing portal instead
+      return res.status(400).json({
+        error: 'Already subscribed',
+        message: 'Use the billing portal to change your plan',
+        usePortal: true
+      });
+    }
 
     // Create or retrieve Stripe customer
     let customerId = user.stripe_customer_id;
@@ -67,7 +97,7 @@ router.post('/create-checkout-session', authenticateToken, checkStripeConfigured
       logger.info(`Created Stripe customer ${customerId} for user ${user.id}`);
     }
 
-    // Create checkout session
+    // Create checkout session with tier metadata
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: 'subscription',
@@ -78,20 +108,28 @@ router.post('/create-checkout-session', authenticateToken, checkStripeConfigured
           quantity: 1
         }
       ],
-      success_url: `${process.env.FRONTEND_URL}/premium/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.FRONTEND_URL}/premium/success?session_id={CHECKOUT_SESSION_ID}&tier=${targetTier}`,
       cancel_url: `${process.env.FRONTEND_URL}/premium?canceled=true`,
       metadata: {
-        userId: user.id.toString()
+        userId: user.id.toString(),
+        tier: targetTier
+      },
+      subscription_data: {
+        metadata: {
+          userId: user.id.toString(),
+          tier: targetTier
+        }
       },
       allow_promotion_codes: true,
       billing_address_collection: 'auto'
     });
 
-    logger.info(`Created checkout session ${session.id} for user ${user.id}`);
+    logger.info(`Created checkout session ${session.id} for user ${user.id} (tier: ${targetTier})`);
 
     return res.json({
       sessionId: session.id,
-      url: session.url
+      url: session.url,
+      tier: targetTier
     });
 
   } catch (error) {
@@ -210,43 +248,101 @@ router.get('/subscription-status', authenticateToken, checkStripeConfigured, asy
 
 /**
  * GET /api/stripe/prices
- * Get available subscription prices
+ * Get available subscription prices for all tiers
  */
 router.get('/prices', async (req, res) => {
-  if (!stripe) {
-    return res.json({ prices: [] });
-  }
-
   try {
-    const prices = [];
+    // Get prices from tier config (includes both Pro and Premium)
+    const prices = getStripePrices();
+    
+    // Also return full tier information for the pricing page
+    const tiers = Object.entries(TIERS)
+      .filter(([key]) => key !== 'enterprise') // Enterprise is contact-sales only
+      .map(([key, config]) => ({
+        id: key,
+        name: config.displayName,
+        description: config.description,
+        priceMonthly: config.priceMonthly,
+        priceYearly: config.priceYearly,
+        stripePriceIdMonthly: config.stripePriceIdMonthly || null,
+        stripePriceIdYearly: config.stripePriceIdYearly || null,
+        features: config.features,
+        limits: {
+          tracks: config.limits.tracks === Infinity ? 'Unlimited' : config.limits.tracks,
+          alertsPerDay: config.limits.alertsPerDay === Infinity ? 'Unlimited' : config.limits.alertsPerDay,
+          priceHistory: config.limits.priceHistory,
+          realTimeAlerts: config.limits.realTimeAlerts,
+          prioritySupport: config.limits.prioritySupport,
+          aiFeatures: config.limits.aiFeatures,
+          exportData: config.limits.exportData,
+          earlyAccess: config.limits.earlyAccess
+        },
+        badge: config.badge || null
+      }));
 
-    // Add configured prices if they exist
-    if (process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID) {
-      prices.push({
-        id: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID,
-        name: 'Premium Monthly',
-        amount: 1499,
-        currency: 'usd',
-        interval: 'month'
-      });
-    }
-
-    if (process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID) {
-      prices.push({
-        id: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID,
-        name: 'Premium Yearly',
-        amount: 14900,
-        currency: 'usd',
-        interval: 'year'
-      });
-    }
-
-    return res.json({ prices });
+    return res.json({ 
+      prices,
+      tiers,
+      stripeConfigured: !!stripe
+    });
 
   } catch (error) {
     logger.error('Failed to get prices:', error);
     return res.status(500).json({
       error: 'Failed to get prices',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/stripe/change-plan
+ * Change subscription plan (upgrade/downgrade)
+ * Uses Stripe billing portal for simplicity
+ */
+router.post('/change-plan', authenticateToken, checkStripeConfigured, async (req, res) => {
+  try {
+    const userResult = await pool.query(
+      'SELECT stripe_customer_id, tier FROM users WHERE id = $1',
+      [req.userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = userResult.rows[0];
+
+    if (!user.stripe_customer_id) {
+      return res.status(400).json({
+        error: 'No subscription found',
+        message: 'You do not have an active subscription to change'
+      });
+    }
+
+    // Create billing portal session for plan management
+    const session = await stripe.billingPortal.sessions.create({
+      customer: user.stripe_customer_id,
+      return_url: `${process.env.FRONTEND_URL}/settings?tab=subscription`,
+      flow_data: {
+        type: 'subscription_update',
+        after_completion: {
+          type: 'redirect',
+          redirect: {
+            return_url: `${process.env.FRONTEND_URL}/settings?tab=subscription&changed=true`
+          }
+        }
+      }
+    });
+
+    logger.info(`Created plan change portal session for user ${req.userId}`);
+
+    return res.json({ url: session.url });
+
+  } catch (error) {
+    logger.error('Plan change portal creation failed:', error);
+    return res.status(500).json({
+      error: 'Failed to create plan change session',
       message: error.message
     });
   }
