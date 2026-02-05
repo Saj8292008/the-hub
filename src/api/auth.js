@@ -41,7 +41,7 @@ const logger = require('../utils/logger');
 
 router.post('/signup', authRateLimit, async (req, res) => {
   try {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password, firstName, lastName, referralCode } = req.body;
 
     // Validate required fields
     if (!email || !password) {
@@ -150,6 +150,27 @@ router.post('/signup', authRateLimit, async (req, res) => {
 
     logger.info(`New user registered: ${user.email} (ID: ${user.id})`);
 
+    // Process referral code if provided
+    let referralApplied = false;
+    if (referralCode) {
+      try {
+        const ReferralService = require('../services/growth/ReferralService');
+        const referralService = new ReferralService(supabase);
+        const referralResult = await referralService.processReferral(
+          referralCode,
+          user.id,
+          user.email
+        );
+        referralApplied = referralResult.success;
+        if (referralApplied) {
+          logger.info(`Referral code ${referralCode} applied for user ${user.id}`);
+        }
+      } catch (refError) {
+        logger.warn(`Failed to process referral code: ${refError.message}`);
+        // Don't fail signup if referral fails
+      }
+    }
+
     res.status(201).json({
       message: 'Account created successfully',
       user: {
@@ -158,6 +179,7 @@ router.post('/signup', authRateLimit, async (req, res) => {
         firstName: user.first_name,
         lastName: user.last_name
       },
+      referralApplied,
       note: 'Please check your email to verify your account'
     });
   } catch (error) {

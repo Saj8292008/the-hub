@@ -1,16 +1,23 @@
 /**
  * Signup Page
  * User registration with email verification
+ * Supports referral codes via URL param: /signup?ref=HUB-XXXX-XXXX
  */
 
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { validateEmail, validatePassword } from '../services/auth';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export default function Signup() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signup, clearError } = useAuth();
+
+  // Get referral code from URL
+  const refCode = searchParams.get('ref') || '';
 
   const [formData, setFormData] = useState({
     email: '',
@@ -18,7 +25,39 @@ export default function Signup() {
     confirmPassword: '',
     firstName: '',
     lastName: '',
+    referralCode: refCode,
   });
+
+  const [referrerName, setReferrerName] = useState<string | null>(null);
+  const [validatingCode, setValidatingCode] = useState(false);
+
+  // Validate referral code on mount or when it changes
+  useEffect(() => {
+    if (formData.referralCode) {
+      validateReferralCode(formData.referralCode);
+    }
+  }, []);
+
+  const validateReferralCode = async (code: string) => {
+    if (!code || code.length < 8) {
+      setReferrerName(null);
+      return;
+    }
+
+    setValidatingCode(true);
+    try {
+      const response = await fetch(`${API_URL}/api/referrals/validate/${code}`);
+      const data = await response.json();
+      if (data.valid) {
+        setReferrerName(data.referrerName || 'A Hub member');
+      } else {
+        setReferrerName(null);
+      }
+    } catch {
+      setReferrerName(null);
+    }
+    setValidatingCode(false);
+  };
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState('');
@@ -85,6 +124,7 @@ export default function Signup() {
         password: formData.password,
         firstName: formData.firstName || undefined,
         lastName: formData.lastName || undefined,
+        referralCode: formData.referralCode || undefined,
       });
 
       setSuccess(true);
@@ -93,6 +133,18 @@ export default function Signup() {
       setServerError(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleReferralCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toUpperCase();
+    setFormData(prev => ({ ...prev, referralCode: value }));
+    
+    // Validate after a short delay
+    if (value.length >= 8) {
+      validateReferralCode(value);
+    } else {
+      setReferrerName(null);
     }
   };
 
@@ -259,6 +311,38 @@ export default function Signup() {
               />
               {errors.confirmPassword && (
                 <p className="mt-2 text-sm text-red-400">{errors.confirmPassword}</p>
+              )}
+            </div>
+
+            {/* Referral Code Field */}
+            <div>
+              <label htmlFor="referralCode" className="block text-sm font-medium text-gray-300 mb-2">
+                Referral Code (optional)
+              </label>
+              <input
+                type="text"
+                id="referralCode"
+                name="referralCode"
+                value={formData.referralCode}
+                onChange={handleReferralCodeChange}
+                className={`w-full px-4 py-3 bg-[#0A0E27] border ${
+                  referrerName ? 'border-green-500' : 'border-gray-700'
+                } rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors uppercase`}
+                placeholder="HUB-XXXX-XXXX"
+                disabled={loading}
+              />
+              {validatingCode && (
+                <p className="mt-2 text-sm text-gray-400">Validating code...</p>
+              )}
+              {referrerName && !validatingCode && (
+                <p className="mt-2 text-sm text-green-400">
+                  ✓ Referred by {referrerName}
+                </p>
+              )}
+              {formData.referralCode && !referrerName && !validatingCode && formData.referralCode.length >= 8 && (
+                <p className="mt-2 text-sm text-red-400">
+                  Invalid referral code
+                </p>
               )}
             </div>
 

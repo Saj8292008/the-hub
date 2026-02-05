@@ -24,6 +24,7 @@ import NewsletterUnsubscribe from './pages/NewsletterUnsubscribe'
 import ScraperDebug from './pages/ScraperDebug'
 import MissionControl from './pages/MissionControl'
 import Projects from './pages/Projects'
+import Referrals from './pages/Referrals'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import ForgotPassword from './pages/ForgotPassword'
@@ -34,6 +35,10 @@ import PremiumSuccess from './pages/PremiumSuccess'
 import About from './pages/About'
 import Compare from './pages/Compare'
 import Deals from './pages/Deals'
+
+
+import AlertPreferences from './pages/AlertPreferences'
+
 import { Resellers, Collectors, Dealers } from './pages/for'
 import { ConnectionStatus } from './components/ConnectionStatus'
 
@@ -116,10 +121,12 @@ function App() {
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/integrations" element={<Integrations />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings/alerts" element={<AlertPreferences />} />
                   <Route path="/admin" element={<AdminSettings />} />
                   <Route path="/admin/scraper-debug" element={<ScraperDebug />} />
                   <Route path="/mission-control" element={<MissionControl />} />
                   <Route path="/projects" element={<Projects />} />
+                  <Route path="/referrals" element={<Referrals />} />
                 </Routes>
               </Layout>
             } />

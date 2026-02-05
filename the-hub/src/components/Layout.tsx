@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { BarChart3, Settings, Zap, Home, Menu, X, Search, Watch, Car, Footprints, Trophy, FileText, User, LogIn, UserPlus, LogOut, Crown } from 'lucide-react'
+import { BarChart3, Settings, Zap, Home, Menu, X, Search, Watch, Car, Footprints, Trophy, FileText, User, LogIn, UserPlus, LogOut, Crown, Bell } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuth } from '../contexts/AuthContext'
 import { NotificationPanel } from './NotificationPanel'
@@ -35,6 +35,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { path: '/analytics', icon: BarChart3, label: 'Analytics' },
     { path: '/blog', icon: FileText, label: 'Blog' },
     { path: '/integrations', icon: Zap, label: 'Integrations' },
+    { path: '/settings/alerts', icon: Bell, label: 'Deal Alerts' },
     { path: '/settings', icon: Settings, label: 'Settings' },
   ]
 

@@ -1,0 +1,24 @@
+<svg width="400" height="100" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Full logo with text -->
+  <defs>
+    <linearGradient id="gradText" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Hub icon (mini) -->
+  <circle cx="40" cy="50" r="12" fill="url(#gradText)"/>
+  <circle cx="40" cy="25" r="6" fill="url(#gradText)" opacity="0.7"/>
+  <circle cx="60" cy="37" r="6" fill="url(#gradText)" opacity="0.7"/>
+  <circle cx="60" cy="63" r="6" fill="url(#gradText)" opacity="0.7"/>
+  <circle cx="40" cy="75" r="6" fill="url(#gradText)" opacity="0.7"/>
+  <circle cx="20" cy="63" r="6" fill="url(#gradText)" opacity="0.7"/>
+  <circle cx="20" cy="37" r="6" fill="url(#gradText)" opacity="0.7"/>
+  
+  <!-- Text: THE HUB -->
+  <text x="90" y="62" font-family="system-ui, -apple-system, sans-serif" font-size="42" font-weight="700" fill="url(#gradText)">THE HUB</text>
+  
+  <!-- Tagline -->
+  <text x="92" y="82" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="400" fill="#64748b">Deals. Aggregated.</text>
+</svg>

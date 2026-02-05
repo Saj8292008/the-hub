@@ -1,0 +1,28 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Modern Hub Icon - Connected nodes -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Center hub circle -->
+  <circle cx="100" cy="100" r="25" fill="url(#grad1)"/>
+  
+  <!-- Outer connection nodes -->
+  <circle cx="100" cy="40" r="15" fill="url(#grad1)" opacity="0.8"/>
+  <circle cx="152" cy="70" r="15" fill="url(#grad1)" opacity="0.8"/>
+  <circle cx="152" cy="130" r="15" fill="url(#grad1)" opacity="0.8"/>
+  <circle cx="100" cy="160" r="15" fill="url(#grad1)" opacity="0.8"/>
+  <circle cx="48" cy="130" r="15" fill="url(#grad1)" opacity="0.8"/>
+  <circle cx="48" cy="70" r="15" fill="url(#grad1)" opacity="0.8"/>
+  
+  <!-- Connection lines -->
+  <line x1="100" y1="75" x2="100" y2="55" stroke="url(#grad1)" stroke-width="3" opacity="0.6"/>
+  <line x1="122" y1="88" x2="140" y2="78" stroke="url(#grad1)" stroke-width="3" opacity="0.6"/>
+  <line x1="122" y1="112" x2="140" y2="122" stroke="url(#grad1)" stroke-width="3" opacity="0.6"/>
+  <line x1="100" y1="125" x2="100" y2="145" stroke="url(#grad1)" stroke-width="3" opacity="0.6"/>
+  <line x1="78" y1="112" x2="60" y2="122" stroke="url(#grad1)" stroke-width="3" opacity="0.6"/>
+  <line x1="78" y1="88" x2="60" y2="78" stroke="url(#grad1)" stroke-width="3" opacity="0.6"/>
+</svg>

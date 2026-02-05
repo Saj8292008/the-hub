@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 1080px;
+      height: 1080px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: white;
+      padding: 60px;
+    }
+    .logo {
+      font-size: 72px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .tagline {
+      font-size: 36px;
+      color: #a0a0a0;
+      margin-bottom: 60px;
+    }
+    .categories {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+    .category {
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 30px 40px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .category-icon {
+      font-size: 64px;
+      margin-bottom: 15px;
+    }
+    .category-name {
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .cta {
+      font-size: 42px;
+      font-weight: 700;
+      margin-top: 40px;
+      color: #00d4ff;
+    }
+    .url {
+      font-size: 28px;
+      color: #888;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">THE HUB</div>
+  <div class="tagline">Find Deals Before Anyone Else</div>
+  
+  <div class="categories">
+    <div class="category">
+      <div class="category-icon">⌚</div>
+      <div class="category-name">Watches</div>
+    </div>
+    <div class="category">
+      <div class="category-icon">👟</div>
+      <div class="category-name">Sneakers</div>
+    </div>
+    <div class="category">
+      <div class="category-icon">🚗</div>
+      <div class="category-name">Cars</div>
+    </div>
+  </div>
+  
+  <div class="cta">🔥 Real-Time Deal Alerts</div>
+  <div class="url">the-hub-psi.vercel.app</div>
+</body>
+</html>

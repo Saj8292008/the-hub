@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../contexts/NotificationContext';
+import ReferralDashboard from '../components/referrals/ReferralDashboard';
 import '../styles/Settings.css';
 
 interface UserSettings {
@@ -301,6 +302,12 @@ const Settings: React.FC = () => {
           onClick={() => setActiveTab('privacy')}
         >
           Privacy
+        </button>
+        <button
+          className={activeTab === 'referrals' ? 'active' : ''}
+          onClick={() => setActiveTab('referrals')}
+        >
+          Referrals
         </button>
       </div>
 
@@ -635,6 +642,17 @@ const Settings: React.FC = () => {
               </ul>
               <p>We never sell your data. Read our <a href="/privacy">Privacy Policy</a>.</p>
             </div>
+          </div>
+        )}
+
+        {/* REFERRALS TAB */}
+        {activeTab === 'referrals' && (
+          <div className="referral-settings">
+            <h2>Referral Program</h2>
+            <p className="text-gray-400 mb-6">
+              Share The Hub with friends and earn free Pro months!
+            </p>
+            <ReferralDashboard />
           </div>
         )}
 
