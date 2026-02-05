@@ -10,6 +10,7 @@ interface SignupData {
   password: string;
   firstName?: string;
   lastName?: string;
+  referralCode?: string;
 }
 
 interface LoginData {

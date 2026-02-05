@@ -2,12 +2,17 @@
  * Referral API
  * 
  * Endpoints for referral program
+ * - Get/generate referral code
+ * - Track referral stats
+ * - View progress towards free months
+ * - Leaderboard
  */
 
 const express = require('express');
 const router = express.Router();
 const ReferralService = require('../services/growth/ReferralService');
 const supabase = require('../db/supabase');
+const { authenticateToken } = require('../middleware/auth');
 
 const referralService = new ReferralService(supabase.client);
 
@@ -15,20 +20,20 @@ const referralService = new ReferralService(supabase.client);
  * GET /api/referrals/code
  * Get or generate referral code for authenticated user
  */
-router.get('/code', async (req, res) => {
+router.get('/code', authenticateToken, async (req, res) => {
   try {
-    // For now, use a query param for user ID (in production, use auth)
-    const userId = req.query.userId || req.user?.id;
+    const userId = req.userId;
     
     if (!userId) {
-      return res.status(401).json({ error: 'User ID required' });
+      return res.status(401).json({ error: 'Authentication required' });
     }
     
     const code = await referralService.generateCode(userId);
     
     res.json({
       code,
-      referralLink: `https://thehub.deals/join?ref=${code}`
+      referralLink: `https://thehub.deals/signup?ref=${code}`,
+      shortLink: `thehub.deals/r/${code}`
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -61,14 +66,14 @@ router.post('/apply', async (req, res) => {
 
 /**
  * GET /api/referrals/stats
- * Get referral stats for a user
+ * Get comprehensive referral stats for authenticated user
  */
-router.get('/stats', async (req, res) => {
+router.get('/stats', authenticateToken, async (req, res) => {
   try {
-    const userId = req.query.userId || req.user?.id;
+    const userId = req.userId;
     
     if (!userId) {
-      return res.status(401).json({ error: 'User ID required' });
+      return res.status(401).json({ error: 'Authentication required' });
     }
     
     const stats = await referralService.getStats(userId);
@@ -78,6 +83,38 @@ router.get('/stats', async (req, res) => {
     }
     
     res.json(stats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/referrals/progress
+ * Get progress towards next free month
+ */
+router.get('/progress', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const stats = await referralService.getStats(userId);
+    
+    if (!stats) {
+      return res.status(404).json({ error: 'Stats not found' });
+    }
+    
+    res.json({
+      paidReferrals: stats.paidReferrals,
+      progressToNextMonth: stats.progressToNextMonth,
+      referralsNeeded: stats.referralsNeededForNextMonth,
+      requiredForReward: stats.requiredPaidReferrals,
+      freeMonthsEarned: stats.freeMonthsEarned,
+      totalDaysEarned: stats.totalDaysEarned,
+      progressPercentage: Math.round((stats.progressToNextMonth / stats.requiredPaidReferrals) * 100)
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -100,25 +137,74 @@ router.get('/leaderboard', async (req, res) => {
 
 /**
  * GET /api/referrals/validate/:code
- * Validate a referral code
+ * Validate a referral code (public - used during signup)
  */
 router.get('/validate/:code', async (req, res) => {
   try {
     const { code } = req.params;
-    
-    const { data } = await supabase.client
-      .from('referral_codes')
-      .select('code, is_active')
-      .eq('code', code.toUpperCase())
-      .single();
-    
-    if (data && data.is_active) {
-      res.json({ valid: true, code: data.code });
-    } else {
-      res.json({ valid: false });
-    }
+    const result = await referralService.validateCode(code);
+    res.json(result);
   } catch (error) {
     res.json({ valid: false });
+  }
+});
+
+/**
+ * GET /api/referrals/history
+ * Get referral history for authenticated user
+ */
+router.get('/history', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const limit = parseInt(req.query.limit) || 50;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const stats = await referralService.getStats(userId);
+    
+    if (!stats) {
+      return res.status(404).json({ error: 'Stats not found' });
+    }
+    
+    res.json({
+      referrals: stats.referrals.slice(0, limit),
+      total: stats.totalReferrals,
+      paid: stats.paidReferrals
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/referrals/rewards
+ * Get reward history for authenticated user
+ */
+router.get('/rewards', authenticateToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    const stats = await referralService.getStats(userId);
+    
+    if (!stats) {
+      return res.status(404).json({ error: 'Stats not found' });
+    }
+    
+    res.json({
+      freeMonthsEarned: stats.freeMonthsEarned,
+      totalDaysEarned: stats.totalDaysEarned,
+      rewardHistory: stats.rewardHistory,
+      milestonesAchieved: stats.milestonesAchieved,
+      nextMilestone: stats.nextMilestone
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

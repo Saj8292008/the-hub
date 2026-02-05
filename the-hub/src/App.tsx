@@ -24,6 +24,7 @@ import NewsletterUnsubscribe from './pages/NewsletterUnsubscribe'
 import ScraperDebug from './pages/ScraperDebug'
 import MissionControl from './pages/MissionControl'
 import Projects from './pages/Projects'
+import Referrals from './pages/Referrals'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import ForgotPassword from './pages/ForgotPassword'
@@ -32,6 +33,10 @@ import VerifyEmail from './pages/VerifyEmail'
 import Premium from './pages/Premium'
 import PremiumSuccess from './pages/PremiumSuccess'
 import About from './pages/About'
+import Compare from './pages/Compare'
+import Deals from './pages/Deals'
+import AlertPreferences from './pages/AlertPreferences'
+import { Resellers, Collectors, Dealers } from './pages/for'
 import { ConnectionStatus } from './components/ConnectionStatus'
 
 function App() {
@@ -69,6 +74,20 @@ function App() {
             {/* Landing Page (No Layout) */}
             <Route path="/" element={<Landing />} />
             <Route path="/about" element={<About />} />
+            
+            {/* Segment Landing Pages (SEO) */}
+            <Route path="/for/resellers" element={<Resellers />} />
+            <Route path="/for/collectors" element={<Collectors />} />
+            <Route path="/for/dealers" element={<Dealers />} />
+            
+            {/* Comparison Pages (SEO) */}
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/compare/:competitor" element={<Compare />} />
+            
+            {/* Programmatic Deal Pages (SEO) */}
+            <Route path="/deals" element={<Deals />} />
+            <Route path="/deals/:brand" element={<Deals />} />
+            <Route path="/deals/category/:category" element={<Deals />} />
 
             {/* Auth Routes (No Layout) */}
             <Route path="/login" element={<Login />} />
@@ -99,10 +118,12 @@ function App() {
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/integrations" element={<Integrations />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings/alerts" element={<AlertPreferences />} />
                   <Route path="/admin" element={<AdminSettings />} />
                   <Route path="/admin/scraper-debug" element={<ScraperDebug />} />
                   <Route path="/mission-control" element={<MissionControl />} />
                   <Route path="/projects" element={<Projects />} />
+                  <Route path="/referrals" element={<Referrals />} />
                 </Routes>
               </Layout>
             } />
