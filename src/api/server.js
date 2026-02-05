@@ -394,6 +394,22 @@ app.set('supabase', supabase.client);
 app.use('/api/alerts', dealAlertsRouter);
 
 // ============================================================================
+// PREMIUM ALERTS API (Multi-channel webhooks with tier-based delays)
+// ============================================================================
+
+const { router: premiumAlertsRouter, alertService: premiumAlertService } = require('./premiumAlerts');
+app.use('/api/premium-alerts', premiumAlertsRouter);
+
+// Start premium alert queue processor
+if (process.env.ENABLE_PREMIUM_ALERTS !== 'false') {
+  premiumAlertService.startQueueProcessor(30000); // Process every 30 seconds
+  logger.info('✅ Premium alert queue processor started');
+}
+
+// Make alert service globally available for other modules
+global.premiumAlertService = premiumAlertService;
+
+// ============================================================================
 // REDDIT WTB MONITOR API
 // ============================================================================
 
@@ -561,6 +577,18 @@ const projectsRouter = require('./projects');
 app.use('/api/projects', projectsRouter);
 
 // ============================================================================
+// EMAIL SEQUENCES API (Drip Campaigns)
+// ============================================================================
+const sequencesRouter = require('./sequences');
+app.use('/api/sequences', sequencesRouter);
+
+// ============================================================================
+// CONTENT ATOMIZER API
+// ============================================================================
+const contentRouter = require('./content');
+app.use('/api/content', contentRouter);
+
+// ============================================================================
 // TELEGRAM BOT API ROUTES
 // ============================================================================
 const telegramAPI = require('./telegram');
@@ -572,12 +600,22 @@ app.use('/api/telegram', telegramAPI);
 
 const dealScoringAPI = require('./dealScoring');
 
-// Deal Scoring
+// Deal Scoring v2.0
 app.post('/api/listings/score/:id', handleRoute((req) => dealScoringAPI.scoreListing(req)));
 app.post('/api/listings/score-all', handleRoute((req) => dealScoringAPI.scoreAllListings(req)));
 app.get('/api/listings/hot-deals', handleRoute((req) => dealScoringAPI.getHotDeals(req)));
 app.get('/api/listings/score-stats', handleRoute((req) => dealScoringAPI.getScoreStats(req)));
 app.post('/api/listings/ai-rarity', handleRoute((req) => dealScoringAPI.toggleAIRarity(req)));
+
+// Deal of the Day
+app.get('/api/listings/deal-of-the-day', handleRoute((req) => dealScoringAPI.getDealOfTheDay(req)));
+
+// Profit Potential Estimation
+app.post('/api/listings/profit-estimate', handleRoute((req) => dealScoringAPI.estimateProfitPotential(req)));
+
+// Scoring Configuration (admin)
+app.get('/api/scoring/config', handleRoute((req) => dealScoringAPI.getConfiguration(req)));
+app.put('/api/scoring/config/:category', handleRoute((req) => dealScoringAPI.updateConfiguration(req)));
 
 // Deal Scoring Scheduler Control
 app.get('/api/deal-scoring/scheduler/status', handleRoute(async () => {
