@@ -572,12 +572,22 @@ app.use('/api/telegram', telegramAPI);
 
 const dealScoringAPI = require('./dealScoring');
 
-// Deal Scoring
+// Deal Scoring v2.0
 app.post('/api/listings/score/:id', handleRoute((req) => dealScoringAPI.scoreListing(req)));
 app.post('/api/listings/score-all', handleRoute((req) => dealScoringAPI.scoreAllListings(req)));
 app.get('/api/listings/hot-deals', handleRoute((req) => dealScoringAPI.getHotDeals(req)));
 app.get('/api/listings/score-stats', handleRoute((req) => dealScoringAPI.getScoreStats(req)));
 app.post('/api/listings/ai-rarity', handleRoute((req) => dealScoringAPI.toggleAIRarity(req)));
+
+// Deal of the Day
+app.get('/api/listings/deal-of-the-day', handleRoute((req) => dealScoringAPI.getDealOfTheDay(req)));
+
+// Profit Potential Estimation
+app.post('/api/listings/profit-estimate', handleRoute((req) => dealScoringAPI.estimateProfitPotential(req)));
+
+// Scoring Configuration (admin)
+app.get('/api/scoring/config', handleRoute((req) => dealScoringAPI.getConfiguration(req)));
+app.put('/api/scoring/config/:category', handleRoute((req) => dealScoringAPI.updateConfiguration(req)));
 
 // Deal Scoring Scheduler Control
 app.get('/api/deal-scoring/scheduler/status', handleRoute(async () => {
