@@ -1,6 +1,12 @@
 /**
- * Deal Scoring Scheduler
- * Automatically scores all listings on a schedule
+ * Deal Scoring Scheduler v2.0
+ * Automatically scores all listings across categories on a schedule
+ * 
+ * Features:
+ * - Multi-category support (watches, sneakers, cars)
+ * - Deal of the Day selection
+ * - Score distribution tracking
+ * - Real-time updates via Socket.IO
  */
 
 const dealScorer = require('../services/ai/dealScorer');
@@ -14,29 +20,35 @@ class DealScoringScheduler {
     this.interval = null;
     this.intervalMs = 60 * 60 * 1000; // 1 hour default
     this.lastRun = null;
+    this.enabledCategories = ['watch']; // Categories to score
+    
     this.stats = {
       totalRuns: 0,
       totalScored: 0,
       totalErrors: 0,
-      lastRunStats: null
+      lastRunStats: null,
+      dealsOfTheDay: {}
     };
   }
 
   /**
    * Start the scheduler
    * @param {number} intervalMs - Interval in milliseconds (default: 1 hour)
+   * @param {string[]} categories - Categories to score (default: ['watch'])
    */
-  start(intervalMs = 60 * 60 * 1000) {
+  start(intervalMs = 60 * 60 * 1000, categories = ['watch']) {
     if (this.isRunning) {
       console.log('⚠️  Deal scoring scheduler already running');
       return;
     }
 
     this.intervalMs = intervalMs;
+    this.enabledCategories = categories;
     this.isRunning = true;
 
-    console.log('🚀 Starting deal scoring scheduler');
+    console.log('🚀 Starting deal scoring scheduler v2.0');
     console.log(`⏰ Interval: ${this.intervalMs / 1000 / 60} minutes`);
+    console.log(`📦 Categories: ${this.enabledCategories.join(', ')}`);
 
     // Run immediately on start
     this.runScoring().catch(err => {
@@ -72,56 +84,80 @@ class DealScoringScheduler {
   }
 
   /**
-   * Run scoring for all listings
+   * Run scoring for all enabled categories
    */
   async runScoring() {
-    console.log('\n🔄 Starting deal scoring run...');
+    console.log('\n🔄 Starting deal scoring run v2.0...');
     const startTime = Date.now();
 
     const runStats = {
       startTime: new Date().toISOString(),
-      watches: { total: 0, scored: 0, errors: 0 },
-      cars: { total: 0, scored: 0, errors: 0 },
-      sneakers: { total: 0, scored: 0, errors: 0 },
-      duration: 0
+      categories: {},
+      totalScored: 0,
+      totalErrors: 0,
+      duration: 0,
+      dealsOfTheDay: {}
     };
 
     try {
-      // Score watch listings
-      console.log('⌚ Scoring watch listings...');
-      const watchStats = await this.scoreWatchListings();
-      runStats.watches = watchStats;
+      // Score each enabled category
+      for (const category of this.enabledCategories) {
+        console.log(`\n📦 Scoring ${category} listings...`);
+        
+        try {
+          const categoryStats = await this.scoreCategoryListings(category);
+          runStats.categories[category] = categoryStats;
+          runStats.totalScored += categoryStats.scored;
+          runStats.totalErrors += categoryStats.errors;
 
-      // Score car listings (if implemented)
-      // console.log('🚗 Scoring car listings...');
-      // const carStats = await this.scoreCarListings();
-      // runStats.cars = carStats;
-
-      // Score sneaker listings (if implemented)
-      // console.log('👟 Scoring sneaker listings...');
-      // const sneakerStats = await this.scoreSneakerListings();
-      // runStats.sneakers = sneakerStats;
+          // Get Deal of the Day for this category
+          const dotd = await dealScorer.getDealOfTheDay(category);
+          if (dotd) {
+            runStats.dealsOfTheDay[category] = {
+              id: dotd.listing?.id,
+              title: dotd.listing?.title,
+              score: dotd.score,
+              grade: dotd.grade,
+              reason: dotd.reason
+            };
+          }
+        } catch (error) {
+          console.error(`❌ Error scoring ${category}:`, error.message);
+          runStats.categories[category] = { total: 0, scored: 0, errors: 1, error: error.message };
+        }
+      }
 
       // Calculate totals
       const duration = Date.now() - startTime;
       runStats.duration = duration;
 
-      const totalScored = runStats.watches.scored + runStats.cars.scored + runStats.sneakers.scored;
-      const totalErrors = runStats.watches.errors + runStats.cars.errors + runStats.sneakers.errors;
-
       // Update stats
       this.stats.totalRuns++;
-      this.stats.totalScored += totalScored;
-      this.stats.totalErrors += totalErrors;
+      this.stats.totalScored += runStats.totalScored;
+      this.stats.totalErrors += runStats.totalErrors;
       this.stats.lastRunStats = runStats;
+      this.stats.dealsOfTheDay = runStats.dealsOfTheDay;
       this.lastRun = new Date().toISOString();
 
       // Log summary
       console.log('\n✅ Scoring run complete!');
       console.log(`⏱️  Duration: ${(duration / 1000).toFixed(2)}s`);
-      console.log(`📊 Total scored: ${totalScored}`);
-      console.log(`❌ Total errors: ${totalErrors}`);
-      console.log(`⌚ Watches: ${runStats.watches.scored}/${runStats.watches.total}`);
+      console.log(`📊 Total scored: ${runStats.totalScored}`);
+      console.log(`❌ Total errors: ${runStats.totalErrors}`);
+      
+      // Log category breakdown
+      for (const [cat, stats] of Object.entries(runStats.categories)) {
+        console.log(`   ${cat}: ${stats.scored}/${stats.total} scored`);
+        if (stats.distribution) {
+          console.log(`      Hot deals: ${stats.distribution.hotDeals}, Great: ${stats.distribution.greatDeals}, Good: ${stats.distribution.goodDeals}`);
+        }
+      }
+
+      // Log Deals of the Day
+      console.log('\n🏆 Deals of the Day:');
+      for (const [cat, dotd] of Object.entries(runStats.dealsOfTheDay)) {
+        console.log(`   ${cat}: "${dotd.title}" - ${dotd.grade} (${dotd.score})`);
+      }
 
       // Emit real-time update via Socket.IO
       if (this.io) {
@@ -129,6 +165,11 @@ class DealScoringScheduler {
           runStats,
           timestamp: new Date().toISOString()
         });
+
+        // Emit Deal of the Day updates
+        for (const [category, dotd] of Object.entries(runStats.dealsOfTheDay)) {
+          this.io.emit('deal-of-the-day', { category, deal: dotd });
+        }
       }
 
       return runStats;
@@ -140,94 +181,117 @@ class DealScoringScheduler {
   }
 
   /**
-   * Score all watch listings
+   * Score all listings in a category
    */
-  async scoreWatchListings() {
-    const stats = { total: 0, scored: 0, errors: 0 };
+  async scoreCategoryListings(category) {
+    const stats = { 
+      total: 0, 
+      scored: 0, 
+      errors: 0,
+      distribution: {
+        hotDeals: 0,
+        greatDeals: 0,
+        goodDeals: 0,
+        fair: 0,
+        belowMarket: 0
+      }
+    };
 
     try {
-      // Get all watch listings
+      const config = dealScorer.getConfig(category);
+      const thresholds = config.thresholds;
+      const tableName = `${category}_listings`;
+
+      // Get all listings
       let listings;
       if (supabase.isAvailable()) {
-        const result = await supabase.getWatchListings({ limit: 10000 });
-        listings = result.data || [];
-      } else {
+        const { data } = await supabase.client
+          .from(tableName)
+          .select('*')
+          .order('timestamp', { ascending: false })
+          .limit(10000);
+        listings = data || [];
+      } else if (category === 'watch') {
+        // Fallback for watches only
         const result = await localWatchListings.getWatchListings({ limit: 10000 });
         listings = result.data || [];
+      } else {
+        listings = [];
       }
 
       stats.total = listings.length;
 
       if (listings.length === 0) {
-        console.log('   No watch listings to score');
+        console.log(`   No ${category} listings to score`);
         return stats;
       }
 
-      console.log(`   Found ${listings.length} watch listings`);
+      console.log(`   Found ${listings.length} ${category} listings`);
 
       // Score each listing
+      const scores = [];
       for (let i = 0; i < listings.length; i++) {
         const listing = listings[i];
 
         try {
           // Score the listing
-          const { score, breakdown } = await dealScorer.scoreWatchListing(listing);
+          const result = await dealScorer.scoreListing(listing, category);
+          scores.push(result.score);
 
           // Update in database
           if (supabase.isAvailable()) {
             await supabase.client
-              .from('watch_listings')
+              .from(tableName)
               .update({
-                deal_score: score,
-                score_breakdown: breakdown,
+                deal_score: result.score,
+                score_breakdown: result.breakdown,
+                profit_potential: result.profitPotential,
                 scored_at: new Date().toISOString()
               })
               .eq('id', listing.id);
-          } else {
+          } else if (category === 'watch') {
             await localWatchListings.updateWatchListing(listing.id, {
-              deal_score: score,
-              score_breakdown: breakdown
+              deal_score: result.score,
+              score_breakdown: result.breakdown
             });
           }
 
           stats.scored++;
 
-          // Log progress every 10 listings
-          if ((i + 1) % 10 === 0) {
+          // Log progress every 25 listings
+          if ((i + 1) % 25 === 0) {
             console.log(`   Progress: ${i + 1}/${listings.length} (${((i + 1) / listings.length * 100).toFixed(1)}%)`);
           }
         } catch (error) {
-          console.error(`   Error scoring listing ${listing.id}:`, error.message);
+          console.error(`   Error scoring ${category} listing ${listing.id}:`, error.message);
           stats.errors++;
         }
       }
 
-      console.log(`   ✅ Scored ${stats.scored}/${stats.total} watch listings`);
+      // Calculate distribution
+      stats.distribution = {
+        hotDeals: scores.filter(s => s >= thresholds.hotDeal).length,
+        greatDeals: scores.filter(s => s >= thresholds.greatDeal && s < thresholds.hotDeal).length,
+        goodDeals: scores.filter(s => s >= thresholds.goodDeal && s < thresholds.greatDeal).length,
+        fair: scores.filter(s => s >= thresholds.fair && s < thresholds.goodDeal).length,
+        belowMarket: scores.filter(s => s < thresholds.fair).length
+      };
+
+      stats.averageScore = scores.length > 0 
+        ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) 
+        : 0;
+
+      console.log(`   ✅ Scored ${stats.scored}/${stats.total} ${category} listings`);
+      console.log(`   📊 Average score: ${stats.averageScore}`);
       if (stats.errors > 0) {
         console.log(`   ⚠️  ${stats.errors} errors`);
       }
 
       return stats;
     } catch (error) {
-      console.error('   ❌ Error in watch listing scoring:', error);
+      console.error(`   ❌ Error in ${category} listing scoring:`, error);
       throw error;
     }
-  }
-
-  /**
-   * Score car listings (placeholder)
-   */
-  async scoreCarListings() {
-    // TODO: Implement when car listings are available
-    return { total: 0, scored: 0, errors: 0 };
-  }
-
-  /**
-   * Score sneaker listings (placeholder)
-   */
-  async scoreSneakerListings() {
-    // TODO: Implement when sneaker listings are available
-    return { total: 0, scored: 0, errors: 0 };
   }
 
   /**
@@ -238,12 +302,16 @@ class DealScoringScheduler {
       isRunning: this.isRunning,
       intervalMs: this.intervalMs,
       intervalMinutes: this.intervalMs / 1000 / 60,
+      enabledCategories: this.enabledCategories,
       lastRun: this.lastRun,
       nextRun: this.isRunning && this.lastRun
         ? new Date(new Date(this.lastRun).getTime() + this.intervalMs).toISOString()
         : null,
       stats: this.stats,
-      uptime: this.isRunning ? Date.now() - new Date(this.lastRun || Date.now()).getTime() : 0
+      dealsOfTheDay: this.stats.dealsOfTheDay,
+      uptime: this.isRunning && this.lastRun 
+        ? Date.now() - new Date(this.lastRun).getTime() 
+        : 0
     };
   }
 
@@ -253,6 +321,14 @@ class DealScoringScheduler {
   async forceRun() {
     console.log('⚡ Manual scoring run triggered');
     return await this.runScoring();
+  }
+
+  /**
+   * Set categories to score
+   */
+  setCategories(categories) {
+    this.enabledCategories = categories;
+    console.log(`📦 Updated categories: ${categories.join(', ')}`);
   }
 }
 
