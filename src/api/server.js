@@ -28,9 +28,38 @@ const sneakerTracker = new SneakerTracker();
 const sportsTracker = new SportsTracker();
 const aiTracker = new AiTracker();
 
-// Middleware - Allow multiple frontend origins for development
+// Middleware - Allow frontend origins (dev + production)
+const allowedOrigins = [
+  // Development
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:5001',
+  // Production
+  'https://the-hub-psi.vercel.app',
+  'https://the-hub.vercel.app',
+  // Allow any vercel preview deployments
+  /\.vercel\.app$/
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:3001', 'http://localhost:5001'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    // Check against allowed origins (strings and regex)
+    const isAllowed = allowedOrigins.some(allowed => {
+      if (allowed instanceof RegExp) return allowed.test(origin);
+      return allowed === origin;
+    });
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
