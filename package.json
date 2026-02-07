@@ -41,7 +41,14 @@
     "pm2:logs": "pm2 logs the-hub",
     "pm2:status": "pm2 status",
     "pm2:monit": "pm2 monit",
-    "dash": "node scripts/dashboard-cli.js"
+    "dash": "node scripts/dashboard-cli.js",
+    "mc": "node scripts/mission-control-cli.js status",
+    "mc:quick": "node scripts/mission-control-cli.js quick",
+    "mc:scrapers": "node scripts/mission-control-cli.js scrapers",
+    "mc:newsletter": "node scripts/mission-control-cli.js newsletter",
+    "mc:hotdeals": "node scripts/mission-control-cli.js hotdeals",
+    "mc:restart": "node scripts/mission-control-cli.js restart",
+    "health": "node scripts/health-monitor.js"
   },
   "bin": {
     "hub": "./src/cli.js"
@@ -71,6 +78,7 @@
     "node-telegram-bot-api": "^0.66.0",
     "nodemailer": "^7.0.12",
     "openai": "^6.16.0",
+    "playwright": "^1.58.1",
     "playwright-extra": "^4.3.6",
     "playwright-extra-plugin-stealth": "^0.0.1",
     "puppeteer": "^24.35.0",
@@ -81,6 +89,7 @@
     "slugify": "^1.6.6",
     "socket.io": "^4.8.3",
     "stripe": "^20.2.0",
+    "twitter-api-v2": "^1.29.0",
     "user-agents": "^1.1.669",
     "winston": "^3.19.0"
   },
