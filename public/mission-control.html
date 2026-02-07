@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mission Control - The Hub</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --card-bg: #111827;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --text-dim: #9ca3af;
+      --accent: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    .header {
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.875rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-dim);
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+    }
+
+    .metric {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-label {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      color: var(--text-dim);
+      font-size: 0.875rem;
+    }
+
+    .stat-value {
+      font-weight: 600;
+    }
+
+    .activity-feed {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .activity-item {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.875rem;
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-time {
+      color: var(--text-dim);
+      font-size: 0.75rem;
+    }
+
+    .success { color: var(--success); }
+    .warning { color: var(--warning); }
+    .danger { color: var(--danger); }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+    }
+
+    .error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid var(--danger);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🚀 Mission Control</h1>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      <span id="server-status">Online</span>
+    </div>
+  </div>
+
+  <div id="error-container"></div>
+
+  <div id="dashboard" class="loading">
+    Loading dashboard data...
+  </div>
+
+  <script>
+    let autoRefresh = true;
+    const REFRESH_INTERVAL = 30000; // 30 seconds
+
+    async function fetchDashboard() {
+      try {
+        const response = await fetch('/api/dashboard/status');
+        if (!response.ok) throw new Error('Failed to fetch dashboard');
+        const data = await response.json();
+        renderDashboard(data);
+        clearError();
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    function renderDashboard(data) {
+      const dashboard = document.getElementById('dashboard');
+      dashboard.className = '';
+      
+      dashboard.innerHTML = `
+        <div class="grid">
+          <!-- Server Status -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Server</div>
+              <div class="card-icon">🖥️</div>
+            </div>
+            <div class="metric success">${data.server.status}</div>
+            <div class="metric-label">Uptime: ${data.server.uptime}</div>
+            <div style="margin-top: 1rem;">
+              <div class="stat-row">
+                <span class="stat-label">Memory</span>
+                <span class="stat-value">${data.server.memory.used}MB / ${data.server.memory.total}MB</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">CPU Load</span>
+                <span class="stat-value">${data.server.cpu}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scrapers -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Scrapers</div>
+              <div class="card-icon">🔍</div>
+            </div>
+            <div class="metric">${data.scrapers.last24h}</div>
+            <div class="metric-label">Listings in 24h</div>
+            <div style="margin-top: 1rem;">
+              <div class="stat-row">
+                <span class="stat-label">Total Listings</span>
+                <span class="stat-value">${data.scrapers.totalListings.toLocaleString()}</span>
+              </div>
+              ${Object.entries(data.scrapers.sources).map(([source, info]) => `
+                <div class="stat-row">
+                  <span class="stat-label">${source}</span>
+                  <span class="stat-value ${info.status === 'ok' ? 'success' : 'warning'}">${info.status}</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Newsletter -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Newsletter</div>
+              <div class="card-icon">📧</div>
+            </div>
+            <div class="metric">${data.newsletter.subscribers}</div>
+            <div class="metric-label">Active Subscribers</div>
+            ${data.newsletter.lastCampaign ? `
+              <div style="margin-top: 1rem;">
+                <div class="stat-row">
+                  <span class="stat-label">Last Campaign</span>
+                  <span class="stat-value">${data.newsletter.lastCampaign.name}</span>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Sent</span>
+                  <span class="stat-value">${data.newsletter.lastCampaign.sent}</span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Telegram -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Telegram</div>
+              <div class="card-icon">✈️</div>
+            </div>
+            <div class="metric ${data.telegram.botStatus === 'active' ? 'success' : 'warning'}">
+              ${data.telegram.botStatus}
+            </div>
+            <div class="metric-label">Channel: ${data.telegram.channelId}</div>
+            <div style="margin-top: 1rem;">
+              <div class="stat-row">
+                <span class="stat-label">Posts Today</span>
+                <span class="stat-value">${data.telegram.postsToday}</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Scheduled Jobs</span>
+                <span class="stat-value">${data.telegram.scheduledJobs}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Deals -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Deals</div>
+              <div class="card-icon">🔥</div>
+            </div>
+            <div class="metric">${data.deals.hotDealsToday}</div>
+            <div class="metric-label">Hot Deals Today (Score >15)</div>
+            <div style="margin-top: 1rem;">
+              <div class="stat-row">
+                <span class="stat-label">Active Watchlists</span>
+                <span class="stat-value">${data.deals.activeWatchlists}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+            <div class="card-icon">📊</div>
+          </div>
+          <div class="activity-feed">
+            ${data.activity.length > 0 ? data.activity.map(item => `
+              <div class="activity-item">
+                <div><strong>${item.title}</strong></div>
+                <div class="stat-label">
+                  ${item.source} • $${item.price} • Score: ${item.score}
+                </div>
+                <div class="activity-time">${formatTime(item.timestamp)}</div>
+              </div>
+            `).join('') : '<div class="activity-item">No recent activity</div>'}
+          </div>
+        </div>
+      `;
+    }
+
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diff = Math.floor((now - date) / 1000);
+      
+      if (diff < 60) return 'Just now';
+      if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+      return date.toLocaleDateString();
+    }
+
+    function showError(message) {
+      const container = document.getElementById('error-container');
+      container.innerHTML = `
+        <div class="error">
+          ⚠️ <strong>Error:</strong> ${message}
+        </div>
+      `;
+    }
+
+    function clearError() {
+      document.getElementById('error-container').innerHTML = '';
+    }
+
+    // Initial load
+    fetchDashboard();
+
+    // Auto-refresh
+    if (autoRefresh) {
+      setInterval(fetchDashboard, REFRESH_INTERVAL);
+    }
+  </script>
+</body>
+</html>

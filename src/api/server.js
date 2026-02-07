@@ -87,6 +87,15 @@ app.use(performanceMonitor.middleware());
 // Response caching middleware
 const cacheMiddleware = require('../middleware/caching');
 
+// Serve static files from public directory (Mission Control dashboard)
+const path = require('path');
+app.use(express.static(path.join(__dirname, '../../public')));
+
+// Mission Control redirect
+app.get('/mission-control', (req, res) => {
+  res.redirect('/mission-control.html');
+});
+
 // Basic route
 app.get('/', (req, res) => {
   res.json({ message: 'API Server is running!' });
