@@ -52,7 +52,7 @@ async function main() {
 
     // Initialize Telegram Interactive features
     const TelegramInteractive = require('./bot/telegramInteractive');
-    new TelegramInteractive(telegramBot.bot || telegramBot);
+    new TelegramInteractive(telegramBot.bot);
     logger.info('📱 Telegram Interactive: Active');
 
     // Start Discord bot
@@ -96,6 +96,15 @@ async function main() {
       const { initScheduler: initSneakerScheduler } = require('./schedulers/sneakerPriceScheduler');
       initSneakerScheduler(io, telegramBot.bot);
       logger.info('👟 Sneaker Price Scheduler: Active (every 4 hours)');
+    }
+
+    // Initialize Twitter auto-poster
+    if (process.env.TWITTER_ENABLED === 'true') {
+      logger.info('Initializing Twitter auto-poster...');
+      const { getPoster } = require('./automations/twitterPoster');
+      const twitterPoster = getPoster();
+      twitterPoster.start();
+      logger.info('🐦 Twitter Auto-Poster: Active (@TheHubDeals)');
     }
 
     // Start price poller with WebSocket support
