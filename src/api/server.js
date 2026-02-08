@@ -624,10 +624,10 @@ const telegramAPI = require('./telegram');
 app.use('/api/telegram', telegramAPI);
 
 // ============================================================================
-// TWITTER BOT API ROUTES
+// INSTAGRAM API ROUTES
 // ============================================================================
-const twitterAPI = require('./twitter');
-app.use('/api/twitter', twitterAPI);
+const instagramAPI = require('./instagram');
+app.use('/api/instagram', instagramAPI);
 
 // ============================================================================
 // DEAL SCORING API ENDPOINTS (AI Features)

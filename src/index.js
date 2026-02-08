@@ -98,13 +98,13 @@ async function main() {
       logger.info('👟 Sneaker Price Scheduler: Active (every 4 hours)');
     }
 
-    // Initialize Twitter auto-poster
-    if (process.env.TWITTER_ENABLED === 'true') {
-      logger.info('Initializing Twitter auto-poster...');
-      const { getPoster } = require('./automations/twitterPoster');
-      const twitterPoster = getPoster();
-      twitterPoster.start();
-      logger.info('🐦 Twitter Auto-Poster: Active (@TheHubDeals)');
+    // Initialize Instagram auto-poster
+    if (process.env.ENABLE_INSTAGRAM_POSTER !== 'false') {
+      logger.info('Initializing Instagram auto-poster...');
+      const supabase = require('./db/supabase');
+      const { initScheduler: initInstagramScheduler } = require('./schedulers/instagramScheduler');
+      initInstagramScheduler(supabase);
+      logger.info('📸 Instagram Auto-Poster: Active (10am, 2pm, 7pm CT)');
     }
 
     // Start price poller with WebSocket support
