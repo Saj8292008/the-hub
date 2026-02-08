@@ -14,8 +14,15 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const channelId = process.env.TELEGRAM_CHANNEL_ID; // e.g., @TheHubDeals
 
 if (!token) {
-  console.error('Missing TELEGRAM_BOT_TOKEN in .env');
-  process.exit(1);
+  console.log('⚠️  TELEGRAM_BOT_TOKEN not configured. Telegram bot disabled.');
+  // Export stub to allow server to continue
+  module.exports = {
+    bot: null,
+    postDealToChannel: async () => {},
+    sendPersonalizedAlert: async () => {},
+    findUsersForAlert: async () => []
+  };
+  return;
 }
 
 const bot = new TelegramBot(token, { polling: true });

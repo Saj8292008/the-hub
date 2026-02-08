@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate PWA Icons</title>
+</head>
+<body>
+    <h1>Generating Icons...</h1>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div id="output"></div>
+    
+    <script>
+        const sizes = [192, 512];
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const output = document.getElementById('output');
+        
+        sizes.forEach(size => {
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Background
+            ctx.fillStyle = '#6366f1';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Center circle
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/12.8, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Outer circles
+            const radius = size/17;
+            const distance = size/4.27;
+            
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * 60 - 90) * Math.PI / 180;
+                const x = size/2 + Math.cos(angle) * distance;
+                const y = size/2 + Math.sin(angle) * distance;
+                
+                ctx.globalAlpha = 0.9;
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            
+            // Connection lines
+            ctx.globalAlpha = 0.6;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = size/64;
+            
+            for (let i = 0; i < 6; i++) {
+                const angle = (i * 60 - 90) * Math.PI / 180;
+                const x = size/2 + Math.cos(angle) * distance;
+                const y = size/2 + Math.sin(angle) * distance;
+                
+                ctx.beginPath();
+                ctx.moveTo(size/2, size/2);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+            
+            // Text
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${size/10.67}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('THE HUB', size/2, size * 0.86);
+            
+            // Download link
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `icon-${size}x${size}.png`;
+                link.textContent = `Download icon-${size}x${size}.png`;
+                link.style.display = 'block';
+                link.style.margin = '10px';
+                output.appendChild(link);
+                
+                // Auto-click to download
+                link.click();
+            });
+        });
+        
+        output.innerHTML += '<p>Icons generated! Check your downloads folder.</p>';
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "pending": [
+    {
+      "id": "pwa-implementation",
+      "type": "coding",
+      "description": "Build Progressive Web App (PWA) for The Hub - manifest, service worker, push notifications, install prompt, offline support",
+      "status": "in-progress",
+      "createdAt": "2026-02-08T21:15:00.000Z",
+      "sessionKey": "agent:main:subagent:077f8e5b-8d8d-4725-aeea-c430691c3e9f",
+      "estimatedCompletion": "2-3 days",
+      "priority": "high"
+    },
+    {
+      "id": "deployment-prep",
+      "type": "devops",
+      "description": "Prepare production deployment configuration for Railway (backend) + Vercel (frontend) with complete documentation",
+      "status": "in-progress",
+      "createdAt": "2026-02-08T21:16:00.000Z",
+      "sessionKey": "agent:main:subagent:0b01e991-2946-4a43-841b-3534de14593f",
+      "estimatedCompletion": "24 hours",
+      "priority": "high"
+    },
+    {
+      "id": "landing-page-spec",
+      "type": "design",
+      "description": "Design and spec marketing landing page for The Hub with hero, features, pricing, testimonials, FAQ",
+      "status": "in-progress",
+      "createdAt": "2026-02-08T21:17:00.000Z",
+      "sessionKey": "agent:main:subagent:f011da83-0339-404c-af12-6e107b333836",
+      "estimatedCompletion": "24 hours",
+      "priority": "medium"
+    }
+  ],
+  "completed": [],
+  "failed": []
+}

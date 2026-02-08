@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 import { WebSocketProvider } from './context/WebSocketContext'
+import { initPWA } from './utils/initPWA'
+
+// Initialize PWA functionality
+initPWA();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

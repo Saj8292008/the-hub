@@ -1,0 +1,23 @@
+Feature,Category,WatchCharts,StockX,Chrono24,SneakerNews,SoleLinks,Bring a Trailer,The Hub (Target)
+Watch Tracking,Core,Yes,Limited,Yes,No,No,No,Yes
+Sneaker Tracking,Core,No,Yes,No,Yes,Yes,No,Yes
+Car Tracking,Core,No,No,No,No,No,Yes,Yes
+Market Data,Data,Strong,Strong,Weak,None,None,Strong,Strong
+Historical Pricing,Data,Yes,Yes,Limited,No,No,Yes,Yes
+Portfolio Tracking,Data,Yes,No,No,No,No,No,Yes
+Investment Analytics,Data,Limited,No,No,No,No,Limited,Yes
+Price Alerts,Alerts,Limited,No,No,Limited,Strong,Limited,Strong
+Deal Alerts,Alerts,No,No,No,No,Limited,No,Strong
+Restock Alerts,Alerts,No,Yes,No,Yes,Strong,No,Yes
+Authentication,Trust,No,Yes,No,No,No,No,Planned
+Verified Sellers,Trust,No,Partial,Partial,No,No,No,Planned
+Buyer Protection,Trust,No,Yes,Yes,No,No,No,Planned
+Marketplace,Commerce,No,Yes,Yes,No,No,Yes,Planned
+Auction Platform,Commerce,No,No,No,No,No,Yes,No
+Mobile App,Platform,Yes,Yes,Yes,No,No,Yes,Planned
+API Access,Platform,Paid,No,No,No,No,No,Planned
+Community Features,Social,Weak,None,Weak,Strong,Weak,Strong,Planned
+Expert Reviews,Social,No,No,Partial,Yes,No,Yes,Planned
+Free Tier,Pricing,Limited,Yes,Yes,Yes,Yes,Yes,Yes
+Subscription Model,Pricing,Yes ($10-20),No,No,No,No,No,Yes
+Transaction Fees,Pricing,None,3-10%,5.5-6.5%,None,None,5-9.5%,TBD

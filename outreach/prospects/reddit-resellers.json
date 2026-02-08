@@ -1,0 +1,98 @@
+{
+  "source": "Reddit",
+  "last_updated": "2026-02-05",
+  "segments": {
+    "watch_resellers": {
+      "subreddit": "r/Watchexchange",
+      "subscribers": "300k+",
+      "prospects": [
+        {
+          "username": "soycowboy",
+          "tier": "power_seller",
+          "notes": "Prolific watch dealer, hundreds of transactions, California-based",
+          "profile_url": "https://reddit.com/u/soycowboy",
+          "status": "not_contacted"
+        },
+        {
+          "username": "PhillyWatchGuy",
+          "tier": "power_seller",
+          "notes": "Verified dealer, high volume, established presence",
+          "profile_url": "https://reddit.com/u/PhillyWatchGuy",
+          "status": "not_contacted"
+        },
+        {
+          "username": "tdoan89",
+          "tier": "power_seller",
+          "notes": "Super active, luxury pieces, TX-based",
+          "profile_url": "https://reddit.com/u/tdoan89",
+          "status": "not_contacted"
+        },
+        {
+          "username": "liftback",
+          "tier": "power_seller",
+          "notes": "High-end Rolex/Tudor specialist",
+          "profile_url": "https://reddit.com/u/liftback",
+          "status": "not_contacted"
+        },
+        {
+          "username": "zeroair",
+          "tier": "power_seller",
+          "notes": "Mod/trusted seller, diverse inventory",
+          "profile_url": "https://reddit.com/u/zeroair",
+          "status": "not_contacted"
+        }
+      ],
+      "how_to_find_more": [
+        "Sort by 'Top' posts - sellers with most upvotes have best reputation",
+        "Check WatchExchangeFeedback subreddit for transaction counts",
+        "Look for [WTS] posts with 'SOLD' flair - indicates active sellers",
+        "Users with custom flair (100+ transactions) are prime targets"
+      ]
+    },
+    "sneaker_resellers": {
+      "subreddit": "r/sneakermarket",
+      "subscribers": "227k+",
+      "prospects": [
+        {
+          "username": "LeoKingkilla",
+          "tier": "advanced_seller",
+          "flair": "💰 - Advanced Seller (10+ sales)",
+          "recent_listings": ["Kobe 5 Caitlin", "Vans Habana"],
+          "profile_url": "https://reddit.com/u/LeoKingkilla",
+          "status": "not_contacted"
+        },
+        {
+          "username": "anon3212",
+          "tier": "power_seller",
+          "notes": "One of the most trusted sellers, huge transaction history",
+          "profile_url": "https://reddit.com/u/anon3212",
+          "status": "not_contacted"
+        },
+        {
+          "username": "poofstyle",
+          "tier": "power_seller",
+          "notes": "Established seller, diverse inventory",
+          "profile_url": "https://reddit.com/u/poofstyle",
+          "status": "not_contacted"
+        }
+      ],
+      "flair_tiers": {
+        "🌟": "Trusted Seller (100+ sales)",
+        "💰": "Advanced Seller (10+ sales)",
+        "✅": "Verified Seller (5+ sales)"
+      },
+      "how_to_find_more": [
+        "Filter posts by 'WTS' flair for active sellers",
+        "Check r/SneakerMarketRefs for verified transactions",
+        "Look for users posting multiple sizes = bulk resellers",
+        "Jordan/Yeezy specialists are high-volume targets"
+      ]
+    }
+  },
+  "power_buyer_indicators": [
+    "Multiple [WTB] posts in 30 days",
+    "Comments on many WTS threads asking about availability",
+    "Seeking multiple sizes (buying for resale/group)",
+    "Specific rare items = serious collector with budget"
+  ]
+}

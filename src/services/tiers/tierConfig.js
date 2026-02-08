@@ -40,9 +40,9 @@ const TIERS = {
     name: 'Pro',
     displayName: 'Pro',
     priceMonthly: 9,
-    priceYearly: 89,  // ~$7.42/mo - 2 months free
-    stripePriceIdMonthly: process.env.STRIPE_PRO_MONTHLY_PRICE_ID,
-    stripePriceIdYearly: process.env.STRIPE_PRO_YEARLY_PRICE_ID,
+    priceYearly: 86.40,  // $7.20/mo - 20% off
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
+    stripePriceIdYearly: process.env.STRIPE_PRICE_ID_PRO_YEARLY,
     limits: {
       tracks: 25,
       alertsPerDay: 100,
@@ -72,9 +72,9 @@ const TIERS = {
     name: 'Premium',
     displayName: 'Premium',
     priceMonthly: 19,
-    priceYearly: 189,  // ~$15.75/mo - 2 months free
-    stripePriceIdMonthly: process.env.STRIPE_PREMIUM_MONTHLY_PRICE_ID,
-    stripePriceIdYearly: process.env.STRIPE_PREMIUM_YEARLY_PRICE_ID,
+    priceYearly: 182.40,  // $15.20/mo - 20% off
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_ID_PREMIUM_MONTHLY,
+    stripePriceIdYearly: process.env.STRIPE_PRICE_ID_PREMIUM_YEARLY,
     limits: {
       tracks: Infinity,
       alertsPerDay: Infinity,

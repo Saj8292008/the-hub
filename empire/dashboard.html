@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Hub Empire</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    .org-chart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4rem;
+      padding: 2rem 0;
+    }
+    
+    /* Level containers */
+    .level {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      width: 100%;
+      position: relative;
+    }
+    
+    .level-1 {
+      max-width: 500px;
+    }
+    
+    .level-2 {
+      max-width: 800px;
+    }
+    
+    .level-3 {
+      max-width: 100%;
+      flex-wrap: wrap;
+    }
+    
+    /* Agent Card */
+    .agent-card {
+      background: rgba(20, 20, 30, 0.9);
+      border-radius: 16px;
+      padding: 1.75rem;
+      width: 320px;
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .agent-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--border-start), var(--border-end));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0.6;
+    }
+    
+    .agent-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px var(--glow-color);
+    }
+    
+    .agent-card:hover::before {
+      opacity: 1;
+    }
+    
+    /* Color themes */
+    .agent-card.purple {
+      --border-start: #8b5cf6;
+      --border-end: #a78bfa;
+      --glow-color: rgba(139, 92, 246, 0.3);
+    }
+    
+    .agent-card.blue {
+      --border-start: #3b82f6;
+      --border-end: #60a5fa;
+      --glow-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    .agent-card.orange {
+      --border-start: #f97316;
+      --border-end: #fb923c;
+      --glow-color: rgba(249, 115, 22, 0.3);
+    }
+    
+    .agent-card.green {
+      --border-start: #10b981;
+      --border-end: #34d399;
+      --glow-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    .agent-card.cyan {
+      --border-start: #06b6d4;
+      --border-end: #22d3ee;
+      --glow-color: rgba(6, 182, 212, 0.3);
+    }
+    
+    /* Card header */
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    
+    .agent-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--border-start), var(--border-end));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    
+    .agent-name {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+    
+    .agent-role {
+      font-size: 0.875rem;
+      color: #9ca3af;
+      line-height: 1.3;
+    }
+    
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 12px #10b981;
+      animation: pulse 2s infinite;
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .status-dot.offline {
+      background: #4b5563;
+      box-shadow: none;
+      animation: none;
+    }
+    
+    /* Card body */
+    .card-body {
+      margin-top: 1.25rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid rgba(75, 85, 99, 0.3);
+    }
+    
+    .model-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.8125rem;
+      color: #9ca3af;
+    }
+    
+    .model-badge {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      padding: 0.25rem 0.625rem;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+    
+    .capabilities {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .capability-tag {
+      background: rgba(55, 65, 81, 0.5);
+      color: #d1d5db;
+      padding: 0.375rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    
+    /* Connection lines */
+    .connector {
+      width: 2px;
+      height: 60px;
+      background: linear-gradient(180deg, rgba(99, 102, 241, 0.5), transparent);
+      margin: 0 auto;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .level-3 {
+        justify-content: center;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .org-chart {
+        gap: 2rem;
+      }
+      
+      .agent-card {
+        width: 100%;
+        max-width: 400px;
+      }
+      
+      .level {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .connector {
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="org-chart">
+      <!-- Level 1: CEO -->
+      <div class="level level-1">
+        <div class="agent-card purple">
+          <div class="status-dot"></div>
+          <div class="card-header">
+            <div class="agent-icon">🔥</div>
+            <div class="card-info">
+              <div class="agent-name">Jay</div>
+              <div class="agent-role">Chief Executive Officer</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="model-info">
+              <span class="model-badge">Claude Sonnet 4.5</span>
+            </div>
+            <div class="capabilities">
+              <span class="capability-tag">Strategy</span>
+              <span class="capability-tag">Oversight</span>
+              <span class="capability-tag">Coordination</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="connector"></div>
+      
+      <!-- Level 2: Management -->
+      <div class="level level-2">
+        <div class="agent-card blue" id="deal-hunter">
+          <div class="status-dot offline"></div>
+          <div class="card-header">
+            <div class="agent-icon">💼</div>
+            <div class="card-info">
+              <div class="agent-name">Deal Hunter</div>
+              <div class="agent-role">Chief Sourcing Officer</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="model-info">
+              <span class="model-badge">Claude Sonnet 4.5</span>
+            </div>
+            <div class="capabilities">
+              <span class="capability-tag">Deal Scoring</span>
+              <span class="capability-tag">Price Analysis</span>
+              <span class="capability-tag">Market Research</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="agent-card orange" id="content-manager">
+          <div class="status-dot offline"></div>
+          <div class="card-header">
+            <div class="agent-icon">✍️</div>
+            <div class="card-info">
+              <div class="agent-name">Content Manager</div>
+              <div class="agent-role">Chief Marketing Officer</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="model-info">
+              <span class="model-badge">GPT-4 Turbo</span>
+            </div>
+            <div class="capabilities">
+              <span class="capability-tag">Content Creation</span>
+              <span class="capability-tag">Social Media</span>
+              <span class="capability-tag">Copywriting</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="connector"></div>
+      
+      <!-- Level 3: Specialists -->
+      <div class="level level-3">
+        <div class="agent-card cyan" id="data-analyst">
+          <div class="status-dot offline"></div>
+          <div class="card-header">
+            <div class="agent-icon">📊</div>
+            <div class="card-info">
+              <div class="agent-name">Data Analyst</div>
+              <div class="agent-role">Chief Analytics Officer</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="model-info">
+              <span class="model-badge">o1-preview</span>
+            </div>
+            <div class="capabilities">
+              <span class="capability-tag">Analytics</span>
+              <span class="capability-tag">Metrics</span>
+              <span class="capability-tag">Insights</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="agent-card green" id="growth-lead">
+          <div class="status-dot offline"></div>
+          <div class="card-header">
+            <div class="agent-icon">🚀</div>
+            <div class="card-info">
+              <div class="agent-name">Growth Lead</div>
+              <div class="agent-role">Chief Growth Officer</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="model-info">
+              <span class="model-badge">Claude Opus 4</span>
+            </div>
+            <div class="capabilities">
+              <span class="capability-tag">Strategy</span>
+              <span class="capability-tag">Experiments</span>
+              <span class="capability-tag">Optimization</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="agent-card orange" id="dev-agent">
+          <div class="status-dot offline"></div>
+          <div class="card-header">
+            <div class="agent-icon">🛠️</div>
+            <div class="card-info">
+              <div class="agent-name">Dev Agent</div>
+              <div class="agent-role">Chief Technology Officer</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="model-info">
+              <span class="model-badge">Claude Sonnet 4.5</span>
+            </div>
+            <div class="capabilities">
+              <span class="capability-tag">Code Generation</span>
+              <span class="capability-tag">Debugging</span>
+              <span class="capability-tag">Deployment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Simulate status updates
+    function updateStatuses() {
+      const agents = ['deal-hunter', 'content-manager', 'data-analyst', 'growth-lead', 'dev-agent'];
+      
+      agents.forEach(agentId => {
+        const card = document.getElementById(agentId);
+        const dot = card.querySelector('.status-dot');
+        
+        // Random status (60% chance online)
+        if (Math.random() > 0.4) {
+          dot.classList.remove('offline');
+        } else {
+          dot.classList.add('offline');
+        }
+      });
+    }
+    
+    // Update every 5 seconds
+    setInterval(updateStatuses, 5000);
+    
+    // Initial update
+    setTimeout(updateStatuses, 1000);
+  </script>
+</body>
+</html>

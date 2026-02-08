@@ -1,0 +1,48 @@
+{
+  "lastRun": 1770590969743,
+  "agents": {
+    "dealHunter": {
+      "lastRun": 1770590970444,
+      "status": "success",
+      "stats": {
+        "dealsPosted": 31
+      }
+    },
+    "contentFactory": {
+      "lastRun": 1770587061800,
+      "status": "success",
+      "stats": {
+        "contentCreated": 2
+      }
+    },
+    "analytics": {
+      "lastRun": 1770587665532,
+      "status": "success",
+      "stats": {
+        "reportsGenerated": 7
+      }
+    },
+    "growth": {
+      "lastRun": null,
+      "status": "idle",
+      "stats": {
+        "sourcesFound": 0
+      }
+    },
+    "qualityControl": {
+      "lastRun": 1770589768506,
+      "status": "success",
+      "stats": {
+        "dealsImproved": 14
+      }
+    },
+    "selfImprover": {
+      "lastRun": 1770587062911,
+      "status": "success",
+      "stats": {
+        "analysisRuns": 2,
+        "suggestionsGenerated": 0
+      }
+    }
+  }
+}

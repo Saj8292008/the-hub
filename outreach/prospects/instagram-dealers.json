@@ -1,0 +1,59 @@
+{
+  "source": "Instagram",
+  "last_updated": "2026-02-05",
+  "segments": {
+    "watch_dealers": {
+      "search_hashtags": [
+        "#watchforsale", "#watchesofinstagram", "#rolexforsale",
+        "#omegaforsale", "#watchdealer", "#preownedwatches",
+        "#vintagewatches", "#watchcollector", "#luxurywatches"
+      ],
+      "target_profiles": [
+        {
+          "handle": "@watchbox",
+          "type": "established_dealer",
+          "followers": "500k+",
+          "notes": "Big player - study their model, may be too large",
+          "priority": "low"
+        },
+        {
+          "handle": "TBD - Research needed",
+          "type": "micro_dealer",
+          "followers": "1k-50k",
+          "notes": "Sweet spot - big enough to have volume, small enough to need tools",
+          "priority": "high"
+        }
+      ],
+      "ideal_profile_signals": [
+        "1k-50k followers (not too big, not too small)",
+        "Posts watches with prices in captions",
+        "Uses 'DM for price' or 'DM to purchase'",
+        "Links to personal website (not just eBay)",
+        "Posts multiple items per week",
+        "Has 'Collector selling pieces' in bio"
+      ]
+    },
+    "sneaker_dealers": {
+      "search_hashtags": [
+        "#sneakerforsale", "#kicksforsale", "#sneakerhead",
+        "#jordansforsale", "#yeezysforsale", "#heatforsale",
+        "#sneakerreseller", "#kicksonsale", "#sneakermarket"
+      ],
+      "ideal_profile_signals": [
+        "Bio mentions 'DM for prices' or 'Ship worldwide'",
+        "Consistent posting schedule (2-3x per week)",
+        "Shows receipt/proof of authenticity",
+        "Multiple sizes available = bulk operations",
+        "Link to external store or Depop/Grailed",
+        "Story highlights for 'Available' or 'Sold'"
+      ]
+    }
+  },
+  "research_methodology": [
+    "1. Search hashtags, sort by Recent",
+    "2. Check poster profiles for dealer indicators",
+    "3. Look at who comments 'Sold!' on posts (active community)",
+    "4. Note accounts that tag other dealers (network mapping)",
+    "5. Check 'Similar Accounts' suggestions from Instagram"
+  ]
+}

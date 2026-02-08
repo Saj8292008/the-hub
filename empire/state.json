@@ -1,0 +1,10 @@
+{
+  "activeAgents": [
+    "deal-hunter",
+    "dev-agent",
+    "content-manager",
+    "data-analyst"
+  ],
+  "lastUpdate": "2026-02-08T21:21:52.022Z",
+  "agentCount": 4
+}

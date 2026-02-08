@@ -8,10 +8,13 @@ require('dotenv').config();
 class TelegramInteractive {
   constructor(bot) {
     this.bot = bot;
+    // Skip setup if bot is null (Telegram disabled)
+    if (!bot) return;
     this.setupCallbackHandlers();
   }
 
   setupCallbackHandlers() {
+    if (!this.bot) return;
     this.bot.on('callback_query', async (query) => {
       const data = query.data;
       const chatId = query.message.chat.id;

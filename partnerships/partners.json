@@ -1,0 +1,593 @@
+{
+  "metadata": {
+    "lastUpdated": "2026-02-05",
+    "version": "1.0",
+    "totalPartners": 52
+  },
+  "partners": {
+    "telegram_channels": [
+      {
+        "id": "tg-001",
+        "name": "WatchEx Alerts",
+        "handle": "@watchexalerts",
+        "platform": "telegram",
+        "category": "watches",
+        "estimatedMembers": 8500,
+        "description": "Reddit r/watchexchange deal alerts",
+        "contactMethod": "telegram_dm",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Posts similar content - perfect swap partner"
+      },
+      {
+        "id": "tg-002",
+        "name": "Sneaker Deals Daily",
+        "handle": "@sneakerdealsdaily",
+        "platform": "telegram",
+        "category": "sneakers",
+        "estimatedMembers": 12000,
+        "description": "Daily sneaker deals from major retailers",
+        "contactMethod": "telegram_dm",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "High engagement, complementary audience"
+      },
+      {
+        "id": "tg-003",
+        "name": "Chrono24 Steals",
+        "handle": "@chrono24steals",
+        "platform": "telegram",
+        "category": "watches",
+        "estimatedMembers": 4200,
+        "description": "Underpriced Chrono24 listings",
+        "contactMethod": "telegram_dm",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Smaller but highly targeted audience"
+      },
+      {
+        "id": "tg-004",
+        "name": "StockX Price Drops",
+        "handle": "@stockxdrops",
+        "platform": "telegram",
+        "category": "sneakers",
+        "estimatedMembers": 25000,
+        "description": "StockX price drop notifications",
+        "contactMethod": "telegram_dm",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Large audience, may want payment for promo"
+      },
+      {
+        "id": "tg-005",
+        "name": "Watch Flips",
+        "handle": "@watchflips",
+        "platform": "telegram",
+        "category": "watches",
+        "estimatedMembers": 3100,
+        "description": "Watch reselling opportunities",
+        "contactMethod": "telegram_dm",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Reseller focused - loves tools like The Hub"
+      }
+    ],
+    "discord_servers": [
+      {
+        "id": "dc-001",
+        "name": "r/Watches Discord",
+        "inviteLink": "discord.gg/watches",
+        "platform": "discord",
+        "category": "watches",
+        "estimatedMembers": 45000,
+        "description": "Official r/Watches community",
+        "contactMethod": "mod_message",
+        "moderators": ["Check #mod-applications"],
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Large engaged community, approach mods carefully"
+      },
+      {
+        "id": "dc-002",
+        "name": "Sneaker Market",
+        "inviteLink": "discord.gg/sneakermarket",
+        "platform": "discord",
+        "category": "sneakers",
+        "estimatedMembers": 28000,
+        "description": "Buy/sell/trade sneakers",
+        "contactMethod": "mod_message",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Active marketplace - our tool adds direct value"
+      },
+      {
+        "id": "dc-003",
+        "name": "WatchExchange",
+        "inviteLink": "discord.gg/watchexchange",
+        "platform": "discord",
+        "category": "watches",
+        "estimatedMembers": 15000,
+        "description": "Watch trading community",
+        "contactMethod": "mod_message",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Core target audience"
+      },
+      {
+        "id": "dc-004",
+        "name": "Sole Supremacy",
+        "inviteLink": "discord.gg/solesupremacy",
+        "platform": "discord",
+        "category": "sneakers",
+        "estimatedMembers": 18000,
+        "description": "Sneaker reselling community",
+        "contactMethod": "mod_message",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Reseller focused, may be competitive"
+      },
+      {
+        "id": "dc-005",
+        "name": "Horology House",
+        "inviteLink": "discord.gg/horologyhouse",
+        "platform": "discord",
+        "category": "watches",
+        "estimatedMembers": 8500,
+        "description": "Watch enthusiast hangout",
+        "contactMethod": "mod_message",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Collectors who appreciate good deals"
+      }
+    ],
+    "newsletters": [
+      {
+        "id": "nl-001",
+        "name": "Worn & Wound",
+        "website": "wornandwound.com",
+        "platform": "newsletter",
+        "category": "watches",
+        "estimatedSubscribers": 75000,
+        "frequency": "weekly",
+        "contactEmail": "editors@wornandwound.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Major watch publication, accepts guest content"
+      },
+      {
+        "id": "nl-002",
+        "name": "Fratello Watches",
+        "website": "fratellowatches.com",
+        "platform": "newsletter",
+        "category": "watches",
+        "estimatedSubscribers": 50000,
+        "frequency": "daily",
+        "contactEmail": "editors@fratellowatches.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Well-respected, good for guest posts"
+      },
+      {
+        "id": "nl-003",
+        "name": "The Weekly Sneaker",
+        "website": "theweeklysneaker.com",
+        "platform": "newsletter",
+        "category": "sneakers",
+        "estimatedSubscribers": 25000,
+        "frequency": "weekly",
+        "contactEmail": "hello@theweeklysneaker.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Growing newsletter, likely open to swaps"
+      },
+      {
+        "id": "nl-004",
+        "name": "Monochrome Watches",
+        "website": "monochrome-watches.com",
+        "platform": "newsletter",
+        "category": "watches",
+        "estimatedSubscribers": 40000,
+        "frequency": "weekly",
+        "contactEmail": "info@monochrome-watches.com",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "High-end focus but covers value too"
+      },
+      {
+        "id": "nl-005",
+        "name": "Kicks On Fire Newsletter",
+        "website": "kicksonfire.com",
+        "platform": "newsletter",
+        "category": "sneakers",
+        "estimatedSubscribers": 80000,
+        "frequency": "daily",
+        "contactEmail": "contact@kicksonfire.com",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Large but may require payment"
+      },
+      {
+        "id": "nl-006",
+        "name": "Time+Tide",
+        "website": "timeandtidewatches.com",
+        "platform": "newsletter",
+        "category": "watches",
+        "estimatedSubscribers": 35000,
+        "frequency": "weekly",
+        "contactEmail": "info@timeandtidewatches.com",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Australian but global reach"
+      }
+    ],
+    "podcasts": [
+      {
+        "id": "pod-001",
+        "name": "The Grey NATO",
+        "platform": "podcast",
+        "category": "watches",
+        "estimatedListeners": 15000,
+        "frequency": "weekly",
+        "hosts": "Jason Heaton, James Stacey",
+        "contactEmail": "thegreynato@gmail.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Fun, accessible watch talk - mentions deals often"
+      },
+      {
+        "id": "pod-002",
+        "name": "40 & 20",
+        "platform": "podcast",
+        "category": "watches",
+        "estimatedListeners": 8000,
+        "frequency": "weekly",
+        "hosts": "Watch enthusiasts",
+        "contactEmail": "Via podcast website",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Growing audience, enthusiast-friendly"
+      },
+      {
+        "id": "pod-003",
+        "name": "Full Size Run",
+        "platform": "podcast",
+        "category": "sneakers",
+        "estimatedListeners": 50000,
+        "frequency": "weekly",
+        "hosts": "Brendan Dunne, Matt Welty",
+        "contactEmail": "fullsizerun@complex.com",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Complex owned - harder to get but worth trying"
+      },
+      {
+        "id": "pod-004",
+        "name": "Sneaker Podcast",
+        "platform": "podcast",
+        "category": "sneakers",
+        "estimatedListeners": 12000,
+        "frequency": "weekly",
+        "hosts": "Various",
+        "contactEmail": "Via website",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Independent, more likely to feature tools"
+      },
+      {
+        "id": "pod-005",
+        "name": "Worn & Wound Podcast",
+        "platform": "podcast",
+        "category": "watches",
+        "estimatedListeners": 20000,
+        "frequency": "weekly",
+        "hosts": "W&W Team",
+        "contactEmail": "podcast@wornandwound.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Good entry point to W&W partnership"
+      }
+    ],
+    "youtube_channels": [
+      {
+        "id": "yt-001",
+        "name": "Teddy Baldassarre",
+        "handle": "@TeddyBaldassarre",
+        "platform": "youtube",
+        "category": "watches",
+        "subscribers": 1200000,
+        "avgViews": 150000,
+        "contactEmail": "Check About page",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Huge reach, reviews affordable watches"
+      },
+      {
+        "id": "yt-002",
+        "name": "Just One More Watch",
+        "handle": "@JustOneMoreWatch",
+        "platform": "youtube",
+        "category": "watches",
+        "subscribers": 320000,
+        "avgViews": 40000,
+        "contactEmail": "Check About page",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Budget focused, perfect audience alignment"
+      },
+      {
+        "id": "yt-003",
+        "name": "Bark & Jack",
+        "handle": "@BarkAndJack",
+        "platform": "youtube",
+        "category": "watches",
+        "subscribers": 210000,
+        "avgViews": 25000,
+        "contactEmail": "barkandjack@gmail.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Affordable luxury focus, engaged community"
+      },
+      {
+        "id": "yt-004",
+        "name": "Ben's Watch Club",
+        "handle": "@BensWatchClub",
+        "platform": "youtube",
+        "category": "watches",
+        "subscribers": 115000,
+        "avgViews": 15000,
+        "contactEmail": "Check About page",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Value-focused, likely to respond"
+      },
+      {
+        "id": "yt-005",
+        "name": "Seth Fowler",
+        "handle": "@SethFowler",
+        "platform": "youtube",
+        "category": "sneakers",
+        "subscribers": 2100000,
+        "avgViews": 200000,
+        "contactEmail": "Check About page",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Deal content, huge audience"
+      },
+      {
+        "id": "yt-006",
+        "name": "Harrison Nevel",
+        "handle": "@HarrisonNevel",
+        "platform": "youtube",
+        "category": "sneakers",
+        "subscribers": 750000,
+        "avgViews": 80000,
+        "contactEmail": "Check About page",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Reselling tips - our tool is perfect for his audience"
+      },
+      {
+        "id": "yt-007",
+        "name": "The Urban Gentry",
+        "handle": "@UrbanGentry",
+        "platform": "youtube",
+        "category": "watches",
+        "subscribers": 520000,
+        "avgViews": 50000,
+        "contactEmail": "Check About page",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Strong community, community-focused"
+      },
+      {
+        "id": "yt-008",
+        "name": "Weartesters",
+        "handle": "@WearTesters",
+        "platform": "youtube",
+        "category": "sneakers",
+        "subscribers": 1100000,
+        "avgViews": 100000,
+        "contactEmail": "Check About page",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Performance focused but covers deals"
+      }
+    ],
+    "blogs": [
+      {
+        "id": "blog-001",
+        "name": "Worn & Wound",
+        "website": "wornandwound.com",
+        "platform": "blog",
+        "category": "watches",
+        "monthlyVisitors": 500000,
+        "acceptsGuestPosts": true,
+        "contactEmail": "editors@wornandwound.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Top watch blog, guest posts accepted"
+      },
+      {
+        "id": "blog-002",
+        "name": "Sneaker News",
+        "website": "sneakernews.com",
+        "platform": "blog",
+        "category": "sneakers",
+        "monthlyVisitors": 2000000,
+        "acceptsGuestPosts": false,
+        "contactEmail": "tips@sneakernews.com",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Huge but worth pitching tool feature"
+      },
+      {
+        "id": "blog-003",
+        "name": "Kicks On Fire",
+        "website": "kicksonfire.com",
+        "platform": "blog",
+        "category": "sneakers",
+        "monthlyVisitors": 1500000,
+        "acceptsGuestPosts": true,
+        "contactEmail": "contact@kicksonfire.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Deal focused, good fit"
+      },
+      {
+        "id": "blog-004",
+        "name": "aBlogtoWatch",
+        "website": "ablogtowatch.com",
+        "platform": "blog",
+        "category": "watches",
+        "monthlyVisitors": 800000,
+        "acceptsGuestPosts": true,
+        "contactEmail": "editor@ablogtowatch.com",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Major watch publication"
+      },
+      {
+        "id": "blog-005",
+        "name": "Hypebeast",
+        "website": "hypebeast.com",
+        "platform": "blog",
+        "category": "sneakers",
+        "monthlyVisitors": 10000000,
+        "acceptsGuestPosts": false,
+        "contactEmail": "editorial@hypebeast.com",
+        "status": "prospect",
+        "priority": "low",
+        "notes": "Massive reach but hard to get featured"
+      }
+    ],
+    "instagram_accounts": [
+      {
+        "id": "ig-001",
+        "name": "Affordable Wrist Time",
+        "handle": "@affordablewristtime",
+        "platform": "instagram",
+        "category": "watches",
+        "followers": 85000,
+        "engagementRate": "4.2%",
+        "contactMethod": "dm",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Perfect audience alignment"
+      },
+      {
+        "id": "ig-002",
+        "name": "Kicks On Fire",
+        "handle": "@kicksonfire",
+        "platform": "instagram",
+        "category": "sneakers",
+        "followers": 2500000,
+        "engagementRate": "2.1%",
+        "contactMethod": "dm",
+        "status": "prospect",
+        "priority": "medium",
+        "notes": "Huge reach, deal focused"
+      },
+      {
+        "id": "ig-003",
+        "name": "Watch You Can Afford",
+        "handle": "@watchesyoucanafford",
+        "platform": "instagram",
+        "category": "watches",
+        "followers": 45000,
+        "engagementRate": "5.1%",
+        "contactMethod": "dm",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Highly engaged, budget watch focus"
+      },
+      {
+        "id": "ig-004",
+        "name": "Sneaker News",
+        "handle": "@sneakernews",
+        "platform": "instagram",
+        "category": "sneakers",
+        "followers": 3800000,
+        "engagementRate": "1.8%",
+        "contactMethod": "email",
+        "status": "prospect",
+        "priority": "low",
+        "notes": "Massive but harder to partner with"
+      },
+      {
+        "id": "ig-005",
+        "name": "Sole Retriever",
+        "handle": "@soleretriever",
+        "platform": "instagram",
+        "category": "sneakers",
+        "followers": 320000,
+        "engagementRate": "3.5%",
+        "contactMethod": "dm",
+        "status": "prospect",
+        "priority": "high",
+        "notes": "Raffle/deal focused - complementary"
+      }
+    ]
+  },
+  "quickWins": [
+    {
+      "partnerId": "tg-001",
+      "reason": "Direct competitor in positive way - swap benefits both",
+      "effort": "low",
+      "expectedOutcome": "500+ new Telegram subscribers"
+    },
+    {
+      "partnerId": "tg-003",
+      "reason": "Small, niche, likely responsive",
+      "effort": "low",
+      "expectedOutcome": "300+ targeted subscribers"
+    },
+    {
+      "partnerId": "dc-003",
+      "reason": "Direct audience match, already in ecosystem",
+      "effort": "medium",
+      "expectedOutcome": "Discord partnership, referral traffic"
+    },
+    {
+      "partnerId": "ig-001",
+      "reason": "Small creator, engaged audience, likely to respond",
+      "effort": "low",
+      "expectedOutcome": "Shoutout to 85k followers"
+    },
+    {
+      "partnerId": "ig-003",
+      "reason": "Perfect niche match, high engagement",
+      "effort": "low",
+      "expectedOutcome": "Story mention, potential affiliate"
+    },
+    {
+      "partnerId": "yt-004",
+      "reason": "Mid-size creator, value-focused content",
+      "effort": "medium",
+      "expectedOutcome": "Video mention or dedicated tool review"
+    },
+    {
+      "partnerId": "pod-001",
+      "reason": "Accessible hosts, mentions deals often",
+      "effort": "medium",
+      "expectedOutcome": "Podcast sponsor mention"
+    },
+    {
+      "partnerId": "nl-003",
+      "reason": "Growing newsletter, open to swaps",
+      "effort": "low",
+      "expectedOutcome": "Newsletter swap, 25k exposure"
+    },
+    {
+      "partnerId": "tg-005",
+      "reason": "Reseller focused, our tool provides direct value",
+      "effort": "low",
+      "expectedOutcome": "Cross-promotion, affiliate setup"
+    },
+    {
+      "partnerId": "yt-003",
+      "reason": "Known email available, affordable watch focus",
+      "effort": "medium",
+      "expectedOutcome": "Affiliate partnership, video mention"
+    }
+  ]
+}

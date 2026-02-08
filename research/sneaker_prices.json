@@ -1,0 +1,283 @@
+{
+  "metadata": {
+    "updated": "2025-01-27",
+    "currency": "USD"
+  },
+  "sneakers": {
+    "jordan_1_high_gr": {
+      "name": "Jordan 1 Retro High OG (General Release)",
+      "brand": "Jordan",
+      "retail": 180,
+      "market_low": 150,
+      "market_high": 220,
+      "good_deal": 160,
+      "great_deal": 140,
+      "alert_threshold": 150,
+      "liquidity": 9,
+      "notes": "Most GRs at or below retail"
+    },
+    "jordan_1_chicago": {
+      "name": "Jordan 1 Retro High OG Chicago",
+      "brand": "Jordan",
+      "retail": 180,
+      "market_low": 450,
+      "market_high": 600,
+      "good_deal": 420,
+      "great_deal": 380,
+      "alert_threshold": 400,
+      "liquidity": 9,
+      "notes": "Classic colorway premium"
+    },
+    "jordan_1_bred": {
+      "name": "Jordan 1 Retro High OG Bred",
+      "brand": "Jordan",
+      "retail": 180,
+      "market_low": 350,
+      "market_high": 450,
+      "good_deal": 330,
+      "great_deal": 300,
+      "alert_threshold": 320,
+      "liquidity": 9,
+      "notes": "Evergreen colorway"
+    },
+    "jordan_1_lost_found": {
+      "name": "Jordan 1 Lost & Found",
+      "brand": "Jordan",
+      "retail": 180,
+      "market_low": 280,
+      "market_high": 350,
+      "good_deal": 260,
+      "great_deal": 240,
+      "alert_threshold": 250,
+      "liquidity": 9,
+      "notes": "Still holding value"
+    },
+    "jordan_4_gr": {
+      "name": "Jordan 4 Retro (General Release)",
+      "brand": "Jordan",
+      "retail": 215,
+      "market_low": 200,
+      "market_high": 280,
+      "good_deal": 200,
+      "great_deal": 180,
+      "alert_threshold": 190,
+      "liquidity": 8,
+      "notes": "Popular silhouette"
+    },
+    "jordan_4_bred": {
+      "name": "Jordan 4 Bred (2024)",
+      "brand": "Jordan",
+      "retail": 215,
+      "market_low": 300,
+      "market_high": 380,
+      "good_deal": 280,
+      "great_deal": 260,
+      "alert_threshold": 270,
+      "liquidity": 9,
+      "notes": "Restock brought prices down"
+    },
+    "jordan_4_military_black": {
+      "name": "Jordan 4 Military Black",
+      "brand": "Jordan",
+      "retail": 215,
+      "market_low": 280,
+      "market_high": 350,
+      "good_deal": 260,
+      "great_deal": 240,
+      "alert_threshold": 250,
+      "liquidity": 8,
+      "notes": "Versatile colorway"
+    },
+    "dunk_low_gr": {
+      "name": "Nike Dunk Low (General Release)",
+      "brand": "Nike",
+      "retail": 115,
+      "market_low": 90,
+      "market_high": 130,
+      "good_deal": 100,
+      "great_deal": 85,
+      "alert_threshold": 90,
+      "liquidity": 8,
+      "notes": "Market flooded, mostly below retail"
+    },
+    "dunk_low_panda": {
+      "name": "Nike Dunk Low Panda",
+      "brand": "Nike",
+      "retail": 115,
+      "market_low": 85,
+      "market_high": 110,
+      "good_deal": 90,
+      "great_deal": 80,
+      "alert_threshold": 85,
+      "liquidity": 9,
+      "notes": "Restocks killed premium"
+    },
+    "dunk_sb_low": {
+      "name": "Nike Dunk Low Pro SB",
+      "brand": "Nike SB",
+      "retail": 120,
+      "market_low": 150,
+      "market_high": 400,
+      "good_deal": 140,
+      "great_deal": 120,
+      "alert_threshold": 130,
+      "liquidity": 7,
+      "notes": "Varies wildly by colorway"
+    },
+    "yeezy_350_gr": {
+      "name": "Yeezy 350 V2 (General Release)",
+      "brand": "Yeezy",
+      "retail": 230,
+      "market_low": 180,
+      "market_high": 250,
+      "good_deal": 180,
+      "great_deal": 160,
+      "alert_threshold": 170,
+      "liquidity": 6,
+      "notes": "Post-Adidas volatility"
+    },
+    "yeezy_350_zebra": {
+      "name": "Yeezy 350 V2 Zebra",
+      "brand": "Yeezy",
+      "retail": 230,
+      "market_low": 220,
+      "market_high": 280,
+      "good_deal": 210,
+      "great_deal": 190,
+      "alert_threshold": 200,
+      "liquidity": 7,
+      "notes": "Classic colorway"
+    },
+    "yeezy_slide": {
+      "name": "Yeezy Slide",
+      "brand": "Yeezy",
+      "retail": 70,
+      "market_low": 80,
+      "market_high": 150,
+      "good_deal": 85,
+      "great_deal": 75,
+      "alert_threshold": 80,
+      "liquidity": 7,
+      "notes": "Size dependent"
+    },
+    "new_balance_550": {
+      "name": "New Balance 550",
+      "brand": "New Balance",
+      "retail": 130,
+      "market_low": 100,
+      "market_high": 150,
+      "good_deal": 110,
+      "great_deal": 95,
+      "alert_threshold": 100,
+      "liquidity": 6,
+      "notes": "Hype cooling"
+    },
+    "new_balance_2002r": {
+      "name": "New Balance 2002R",
+      "brand": "New Balance",
+      "retail": 150,
+      "market_low": 130,
+      "market_high": 180,
+      "good_deal": 130,
+      "great_deal": 115,
+      "alert_threshold": 120,
+      "liquidity": 6,
+      "notes": "Protection Pack popular"
+    },
+    "adidas_samba": {
+      "name": "Adidas Samba OG",
+      "brand": "Adidas",
+      "retail": 100,
+      "market_low": 90,
+      "market_high": 130,
+      "good_deal": 95,
+      "great_deal": 85,
+      "alert_threshold": 90,
+      "liquidity": 7,
+      "notes": "Trendy but accessible"
+    },
+    "adidas_gazelle": {
+      "name": "Adidas Gazelle",
+      "brand": "Adidas",
+      "retail": 100,
+      "market_low": 80,
+      "market_high": 110,
+      "good_deal": 85,
+      "great_deal": 75,
+      "alert_threshold": 80,
+      "liquidity": 6,
+      "notes": "Below retail often"
+    },
+    "af1_white": {
+      "name": "Nike Air Force 1 Low White",
+      "brand": "Nike",
+      "retail": 115,
+      "market_low": 100,
+      "market_high": 130,
+      "good_deal": 100,
+      "great_deal": 90,
+      "alert_threshold": 95,
+      "liquidity": 10,
+      "notes": "Staple, rarely premium"
+    },
+    "jordan_11_holiday": {
+      "name": "Jordan 11 (Holiday Release)",
+      "brand": "Jordan",
+      "retail": 230,
+      "market_low": 250,
+      "market_high": 350,
+      "good_deal": 240,
+      "great_deal": 220,
+      "alert_threshold": 230,
+      "liquidity": 8,
+      "notes": "Holiday hype"
+    },
+    "travis_scott_collab": {
+      "name": "Travis Scott Collaboration",
+      "brand": "Nike/Jordan",
+      "retail": 200,
+      "market_low": 300,
+      "market_high": 800,
+      "good_deal": null,
+      "great_deal": null,
+      "alert_threshold": null,
+      "liquidity": 7,
+      "notes": "High volatility, use -20% market for deals"
+    }
+  },
+  "brand_multipliers": {
+    "Jordan": 1.05,
+    "Nike": 1.0,
+    "Nike SB": 1.0,
+    "Yeezy": 0.9,
+    "New Balance": 0.95,
+    "Adidas": 0.95
+  },
+  "platform_price_diff": {
+    "stockx": {
+      "name": "StockX",
+      "price_modifier": 1.0,
+      "seller_fees": 0.12
+    },
+    "goat": {
+      "name": "GOAT",
+      "price_modifier": 1.03,
+      "seller_fees": 0.12
+    },
+    "ebay": {
+      "name": "eBay",
+      "price_modifier": 0.93,
+      "seller_fees": 0.13
+    },
+    "reddit": {
+      "name": "Reddit r/sneakermarket",
+      "price_modifier": 0.85,
+      "seller_fees": 0
+    },
+    "facebook": {
+      "name": "Facebook Groups",
+      "price_modifier": 0.80,
+      "seller_fees": 0
+    }
+  }
+}

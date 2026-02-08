@@ -7,7 +7,7 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken } = require('../middleware/auth');
-const { checkTierLimit } = require('../middleware/tierLimits');
+const { checkLimit } = require('../middleware/tierLimits');
 const PremiumAlertService = require('../services/alerts/PremiumAlertService');
 const supabase = require('../db/supabase');
 const logger = require('../utils/logger');
@@ -162,7 +162,7 @@ router.get('/watchlist', async (req, res) => {
  * POST /api/premium-alerts/watchlist
  * Add brand to watchlist
  */
-router.post('/watchlist', checkTierLimit('tracks'), async (req, res) => {
+router.post('/watchlist', checkLimit('tracks'), async (req, res) => {
   try {
     const userId = req.user.id;
     const { brand, category, minDealScore, maxPrice, notifyAllDeals } = req.body;

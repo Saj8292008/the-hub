@@ -52,7 +52,7 @@ async function sendAlert(message) {
  */
 async function checkServer() {
   return new Promise((resolve) => {
-    const req = require('http').get('http://localhost:3000/health', (res) => {
+    const req = require('http').get('http://localhost:3001/health', (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
@@ -81,7 +81,7 @@ async function checkServer() {
  */
 async function checkScrapers() {
   return new Promise((resolve) => {
-    const req = require('http').get('http://localhost:3000/api/dashboard/status', (res) => {
+    const req = require('http').get('http://localhost:3001/api/dashboard/status', (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {

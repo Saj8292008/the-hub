@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "created": "2026-02-05",
+    "version": "1.0",
+    "purpose": "Track all outreach activities for The Hub"
+  },
+  "contacts": [],
+  "stats": {
+    "total_contacted": 0,
+    "awaiting_response": 0,
+    "responded": 0,
+    "interested": 0,
+    "converted": 0,
+    "not_interested": 0
+  },
+  "schema": {
+    "contact_template": {
+      "id": "unique_id",
+      "name": "username or handle",
+      "platform": "reddit|instagram|discord|email",
+      "segment": "watch_reseller|sneaker_reseller|power_buyer|dealer",
+      "source": "where we found them",
+      "first_contact_date": "YYYY-MM-DD",
+      "last_contact_date": "YYYY-MM-DD",
+      "status": "not_contacted|contacted|responded|interested|converted|not_interested|follow_up",
+      "messages_sent": 0,
+      "notes": "any relevant details",
+      "follow_up_date": "YYYY-MM-DD or null"
+    }
+  },
+  "status_definitions": {
+    "not_contacted": "In our list, haven't reached out",
+    "contacted": "Sent initial message, awaiting response",
+    "responded": "They replied (neutral or unclear)",
+    "interested": "Expressed interest, negotiating/demoing",
+    "converted": "Signed up / became customer",
+    "not_interested": "Declined or unresponsive after follow-ups",
+    "follow_up": "Need to follow up on specific date"
+  },
+  "example_entry": {
+    "id": "reddit_001",
+    "name": "LeoKingkilla",
+    "platform": "reddit",
+    "segment": "sneaker_reseller",
+    "source": "r/sneakermarket active seller",
+    "first_contact_date": null,
+    "last_contact_date": null,
+    "status": "not_contacted",
+    "messages_sent": 0,
+    "notes": "Advanced Seller flair, multiple listings, active",
+    "follow_up_date": null
+  }
+}

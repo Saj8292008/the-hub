@@ -27,6 +27,7 @@ import { RecentListingsWidget } from '../components/RecentListingsWidget'
 import { RecentBlogPosts } from '../components/RecentBlogPosts'
 import { ScraperDashboard } from '../components/ScraperDashboard'
 import EmailCapture from '../components/newsletter/EmailCapture'
+import { PricingPlans } from '../components/PricingPlans'
 
 interface Stats {
   watches: number
@@ -638,6 +639,13 @@ const Dashboard: React.FC = () => {
       <section>
         <ScraperDashboard />
       </section>
+
+      {/* Pricing Plans */}
+      {(!user || user.tier === 'free') && (
+        <section className="relative overflow-hidden rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-8 sm:p-12 shadow-xl backdrop-blur-sm">
+          <PricingPlans />
+        </section>
+      )}
 
       {/* Recent Activity Grid */}
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-2">

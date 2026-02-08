@@ -1,0 +1,246 @@
+{
+  "metadata": {
+    "updated": "2025-01-27",
+    "currency": "USD",
+    "notes": "Prices based on clean title, average condition, typical mileage for age"
+  },
+  "cars": {
+    "sports": {
+      "porsche_911_992": {
+        "name": "Porsche 911 (992)",
+        "new_msrp": 115000,
+        "used_1_2yr": {"low": 105000, "high": 130000},
+        "used_3_4yr": {"low": 90000, "high": 110000},
+        "good_deal_3yr": 100000,
+        "alert_threshold_3yr": 95000,
+        "liquidity": 8,
+        "trend": "holds_well"
+      },
+      "c8_corvette": {
+        "name": "Chevrolet Corvette C8 Stingray",
+        "new_msrp": 66000,
+        "used_1_2yr": {"low": 65000, "high": 80000},
+        "used_3_4yr": {"low": 55000, "high": 70000},
+        "good_deal_3yr": 58000,
+        "alert_threshold_3yr": 55000,
+        "liquidity": 8,
+        "trend": "normalizing"
+      },
+      "bmw_m3_g80": {
+        "name": "BMW M3 (G80)",
+        "new_msrp": 76000,
+        "used_1_2yr": {"low": 65000, "high": 80000},
+        "used_3_4yr": {"low": 55000, "high": 70000},
+        "good_deal_3yr": 60000,
+        "alert_threshold_3yr": 57000,
+        "liquidity": 7,
+        "trend": "depreciating"
+      },
+      "ford_mustang_gt": {
+        "name": "Ford Mustang GT",
+        "new_msrp": 45000,
+        "used_1_2yr": {"low": 38000, "high": 48000},
+        "used_3_4yr": {"low": 32000, "high": 40000},
+        "good_deal_3yr": 35000,
+        "alert_threshold_3yr": 33000,
+        "liquidity": 8,
+        "trend": "stable"
+      },
+      "dodge_challenger_rt": {
+        "name": "Dodge Challenger R/T",
+        "new_msrp": 43000,
+        "used_1_2yr": {"low": 35000, "high": 42000},
+        "used_3_4yr": {"low": 28000, "high": 36000},
+        "good_deal_3yr": 30000,
+        "alert_threshold_3yr": 28000,
+        "liquidity": 7,
+        "trend": "end_of_production"
+      },
+      "toyota_gr86": {
+        "name": "Toyota GR86 / Subaru BRZ",
+        "new_msrp": 30000,
+        "used_1_2yr": {"low": 28000, "high": 35000},
+        "used_3_4yr": {"low": 25000, "high": 30000},
+        "good_deal_3yr": 26000,
+        "alert_threshold_3yr": 25000,
+        "liquidity": 7,
+        "trend": "limited_supply"
+      },
+      "mazda_miata": {
+        "name": "Mazda MX-5 Miata",
+        "new_msrp": 28000,
+        "used_1_2yr": {"low": 26000, "high": 32000},
+        "used_3_4yr": {"low": 22000, "high": 28000},
+        "good_deal_3yr": 24000,
+        "alert_threshold_3yr": 23000,
+        "liquidity": 8,
+        "trend": "strong_retention"
+      }
+    },
+    "trucks": {
+      "ford_f150_xlt": {
+        "name": "Ford F-150 XLT",
+        "new_msrp": 48000,
+        "used_1_2yr": {"low": 42000, "high": 50000},
+        "used_3_4yr": {"low": 35000, "high": 42000},
+        "good_deal_3yr": 38000,
+        "alert_threshold_3yr": 36000,
+        "liquidity": 9,
+        "trend": "strong_demand"
+      },
+      "toyota_tacoma_trd": {
+        "name": "Toyota Tacoma TRD",
+        "new_msrp": 45000,
+        "used_1_2yr": {"low": 42000, "high": 48000},
+        "used_3_4yr": {"low": 38000, "high": 44000},
+        "good_deal_3yr": 40000,
+        "alert_threshold_3yr": 38000,
+        "liquidity": 10,
+        "trend": "excellent_retention"
+      },
+      "toyota_tundra": {
+        "name": "Toyota Tundra",
+        "new_msrp": 50000,
+        "used_1_2yr": {"low": 48000, "high": 55000},
+        "used_3_4yr": {"low": 42000, "high": 50000},
+        "good_deal_3yr": 45000,
+        "alert_threshold_3yr": 43000,
+        "liquidity": 9,
+        "trend": "supply_tight"
+      },
+      "chevy_silverado": {
+        "name": "Chevrolet Silverado 1500",
+        "new_msrp": 46000,
+        "used_1_2yr": {"low": 38000, "high": 46000},
+        "used_3_4yr": {"low": 32000, "high": 40000},
+        "good_deal_3yr": 35000,
+        "alert_threshold_3yr": 33000,
+        "liquidity": 8,
+        "trend": "more_depreciation"
+      },
+      "ram_1500": {
+        "name": "RAM 1500",
+        "new_msrp": 45000,
+        "used_1_2yr": {"low": 36000, "high": 44000},
+        "used_3_4yr": {"low": 30000, "high": 38000},
+        "good_deal_3yr": 33000,
+        "alert_threshold_3yr": 31000,
+        "liquidity": 8,
+        "trend": "best_deals_in_segment"
+      }
+    },
+    "suvs": {
+      "toyota_4runner": {
+        "name": "Toyota 4Runner",
+        "new_msrp": 42000,
+        "used_1_2yr": {"low": 42000, "high": 48000},
+        "used_3_4yr": {"low": 38000, "high": 44000},
+        "good_deal_3yr": 40000,
+        "alert_threshold_3yr": 38000,
+        "liquidity": 10,
+        "trend": "insane_retention"
+      },
+      "lexus_gx": {
+        "name": "Lexus GX",
+        "new_msrp": 64000,
+        "used_1_2yr": {"low": 65000, "high": 75000},
+        "used_3_4yr": {"low": 55000, "high": 65000},
+        "good_deal_3yr": 58000,
+        "alert_threshold_3yr": 56000,
+        "liquidity": 9,
+        "trend": "over_msrp_used"
+      },
+      "jeep_wrangler": {
+        "name": "Jeep Wrangler",
+        "new_msrp": 35000,
+        "used_1_2yr": {"low": 34000, "high": 40000},
+        "used_3_4yr": {"low": 30000, "high": 36000},
+        "good_deal_3yr": 32000,
+        "alert_threshold_3yr": 30000,
+        "liquidity": 9,
+        "trend": "cult_following"
+      },
+      "honda_crv": {
+        "name": "Honda CR-V",
+        "new_msrp": 33000,
+        "used_1_2yr": {"low": 30000, "high": 36000},
+        "used_3_4yr": {"low": 26000, "high": 32000},
+        "good_deal_3yr": 28000,
+        "alert_threshold_3yr": 26500,
+        "liquidity": 9,
+        "trend": "reliable"
+      },
+      "hyundai_palisade": {
+        "name": "Hyundai Palisade",
+        "new_msrp": 38000,
+        "used_1_2yr": {"low": 36000, "high": 42000},
+        "used_3_4yr": {"low": 30000, "high": 36000},
+        "good_deal_3yr": 32000,
+        "alert_threshold_3yr": 30000,
+        "liquidity": 8,
+        "trend": "family_favorite"
+      }
+    },
+    "evs": {
+      "tesla_model_3": {
+        "name": "Tesla Model 3",
+        "new_msrp": 40000,
+        "used_1_2yr": {"low": 28000, "high": 35000},
+        "used_3_4yr": {"low": 22000, "high": 30000},
+        "good_deal_3yr": 25000,
+        "alert_threshold_3yr": 24000,
+        "liquidity": 7,
+        "trend": "heavy_depreciation"
+      },
+      "tesla_model_y": {
+        "name": "Tesla Model Y",
+        "new_msrp": 45000,
+        "used_1_2yr": {"low": 32000, "high": 40000},
+        "used_3_4yr": {"low": 26000, "high": 34000},
+        "good_deal_3yr": 30000,
+        "alert_threshold_3yr": 28000,
+        "liquidity": 8,
+        "trend": "better_than_model_3"
+      },
+      "ford_mach_e": {
+        "name": "Ford Mustang Mach-E",
+        "new_msrp": 45000,
+        "used_1_2yr": {"low": 28000, "high": 36000},
+        "used_3_4yr": {"low": 22000, "high": 30000},
+        "good_deal_3yr": 26000,
+        "alert_threshold_3yr": 24000,
+        "liquidity": 6,
+        "trend": "steep_depreciation"
+      },
+      "rivian_r1t": {
+        "name": "Rivian R1T",
+        "new_msrp": 73000,
+        "used_1_2yr": {"low": 55000, "high": 70000},
+        "used_3_4yr": null,
+        "good_deal_2yr": 58000,
+        "alert_threshold_2yr": 55000,
+        "liquidity": 5,
+        "trend": "early_adopter_market"
+      }
+    }
+  },
+  "brand_multipliers": {
+    "Toyota": 1.1,
+    "Lexus": 1.1,
+    "Honda": 1.05,
+    "Acura": 1.0,
+    "Porsche": 1.05,
+    "Ford": 1.0,
+    "Chevrolet": 1.0,
+    "Dodge": 0.95,
+    "RAM": 0.95,
+    "Jeep": 1.0,
+    "BMW": 0.9,
+    "Mercedes": 0.9,
+    "Audi": 0.9,
+    "Tesla": 0.8,
+    "Rivian": 0.75,
+    "Hyundai": 0.95,
+    "Kia": 0.95
+  }
+}

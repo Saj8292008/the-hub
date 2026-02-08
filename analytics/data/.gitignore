@@ -1,0 +1,5 @@
+# Ignore snapshot data files (contain potentially sensitive metrics)
+snapshots/*.json
+
+# Keep the directory structure
+!.gitkeep

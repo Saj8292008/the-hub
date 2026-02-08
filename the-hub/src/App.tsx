@@ -41,6 +41,7 @@ import AlertPreferences from './pages/AlertPreferences'
 
 import { Resellers, Collectors, Dealers } from './pages/for'
 import { ConnectionStatus } from './components/ConnectionStatus'
+import { InstallPrompt } from './components/InstallPrompt'
 
 function App() {
   return (
@@ -48,6 +49,8 @@ function App() {
       <AuthProvider>
         <NotificationProvider>
           <Router>
+          <InstallPrompt variant="banner" />
+          <ConnectionStatus />
           <Toaster
             position="bottom-right"
             toastOptions={{
@@ -72,7 +75,6 @@ function App() {
               }
             }}
           />
-          <ConnectionStatus />
           <Routes>
             {/* Landing Page (No Layout) */}
             <Route path="/" element={<Landing />} />

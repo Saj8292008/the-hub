@@ -13,6 +13,7 @@ class ApiService {
     try {
       const response = await fetch(url, {
         ...options,
+        credentials: 'include', // Include cookies for authentication
         headers: {
           'Content-Type': 'application/json',
           ...options?.headers,
@@ -20,7 +21,8 @@ class ApiService {
       });
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || `API Error: ${response.statusText}`);
       }
 
       return await response.json();
@@ -237,6 +239,38 @@ class ApiService {
 
   async getScraperSources() {
     return this.request<{ sources: string[]; count: number }>('/scraper/sources');
+  }
+
+  // Billing & Subscriptions
+  async createCheckoutSession(data: {
+    priceId: string;
+    tier: string;
+    billingPeriod: 'monthly' | 'yearly';
+  }) {
+    return this.request<{ url: string }>('/api/stripe/create-checkout-session', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getSubscriptionStatus() {
+    return this.request<any>('/api/stripe/subscription-status');
+  }
+
+  async createPortalSession() {
+    return this.request<{ url: string }>('/api/stripe/create-portal-session', {
+      method: 'POST',
+    });
+  }
+
+  async getStripePrices() {
+    return this.request<any>('/api/stripe/prices');
+  }
+
+  async changePlan() {
+    return this.request<{ url: string }>('/api/stripe/change-plan', {
+      method: 'POST',
+    });
   }
 }
 
