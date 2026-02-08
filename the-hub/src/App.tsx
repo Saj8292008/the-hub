@@ -5,6 +5,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
+import LandingNew from './pages/LandingNew'
 import Dashboard from './pages/Dashboard'
 import Analytics from './pages/Analytics'
 import Integrations from './pages/Integrations'
@@ -77,7 +78,8 @@ function App() {
           />
           <Routes>
             {/* Landing Page (No Layout) */}
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<LandingNew />} />
+            <Route path="/landing-old" element={<Landing />} />
             <Route path="/about" element={<About />} />
             
             {/* Segment Landing Pages (SEO) */}
