@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Expert - The Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .message.user .message-bubble {
+            background: #007bff;
+            color: white;
+        }
+
+        .message.assistant .message-bubble {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        #queryInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #queryInput:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        #sendBtn {
+            padding: 15px 30px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        #sendBtn:hover {
+            background: #0056b3;
+        }
+
+        #sendBtn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .quick-action {
+            padding: 15px;
+            background: #f0f7ff;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .quick-action:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+        }
+
+        .games-list {
+            margin-top: 20px;
+        }
+
+        .game-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateX(5px);
+        }
+
+        .game-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .game-status.live {
+            background: #dc3545;
+            color: white;
+        }
+
+        .game-status.scheduled {
+            background: #28a745;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏀 Sports Broadcasting Expert</h1>
+            <p>Your personal AI sports analyst</p>
+        </div>
+
+        <div class="main-card">
+            <div class="chat-container">
+                <div class="messages" id="messages">
+                    <div class="message assistant">
+                        <div class="message-bubble">
+                            👋 Hey Syd! I'm your Sports Expert. Ask me anything about games, players, or teams. 
+                            I can help you sound like a pro analyst!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-container">
+                    <input 
+                        type="text" 
+                        id="queryInput" 
+                        placeholder="Ask about a game, team, or request content..."
+                        onkeypress="if(event.key==='Enter') sendQuery()"
+                    >
+                    <button id="sendBtn" onclick="sendQuery()">Send</button>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <div class="quick-action" onclick="quickQuery('What games are on today?')">
+                    📅 Today's Games
+                </div>
+                <div class="quick-action" onclick="quickQuery('Tell me about the Lakers')">
+                    🏀 Analyze Team
+                </div>
+                <div class="quick-action" onclick="quickQuery('Give me a hot take')">
+                    🌶️ Hot Take
+                </div>
+                <div class="quick-action" onclick="quickQuery('Write a tweet about tonight\'s game')">
+                    📱 Generate Tweet
+                </div>
+                <div class="quick-action" onclick="quickQuery('Make me sound smart')">
+                    🎓 Smart Briefing
+                </div>
+                <div class="quick-action" onclick="quickQuery('Podcast script')">
+                    🎙️ Podcast Script
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const queryInput = document.getElementById('queryInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.textContent = text;
+            
+            messageDiv.appendChild(bubble);
+            messagesContainer.appendChild(messageDiv);
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function quickQuery(query) {
+            queryInput.value = query;
+            sendQuery();
+        }
+
+        async function sendQuery() {
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            // Add user message
+            addMessage(query, true);
+            queryInput.value = '';
+            sendBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/expert/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    addMessage(result.response);
+                } else {
+                    addMessage('❌ ' + (result.error || 'Failed to process query'));
+                }
+            } catch (error) {
+                addMessage('❌ Error: ' + error.message);
+            } finally {
+                sendBtn.disabled = false;
+                queryInput.focus();
+            }
+        }
+
+        // Load today's games on page load
+        async function loadTodaysGames() {
+            try {
+                const response = await fetch('/api/expert/today');
+                const data = await response.json();
+
+                if (data.success && data.total > 0) {
+                    let gamesText = `📊 Today's Games (${data.total} total, ${data.live} live):\n\n`;
+                    
+                    for (const [sport, games] of Object.entries(data.bySport)) {
+                        gamesText += `${sport.toUpperCase()}:\n`;
+                        games.slice(0, 3).forEach(game => {
+                            const status = game.status === 'live' ? 
+                                `🔴 LIVE: ${game.away_score}-${game.home_score}` : 
+                                `⏰ ${game.game_time}`;
+                            gamesText += `• ${game.away_team_name} @ ${game.home_team_name} - ${status}\n`;
+                        });
+                        gamesText += '\n';
+                    }
+
+                    addMessage(gamesText);
+                }
+            } catch (error) {
+                console.error('Error loading games:', error);
+            }
+        }
+
+        // Load games when page loads
+        setTimeout(loadTodaysGames, 1000);
+    </script>
+</body>
+</html>

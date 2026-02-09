@@ -618,6 +618,12 @@ const contentRouter = require('./content');
 app.use('/api/content', contentRouter);
 
 // ============================================================================
+// RECRUITER AGENT API
+// ============================================================================
+const recruiterRouter = require('./recruiter');
+app.use('/api/recruiter', recruiterRouter);
+
+// ============================================================================
 // TELEGRAM BOT API ROUTES
 // ============================================================================
 const telegramAPI = require('./telegram');
@@ -628,6 +634,12 @@ app.use('/api/telegram', telegramAPI);
 // ============================================================================
 const instagramAPI = require('./instagram');
 app.use('/api/instagram', instagramAPI);
+
+// ============================================================================
+// SPORTS EXPERT API ROUTES
+// ============================================================================
+const sportsExpertAPI = require('./sports-expert');
+app.use('/api/expert', sportsExpertAPI);
 
 // ============================================================================
 // DEAL SCORING API ENDPOINTS (AI Features)

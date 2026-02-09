@@ -1025,10 +1025,28 @@ Keep getting instant alerts here on Telegram too! 🔔
 });
 
 // ============================================================================
+// SPORTS EXPERT BOT INTEGRATION
+// ============================================================================
+
+if (process.env.SPORTS_EXPERT_ENABLED === 'true') {
+  const SportsExpertTelegramBot = require('../services/sports-expert/telegram-bot');
+  const sportsExpertBot = new SportsExpertTelegramBot(bot);
+  console.log('✅ Sports Expert bot initialized');
+}
+
+// ============================================================================
 // HELP COMMAND - Show all available commands
 // ============================================================================
 
 bot.onText(commandRegex('help'), async (msg) => {
+  const sportsExpertHelp = process.env.SPORTS_EXPERT_ENABLED === 'true' ? `
+*Sports Expert:*
+/expert <query> - Ask sports questions
+/games - Today's games
+/experthelp - Sports expert help
+
+` : '';
+
   const helpText = `
 🤖 *The Hub Bot Commands*
 
@@ -1047,7 +1065,7 @@ bot.onText(commandRegex('help'), async (msg) => {
 *Newsletter:*
 /subscribe - Sign up for weekly email digest
 
-*Account:*
+${sportsExpertHelp}*Account:*
 /link <email> - Link your Hub account
 /settings - View your alert preferences
 /help - Show this message
