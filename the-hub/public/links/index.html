@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Hub Deals - Your Source for Watches, Sneakers & Cars</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Never miss a deal on watches, sneakers & cars. Browse exclusive deals curated daily.">
+    <meta name="keywords" content="deals, watches, sneakers, cars, luxury deals, discount watches, sneaker deals">
+    <meta name="author" content="The Hub Deals">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thehubdeals.com/links/">
+    <meta property="og:title" content="The Hub Deals - Premium Deals on Watches, Sneakers & Cars">
+    <meta property="og:description" content="Never miss a deal on watches, sneakers & cars. Browse exclusive deals curated daily.">
+    <meta property="og:image" content="https://thehubdeals.com/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://thehubdeals.com/links/">
+    <meta property="twitter:title" content="The Hub Deals - Premium Deals on Watches, Sneakers & Cars">
+    <meta property="twitter:description" content="Never miss a deal on watches, sneakers & cars. Browse exclusive deals curated daily.">
+    <meta property="twitter:image" content="https://thehubdeals.com/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), 0 0 30px rgba(6, 182, 212, 0.4);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        .fade-in-delay-1 {
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out 0.1s forwards;
+        }
+        
+        .fade-in-delay-2 {
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out 0.2s forwards;
+        }
+        
+        .fade-in-delay-3 {
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out 0.3s forwards;
+        }
+        
+        .pulse-badge {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        /* Gradient border effect */
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(145deg, rgba(6, 182, 212, 0.1), rgba(20, 184, 166, 0.1));
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        
+        .gradient-border::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(145deg, #06b6d4, #14b8a6, #06b6d4);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.5;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gradient-border:hover::before {
+            opacity: 1;
+        }
+        
+        /* Link button hover effect */
+        .link-button {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .link-button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.3);
+        }
+        
+        .link-button:active {
+            transform: scale(0.98);
+        }
+        
+        /* Profile picture glow */
+        .profile-glow {
+            box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+        }
+        
+        /* Deal of the day special glow */
+        .deal-special {
+            animation: glow 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen flex items-center justify-center p-4">
+    
+    <div class="max-w-2xl w-full mx-auto py-8">
+        
+        <!-- Profile Section -->
+        <div class="text-center mb-8 fade-in">
+            <!-- Profile Picture -->
+            <div class="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-cyan-500 to-teal-500 flex items-center justify-center text-3xl font-bold profile-glow">
+                TH
+            </div>
+            
+            <!-- Brand Name -->
+            <h1 class="text-4xl md:text-5xl font-bold mb-2 bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">
+                THE HUB DEALS
+            </h1>
+            
+            <!-- Tagline -->
+            <p class="text-gray-400 text-lg md:text-xl">
+                Never miss a deal on watches, sneakers & cars
+            </p>
+        </div>
+        
+        <!-- Links Section -->
+        <div class="space-y-4 mb-8">
+            
+            <!-- Browse Live Deals -->
+            <a href="https://thehubdeals.com/deals?utm_source=instagram&utm_medium=bio" 
+               class="link-button gradient-border block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-1">
+                <span class="mr-2">🔥</span>
+                Browse Live Deals
+            </a>
+            
+            <!-- Watch Deals -->
+            <a href="https://thehubdeals.com/watches?utm_source=instagram&utm_medium=bio" 
+               class="link-button gradient-border block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-1">
+                <span class="mr-2">⌚</span>
+                Watch Deals
+            </a>
+            
+            <!-- Sneaker Deals -->
+            <a href="https://thehubdeals.com/sneakers?utm_source=instagram&utm_medium=bio" 
+               class="link-button gradient-border block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-1">
+                <span class="mr-2">👟</span>
+                Sneaker Deals
+            </a>
+            
+            <!-- Car Deals -->
+            <a href="https://thehubdeals.com/cars?utm_source=instagram&utm_medium=bio" 
+               class="link-button gradient-border block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-2">
+                <span class="mr-2">🚗</span>
+                Car Deals
+            </a>
+            
+            <!-- Latest Blog Posts -->
+            <a href="https://thehubdeals.com/blog?utm_source=instagram&utm_medium=bio" 
+               class="link-button gradient-border block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-2">
+                <span class="mr-2">📰</span>
+                Latest Blog Posts
+            </a>
+            
+            <!-- Get Daily Deal Alerts -->
+            <a href="https://thehubdeals.com/signup?utm_source=instagram&utm_medium=bio" 
+               class="link-button gradient-border block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-2">
+                <span class="mr-2">📧</span>
+                Get Daily Deal Alerts <span class="text-cyan-400">(Free)</span>
+            </a>
+            
+            <!-- Join Our Telegram -->
+            <a href="https://t.me/hubtest123?utm_source=instagram&utm_medium=bio" 
+               target="_blank"
+               rel="noopener noreferrer"
+               class="link-button gradient-border block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-3">
+                <span class="mr-2">💬</span>
+                Join Our Telegram
+            </a>
+            
+            <!-- Today's Deal of the Day (Special) -->
+            <a href="https://thehubdeals.com/deals?utm_source=instagram&utm_medium=bio&utm_campaign=deal_of_day" 
+               class="link-button gradient-border deal-special block w-full p-4 rounded-2xl text-center text-lg font-semibold hover:text-cyan-400 transition-colors fade-in-delay-3 relative">
+                <span class="mr-2">🏷️</span>
+                Today's Deal of the Day
+                <span class="absolute top-2 right-2 bg-gradient-to-r from-cyan-500 to-teal-500 text-white text-xs font-bold px-2 py-1 rounded-full pulse-badge">
+                    NEW
+                </span>
+            </a>
+            
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-gray-500 text-sm fade-in-delay-3">
+            <p class="mb-1">© 2026 The Hub Deals</p>
+            <p class="text-xs text-gray-600">Powered by thehubdeals.com</p>
+        </div>
+        
+    </div>
+    
+    <!-- Simple Analytics Tracking Pixel (Optional - Add your analytics ID) -->
+    <script>
+        // Track page view
+        console.log('Link-in-bio page loaded from Instagram');
+        
+        // Optional: Send analytics to your backend
+        // fetch('/api/analytics/track', {
+        //     method: 'POST',
+        //     headers: { 'Content-Type': 'application/json' },
+        //     body: JSON.stringify({
+        //         page: 'links',
+        //         source: 'instagram',
+        //         timestamp: new Date().toISOString()
+        //     })
+        // });
+    </script>
+    
+</body>
+</html>
