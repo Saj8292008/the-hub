@@ -28,9 +28,9 @@ class NewsletterScheduler {
 
   /**
    * Start newsletter scheduler
-   * @param {string} schedule - Cron expression (default: Fridays 9am EST)
+   * @param {string} schedule - Cron expression (default: Daily 8am CT)
    */
-  start(schedule = '0 9 * * 5') {
+  start(schedule = '0 8 * * *') {
     if (this.isRunning) {
       console.log('⚠️  Newsletter scheduler already running');
       return;
@@ -113,7 +113,9 @@ class NewsletterScheduler {
 
       // Step 2: Generate newsletter content
       console.log('\n🤖 Step 1: Generating newsletter content...');
-      const content = await contentGenerator.generateWeeklyNewsletter();
+      const content = await contentGenerator.generateDailyNewsletter ? 
+        await contentGenerator.generateDailyNewsletter() : 
+        await contentGenerator.generateWeeklyNewsletter();
 
       runStats.generated = true;
       console.log('✅ Content generated successfully');
@@ -123,13 +125,13 @@ class NewsletterScheduler {
       // Step 3: Create campaign in database
       console.log('\n💾 Step 2: Creating campaign...');
       const { data: campaign, error: campaignError } = await newsletterQueries.createCampaign({
-        name: `Weekly Newsletter - ${new Date().toLocaleDateString()}`,
+        name: `Daily Newsletter - ${new Date().toLocaleDateString()}`,
         subject_line: content.subject_lines[0],
         subject_line_variant: content.subject_lines[1] || content.subject_lines[0],
         content_markdown: content.content_markdown,
         content_html: content.content_html,
         status: 'sending',
-        campaign_type: 'weekly',
+        campaign_type: 'daily',
         ai_generated: true,
         ai_model: 'gpt-4-turbo-preview',
         send_started_at: new Date().toISOString(),
@@ -405,10 +407,10 @@ class NewsletterScheduler {
   getNextRun() {
     if (!this.lastRun) return null;
 
-    // Assuming weekly schedule (Fridays 9am)
+    // Daily schedule (8am CT)
     const lastRunDate = new Date(this.lastRun);
     const nextRun = new Date(lastRunDate);
-    nextRun.setDate(nextRun.getDate() + 7); // Add 7 days
+    nextRun.setDate(nextRun.getDate() + 1); // Add 1 day
 
     return nextRun.toISOString();
   }
@@ -420,6 +422,10 @@ class NewsletterScheduler {
    */
   cronToHuman(cron) {
     const parts = cron.split(' ');
+
+    if (cron === '0 8 * * *') {
+      return 'Every day at 8:00 AM CT';
+    }
 
     if (cron === '0 9 * * 5') {
       return 'Every Friday at 9:00 AM';
