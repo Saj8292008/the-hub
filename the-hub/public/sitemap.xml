@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Blog Posts (3) -->
+  <url>
+    <loc>https://thehubdeals.com/blog/how-to-spot-a-good-watch-deal-2026.html</loc>
+    <lastmod>2026-02-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://thehubdeals.com/blog/grey-market-vs-authorized-dealer.html</loc>
+    <lastmod>2026-02-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://thehubdeals.com/blog/sneaker-resale-market-2026.html</loc>
+    <lastmod>2026-02-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Main Pages (8) -->
   <url>
     <loc>https://thehubdeals.com/</loc>
