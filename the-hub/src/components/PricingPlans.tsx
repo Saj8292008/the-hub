@@ -198,13 +198,13 @@ export const PricingPlans: React.FC = () => {
             <div
               key={plan.name}
               className={`relative group ${
-                isPopular ? 'md:-mt-4 md:scale-105' : ''
+                isPopular ? 'mt-6 md:mt-0 md:-mt-4 md:scale-105' : ''
               }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Popular badge */}
               {isPopular && (
-                <div className="absolute -top-5 left-0 right-0 flex justify-center">
+                <div className="absolute -top-5 left-0 right-0 flex justify-center z-10">
                   <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-bold shadow-lg">
                     <Star size={14} fill="white" />
                     Most Popular
