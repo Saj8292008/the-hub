@@ -453,6 +453,12 @@ if (process.env.ENABLE_DEAL_ALERTS !== 'false') {
 }
 
 // ============================================================================
+// PRICE HISTORY / SNAPSHOTS API
+// ============================================================================
+const priceHistoryRouter = require('./priceHistory');
+app.use('/api/price-history', priceHistoryRouter);
+
+// ============================================================================
 // ANALYTICS API (Price History, Deal Comparison, Arbitrage)
 // ============================================================================
 
