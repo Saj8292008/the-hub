@@ -1,49 +1,43 @@
 services:
   - type: web
-    name: the-hub
+    name: the-hub-api
     runtime: node
     plan: free
     branch: main
     buildCommand: npm install
     startCommand: node src/index.js
     envVars:
-      - key: TELEGRAM_BOT_TOKEN
-        value: 8310191561:AAExxS9nt4a2VsUz0W75CG1H_4C0iDG-9UM
-      - key: TELEGRAM_ADMIN_CHAT_ID
-        value: "8427035818"
-      - key: SCRAPERAPI_KEY
-        value: c53a3b6bced75cf230ef7574feea5858
-      - key: APIFY_TOKEN
-        value: apify_api_G1UEBZ6UT7XXhLxPRN8f7oMcnS8ZuD1vGz0C
-      - key: USE_REAL_SCRAPERS
-        value: "false"
-      - key: POLL_SCHEDULE
-        value: "0 * * * *"
-      - key: RUN_ON_START
-        value: "false"
-      - key: SEND_UPDATE_SUMMARY
-        value: "false"
-      - key: SCRAPER_MIN_TIME_CHRONO24
-        value: "3000"
-      - key: SCRAPER_MIN_TIME_AUTOTRADER
-        value: "2000"
-      - key: SCRAPER_MIN_TIME_STOCKX
-        value: "4000"
-      - key: LOG_LEVEL
-        value: info
       - key: NODE_ENV
         value: production
-      - key: DEBUG_SCREENSHOTS
-        value: "false"
-      - key: DEBUG_HTML
-        value: "false"
       - key: PORT
         value: "3000"
+      - key: FRONTEND_URL
+        value: https://thehubdeals.com
+      # Supabase
+      - key: SUPABASE_URL
+        value: https://sysvawxchniqelifyenl.supabase.co
+      - key: SUPABASE_SERVICE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5c3Zhd3hjaG5pcWVsaWZ5ZW5sIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODc4ODk1NSwiZXhwIjoyMDg0MzY0OTU1fQ.2vT6lOoCcZPFg_slodGZEpmUrlQVjf2iNKdrF6lHfsA
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5c3Zhd3hjaG5pcWVsaWZ5ZW5sIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODc4ODk1NSwiZXhwIjoyMDg0MzY0OTU1fQ.2vT6lOoCcZPFg_slodGZEpmUrlQVjf2iNKdrF6lHfsA
+      # JWT Auth
+      - key: JWT_SECRET
+        value: 46841da4bf381cad9c3389cae807b510c4d9660bbc771139f814029cb65d8544
+      - key: JWT_REFRESH_SECRET
+        value: 0f65983aeb523245c38c15e55524c75f56b73f8214b969d97b49099fd6ccefb2
+      # Telegram
+      - key: TELEGRAM_BOT_TOKEN
+        value: 8432859549:AAGOHwCl_57vYMsbCqeeZQc7Z6CnbZNh_s0
+      - key: TELEGRAM_ADMIN_CHAT_ID
+        value: "8427035818"
+      - key: TELEGRAM_CHANNEL_ID
+        value: "-1003850293697"
+      # Scrapers
       - key: ENABLE_SCRAPER_SCHEDULER
         value: "true"
       - key: SCRAPER_RUN_ON_START
         value: "false"
-      - key: SCRAPER_MAX_RETRIES
-        value: "3"
-      - key: SCRAPER_RETRY_DELAY
-        value: "5000"
+      - key: USE_REAL_SCRAPERS
+        value: "false"
+      - key: LOG_LEVEL
+        value: info

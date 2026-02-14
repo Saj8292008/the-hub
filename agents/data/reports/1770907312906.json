@@ -1,0 +1,31 @@
+{
+  "from": "scout",
+  "to": "jay",
+  "finding": {
+    "type": "hot_deals",
+    "deals": [
+      {
+        "id": "36885ceb-2a02-40aa-8668-f1e386879b87",
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "specific_model": null,
+        "target_price": 5500,
+        "current_price": 4821,
+        "last_checked": "2026-02-12T14:00:00.537",
+        "alert_enabled": true,
+        "sources": [
+          "reddit",
+          "ebay",
+          "watchuseek"
+        ],
+        "notes": null,
+        "created_at": "2026-01-28T21:53:55.630671",
+        "updated_at": "2026-02-12T14:00:00.556015"
+      }
+    ],
+    "analysis": "The Grand Seiko Snowflake 821 is a real gem!\n\nOkay, let's break it down:\n\n- The watch features the iconic snowflake dial, which is often associated with quality and craftsmanship.\n- Its stainless steel case is robust and durable, making it suitable for everyday wear.\n- This particular model has been around since 1974, so its age doesn't necessarily detract from its value.\n\nThe current price of $821 (12.3% off target) makes this a pretty sweet deal!\n\nHowever, we need to consider the following:\n\n*   The watch's age might impact its resale value.\n*   Its condition and rarity could affect its overall worth.\n\nOverall, I think this is an excellent opportunity!",
+    "timestamp": 1770907312905
+  },
+  "status": "reviewed",
+  "reviewedAt": 1770907328338
+}

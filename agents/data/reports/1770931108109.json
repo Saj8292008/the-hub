@@ -1,0 +1,31 @@
+{
+  "from": "scout",
+  "to": "jay",
+  "finding": {
+    "type": "hot_deals",
+    "deals": [
+      {
+        "id": "36885ceb-2a02-40aa-8668-f1e386879b87",
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "specific_model": null,
+        "target_price": 5500,
+        "current_price": 4816,
+        "last_checked": "2026-02-12T21:00:00.2",
+        "alert_enabled": true,
+        "sources": [
+          "reddit",
+          "ebay",
+          "watchuseek"
+        ],
+        "notes": null,
+        "created_at": "2026-01-28T21:53:55.630671",
+        "updated_at": "2026-02-12T21:00:00.275201"
+      }
+    ],
+    "analysis": "I love digging into hot deals on Watch Exchange!\n\nThe Grand Seiko Snowflake at 816 is definitely worth a closer look. Here's my analysis:\n\n* **Value:** The discounted price of 12.4% off the target price of $500 brings this deal to approximately $438. This is a significant discount, indicating that the seller is willing to part with their watch quickly.\n* **Rarity:** Grand Seiko watches are already considered high-end and exclusive, so any discount on one like the Snowflake increases its rarity and value in the eyes of collectors. The Snowflake's unique design elements, such as the distinctive snowflake pattern, make it a highly sought-after model among enthusiasts.\n* **Market demand:** The Grand Seiko Snowflake is already considered a modern classic, and its limited production run has contributed to its desirability. With a discount like this, we can expect even more interest from collectors and enthusiasts.\n\nConsidering these factors, I'd say this deal is an exceptional opportunity for several reasons:\n\n1. **High-end brand**: Grand Seiko is known for producing high-quality watches, and the Snowflake is one of their most iconic models.\n2. **Significant discount**: A 12.4% off discount on a watch that's already considered rare is a significant deal for buyers.\n3. **Rarity**: The watch's unique design elements and limited production make it highly sought after by collectors.\n\nOverall, this deal presents an attractive opportunity for Watch Exchange members to acquire a high-end Grand Seiko Snowflake at a discounted price.",
+    "timestamp": 1770931108109
+  },
+  "status": "reviewed",
+  "reviewedAt": 1770931108155
+}

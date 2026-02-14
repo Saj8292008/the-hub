@@ -2,9 +2,10 @@
  * Tier Configuration
  * Defines limits and features for each subscription tier
  * 
- * Pricing aligned with freemium research (2026-02-05):
- * - Pro: $9/mo - Time savings, early access, exclusivity
- * - Premium: $19/mo - Automation, data, competitive edge
+ * Pricing (updated 2026-02-12):
+ * - Free: Basic deal feed, limited alerts
+ * - Pro: $9/mo or $99/yr — real-time Telegram alerts, price history,
+ *   advanced deal scores, early access to deals (save ~8% with yearly)
  */
 
 const TIERS = {
@@ -27,10 +28,10 @@ const TIERS = {
       earlyAccess: false
     },
     features: [
+      'Basic deal feed',
       '3 tracked searches',
-      '5 daily alerts',
+      '5 daily email alerts',
       'Basic deal scoring',
-      'Email digest (weekly)',
       'Community access'
     ],
     description: 'Perfect for casual deal hunters'
@@ -40,7 +41,7 @@ const TIERS = {
     name: 'Pro',
     displayName: 'Pro',
     priceMonthly: 9,
-    priceYearly: 86.40,  // $7.20/mo - 20% off
+    priceYearly: 99,  // $8.25/mo — save ~8% vs monthly
     stripePriceIdMonthly: process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
     stripePriceIdYearly: process.env.STRIPE_PRICE_ID_PRO_YEARLY,
     limits: {
@@ -49,91 +50,24 @@ const TIERS = {
       priceHistory: true,
       aiFeatures: 'advanced',
       exportData: true,
-      prioritySupport: false,
+      prioritySupport: true,
       realTimeAlerts: true,
       earlyAccess: true,
       alertDelay: 0  // Real-time (vs 15 min for free)
     },
     features: [
-      '25 tracked searches',
-      '100 daily alerts',
-      'Real-time alerts (no delay)',
+      'Real-time Telegram alerts',
       'Price history charts',
       'Advanced AI deal scoring',
+      'Early access to deals',
+      '25 tracked searches',
+      '100 daily alerts',
       'Export data (CSV)',
       'Ad-free experience',
-      'Early deal access'
+      'Priority support'
     ],
     description: 'For serious deal hunters who want speed',
     badge: 'Popular'
-  },
-  
-  premium: {
-    name: 'Premium',
-    displayName: 'Premium',
-    priceMonthly: 19,
-    priceYearly: 182.40,  // $15.20/mo - 20% off
-    stripePriceIdMonthly: process.env.STRIPE_PRICE_ID_PREMIUM_MONTHLY,
-    stripePriceIdYearly: process.env.STRIPE_PRICE_ID_PREMIUM_YEARLY,
-    limits: {
-      tracks: Infinity,
-      alertsPerDay: Infinity,
-      priceHistory: true,
-      aiFeatures: 'full',
-      exportData: true,
-      prioritySupport: true,
-      realTimeAlerts: true,
-      earlyAccess: true,
-      alertDelay: 0,
-      apiAccess: true
-    },
-    features: [
-      'Unlimited tracked searches',
-      'Unlimited daily alerts',
-      'Real-time alerts (no delay)',
-      'Price history charts',
-      'Full AI suite ("Should I Buy?")',
-      'Export data (CSV/JSON)',
-      'Priority support (24h response)',
-      'Early access to features',
-      'API access',
-      'Custom alert filters'
-    ],
-    description: 'For resellers and power users',
-    badge: 'Best Value'
-  },
-  
-  // Enterprise tier (contact sales)
-  enterprise: {
-    name: 'Enterprise',
-    displayName: 'Enterprise',
-    price: null, // Contact sales
-    priceMonthly: null,
-    priceYearly: null,
-    stripePriceIdMonthly: null,
-    stripePriceIdYearly: null,
-    limits: {
-      tracks: Infinity,
-      alertsPerDay: Infinity,
-      priceHistory: true,
-      aiFeatures: 'full',
-      exportData: true,
-      prioritySupport: true,
-      realTimeAlerts: true,
-      apiAccess: true,
-      whiteLabel: true,
-      customIntegrations: true
-    },
-    features: [
-      'Everything in Premium',
-      'Dedicated account manager',
-      'Custom integrations',
-      'Volume API access',
-      'White-label option',
-      'SLA guarantees',
-      'Team accounts'
-    ],
-    description: 'For teams and businesses'
   }
 };
 
@@ -164,7 +98,7 @@ function getTierNames() {
 
 // Compare tiers (returns -1, 0, or 1)
 function compareTiers(tier1, tier2) {
-  const order = ['free', 'pro', 'premium', 'enterprise'];
+  const order = ['free', 'pro'];
   return order.indexOf(tier1) - order.indexOf(tier2);
 }
 

@@ -52,10 +52,10 @@ export default function EmailCaptureHero() {
                 <Mail className="h-10 w-10 text-white" />
               </div>
               <h2 className="mb-4 text-4xl font-bold text-white">
-                Track Prices Like a Pro
+                Get the Deal Hunter's Playbook — Free
               </h2>
               <p className="text-xl text-gray-400">
-                Join 500+ subscribers getting weekly deal alerts, market insights, and exclusive content
+                50 expert tips to never overpay again. Plus weekly deal alerts for watches, sneakers & cars.
               </p>
             </div>
 
@@ -90,43 +90,61 @@ export default function EmailCaptureHero() {
             </form>
 
             {/* Features */}
-            <div className="grid gap-6 md:grid-cols-3">
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-600/20">
-                  <TrendingUp className="h-6 w-6 text-purple-400" />
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="flex h-6 w-6 items-center justify-center rounded bg-green-600/20">
+                    <span className="text-green-400 text-sm font-bold">✓</span>
+                  </div>
                 </div>
-                <h3 className="mb-1 font-semibold text-white">Top Deals</h3>
-                <p className="text-sm text-gray-400">
-                  AI-scored deals across watches, cars, sneakers & more
-                </p>
+                <div>
+                  <h4 className="font-semibold text-white text-sm mb-1">Free 50-tip playbook</h4>
+                  <p className="text-xs text-gray-400">Watches, sneakers & cars</p>
+                </div>
               </div>
 
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-600/20">
-                  <Bell className="h-6 w-6 text-purple-400" />
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="flex h-6 w-6 items-center justify-center rounded bg-green-600/20">
+                    <span className="text-green-400 text-sm font-bold">✓</span>
+                  </div>
                 </div>
-                <h3 className="mb-1 font-semibold text-white">Weekly Alerts</h3>
-                <p className="text-sm text-gray-400">
-                  Never miss a great deal - delivered every Friday
-                </p>
+                <div>
+                  <h4 className="font-semibold text-white text-sm mb-1">Weekly deal alerts</h4>
+                  <p className="text-xs text-gray-400">Best deals, delivered Friday</p>
+                </div>
               </div>
 
-              <div className="text-center">
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-lg bg-purple-600/20">
-                  <Sparkles className="h-6 w-6 text-purple-400" />
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="flex h-6 w-6 items-center justify-center rounded bg-green-600/20">
+                    <span className="text-green-400 text-sm font-bold">✓</span>
+                  </div>
                 </div>
-                <h3 className="mb-1 font-semibold text-white">Expert Insights</h3>
-                <p className="text-sm text-gray-400">
-                  Market trends, price analysis, and buying guides
-                </p>
+                <div>
+                  <h4 className="font-semibold text-white text-sm mb-1">Price drop notifications</h4>
+                  <p className="text-xs text-gray-400">Track your grails</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 mt-1">
+                  <div className="flex h-6 w-6 items-center justify-center rounded bg-green-600/20">
+                    <span className="text-green-400 text-sm font-bold">✓</span>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-white text-sm mb-1">Early access to hot deals</h4>
+                  <p className="text-xs text-gray-400">Be first in line</p>
+                </div>
               </div>
             </div>
 
             {/* Trust badges */}
             <div className="mt-6 flex items-center justify-center gap-6 text-sm text-gray-500">
-              <span>✓ 500+ subscribers</span>
               <span>✓ No spam, ever</span>
               <span>✓ Unsubscribe anytime</span>
+              <span>✓ Real deals, real value</span>
             </div>
           </>
         ) : (
@@ -138,10 +156,29 @@ export default function EmailCaptureHero() {
             <h3 className="mb-4 text-3xl font-bold text-white">
               You're All Set! 🎉
             </h3>
-            <p className="text-xl text-gray-400">
+            <p className="text-xl text-gray-400 mb-6">
               Check your email to confirm your subscription.
             </p>
-            <p className="mt-4 text-gray-500">
+            
+            {/* Download CTA */}
+            <div className="bg-gradient-to-r from-cyan-600 to-purple-600 rounded-xl p-6 mb-6">
+              <h4 className="text-xl font-bold text-white mb-3">
+                Your Deal Hunter's Playbook is Ready 📚
+              </h4>
+              <p className="text-white/90 mb-4">
+                50 expert tips to never overpay for watches, sneakers & cars
+              </p>
+              <a
+                href="/guides/deal-hunters-playbook.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-white text-purple-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Download Your Free Playbook →
+              </a>
+            </div>
+
+            <p className="text-gray-500">
               Your first newsletter arrives this Friday at 9am EST!
             </p>
           </div>

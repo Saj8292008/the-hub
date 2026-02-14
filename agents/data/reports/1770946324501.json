@@ -1,0 +1,31 @@
+{
+  "from": "scout",
+  "to": "jay",
+  "finding": {
+    "type": "hot_deals",
+    "deals": [
+      {
+        "id": "36885ceb-2a02-40aa-8668-f1e386879b87",
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "specific_model": null,
+        "target_price": 5500,
+        "current_price": 4742,
+        "last_checked": "2026-02-13T01:00:00.247",
+        "alert_enabled": true,
+        "sources": [
+          "reddit",
+          "ebay",
+          "watchuseek"
+        ],
+        "notes": null,
+        "created_at": "2026-01-28T21:53:55.630671",
+        "updated_at": "2026-02-13T01:00:00.430943"
+      }
+    ],
+    "analysis": "The Grand Seiko Snowflake is a fantastic find! I love spotting rare deals like this one.\n\nLet's dive into the numbers and see what we've got here:\n\n- Original Price: $500\n- Current Price: $742 (13.8% off)\n- Discount Amount: $58\n\nFirst impressions, the discount of 13.8% is quite significant. However, when comparing it to its market value, it's not as low as expected.\n\nAccording to WatchReport and other reputable sources, a brand new Grand Seiko Snowflake typically ranges from $5,500 to $6,000.\n\nThis watch is from 2020 or newer ( likely 2021+ ) so we should expect that there might be some age-related depreciation.",
+    "timestamp": 1770946324500
+  },
+  "status": "reviewed",
+  "reviewedAt": 1770946340801
+}

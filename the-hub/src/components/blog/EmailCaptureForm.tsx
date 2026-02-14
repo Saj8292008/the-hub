@@ -17,8 +17,8 @@ interface EmailCaptureFormProps {
 
 export default function EmailCaptureForm({
   source,
-  title = 'Stay updated',
-  description = 'Get the latest market insights delivered to your inbox.',
+  title = 'Get the Deal Hunter\'s Playbook — Free',
+  description = 'Get our free Deal Hunter\'s Playbook + weekly market insights delivered to your inbox.',
   compact = false
 }: EmailCaptureFormProps) {
   const [email, setEmail] = useState('');
@@ -62,9 +62,17 @@ export default function EmailCaptureForm({
         <h3 className="mb-2 text-lg font-semibold text-white">
           You're all set!
         </h3>
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-gray-400 mb-4">
           Check your inbox for a confirmation email.
         </p>
+        <a
+          href="/guides/deal-hunters-playbook.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+        >
+          Download Your Free Playbook →
+        </a>
       </div>
     );
   }

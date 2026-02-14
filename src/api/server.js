@@ -34,10 +34,13 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:4003',
   'http://localhost:5001',
   // Production
   'https://the-hub-psi.vercel.app',
   'https://the-hub.vercel.app',
+  'https://thehubdeals.com',
+  'https://www.thehubdeals.com',
   // Allow any vercel preview deployments
   /\.vercel\.app$/
 ];
@@ -69,6 +72,14 @@ app.use(cors({
 // because it needs raw body for signature verification
 const webhookRouter = require('./webhooks');
 app.use('/api/webhooks', webhookRouter);
+
+// Subscription webhook also needs raw body — register before express.json()
+const subscriptionsRouter = require('./subscriptions');
+// Only mount the webhook sub-route here (raw body); other routes mounted after json()
+app.post('/api/subscriptions/webhook',
+  express.raw({ type: 'application/json' }),
+  (req, res, next) => { req.url = '/webhook'; subscriptionsRouter(req, res, next); }
+);
 
 app.use(express.json());
 
@@ -108,6 +119,13 @@ app.use('/api/auth', authRouter);
 // ============================================================================
 const stripeRouter = require('./stripe');
 app.use('/api/stripe', stripeRouter);
+
+// ============================================================================
+// SUBSCRIPTION ROUTES (Pro tier: $9/mo or $99/yr)
+// ============================================================================
+// Note: webhook route already mounted above (before express.json)
+// These routes (create-checkout, status, portal) use parsed JSON bodies
+app.use('/api/subscriptions', subscriptionsRouter);
 
 // ============================================================================
 // SCRAPER DEBUG ROUTES

@@ -14,7 +14,7 @@ interface EmailCaptureInlineProps {
 }
 
 export default function EmailCaptureInline({
-  headline = 'Never miss a deal',
+  headline = 'Get the Deal Hunter\'s Playbook — Free',
   className = ''
 }: EmailCaptureInlineProps) {
   const [email, setEmail] = useState('');
@@ -50,10 +50,20 @@ export default function EmailCaptureInline({
 
   if (subscribed) {
     return (
-      <div className={`my-8 rounded-xl border border-green-500/30 bg-green-500/10 p-6 text-center ${className}`}>
-        <p className="text-green-400">
+      <div className={`my-8 rounded-xl border border-green-500/30 bg-green-500/10 p-6 ${className}`}>
+        <p className="text-green-400 text-center mb-4">
           ✓ You're subscribed! Check your inbox for confirmation.
         </p>
+        <div className="text-center">
+          <a
+            href="/guides/deal-hunters-playbook.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors text-sm"
+          >
+            Download Your Free Playbook →
+          </a>
+        </div>
       </div>
     );
   }
@@ -69,7 +79,7 @@ export default function EmailCaptureInline({
         {/* Text */}
         <div className="flex-1 text-center sm:text-left">
           <h3 className="font-semibold text-white">{headline}</h3>
-          <p className="text-sm text-gray-400">Weekly alerts + market insights</p>
+          <p className="text-sm text-gray-400">50 tips for watches, sneakers & cars + weekly deal alerts</p>
         </div>
 
         {/* Form */}

@@ -66,11 +66,11 @@ router.post('/create-checkout-session', authenticateToken, checkStripeConfigured
     const user = userResult.rows[0];
 
     // Check if user already has an active subscription
-    if (user.stripe_customer_id && (user.tier === 'pro' || user.tier === 'premium')) {
+    if (user.stripe_customer_id && user.tier === 'pro') {
       // User already subscribed - redirect to billing portal instead
       return res.status(400).json({
         error: 'Already subscribed',
-        message: 'Use the billing portal to change your plan',
+        message: 'Use the billing portal to manage your subscription',
         usePortal: true
       });
     }

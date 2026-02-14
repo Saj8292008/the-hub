@@ -1,0 +1,31 @@
+{
+  "from": "scout",
+  "to": "jay",
+  "finding": {
+    "type": "hot_deals",
+    "deals": [
+      {
+        "id": "36885ceb-2a02-40aa-8668-f1e386879b87",
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "specific_model": null,
+        "target_price": 5500,
+        "current_price": 4711,
+        "last_checked": "2026-02-13T03:00:00.363",
+        "alert_enabled": true,
+        "sources": [
+          "reddit",
+          "ebay",
+          "watchuseek"
+        ],
+        "notes": null,
+        "created_at": "2026-01-28T21:53:55.630671",
+        "updated_at": "2026-02-13T03:00:00.476562"
+      }
+    ],
+    "analysis": "The Grand Seiko Snowflake! A highly sought-after watch among collectors. Let's take a closer look at this hot deal on r/Watchexchange.\n\nFirst, we have the price reduction: from $500 to $425 ($25 off). Now, I know what you're thinking - \"That's a 5% discount.\" But hold on, folks! We need to consider the original retail price and the target price. The seller is aiming for a higher sale price than they are selling it for.\n\nThe original retail price of this Grand Seiko Snowflake is around $2,000-$3,000 (depending on the specific model). This particular watch, the SBGA401, has an original retail price of about $3,500. The target price, as mentioned earlier, is $5",
+    "timestamp": 1770955867869
+  },
+  "status": "reviewed",
+  "reviewedAt": 1770955889694
+}

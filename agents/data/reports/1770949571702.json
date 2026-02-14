@@ -1,0 +1,31 @@
+{
+  "from": "scout",
+  "to": "jay",
+  "finding": {
+    "type": "hot_deals",
+    "deals": [
+      {
+        "id": "36885ceb-2a02-40aa-8668-f1e386879b87",
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "specific_model": null,
+        "target_price": 5500,
+        "current_price": 4718,
+        "last_checked": "2026-02-13T02:00:00.525",
+        "alert_enabled": true,
+        "sources": [
+          "reddit",
+          "ebay",
+          "watchuseek"
+        ],
+        "notes": null,
+        "created_at": "2026-01-28T21:53:55.630671",
+        "updated_at": "2026-02-13T02:00:00.586441"
+      }
+    ],
+    "analysis": "The Grand Seiko Snowflake! What a fantastic deal!\n\nFirst impressions: the watch is in good condition with minimal wear, and the price seems to be reflecting its value.\n\nHere are some key stats:\n\n- Market value of new: around $6,000\n- Target price for used (new condition): $500\n- Current sale price: $425\n\nNow, let's break it down. Grand Seiko Snowflake is considered a rare and highly sought-after watch due to its unique design and limited production.\n\nThe main factor in this deal being an exceptional opportunity is that the watch is in like-new condition (14.2% off from the target) with no visible signs of aging or wear. This suggests it has been well-maintained, possibly even kept in a protective case when not worn.",
+    "timestamp": 1770949571701
+  },
+  "status": "reviewed",
+  "reviewedAt": 1770949585836
+}

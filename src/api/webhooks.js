@@ -92,10 +92,10 @@ async function handleCheckoutCompleted(session) {
     return;
   }
 
-  // Upgrade user to premium
+  // Upgrade user to pro (the only paid tier)
   await pool.query(
     `UPDATE users
-     SET tier = 'premium',
+     SET tier = 'pro',
          stripe_customer_id = $1,
          subscription_starts_at = NOW(),
          subscription_ends_at = NOW() + INTERVAL '30 days'
@@ -103,7 +103,7 @@ async function handleCheckoutCompleted(session) {
     [customerId, userId]
   );
 
-  logger.info(`✅ User ${userId} upgraded to premium (checkout completed)`);
+  logger.info(`✅ User ${userId} upgraded to pro (checkout completed)`);
 
   // Process referral reward if this user was referred
   // This is the first payment, so it counts towards the referrer's free month
@@ -142,7 +142,7 @@ async function handleSubscriptionCreated(subscription) {
   // Update subscription info
   await pool.query(
     `UPDATE users
-     SET tier = 'premium',
+     SET tier = 'pro',
          subscription_starts_at = NOW(),
          subscription_ends_at = $1
      WHERE id = $2`,
@@ -239,7 +239,7 @@ async function handlePaymentSucceeded(invoice) {
 
   await pool.query(
     `UPDATE users
-     SET tier = 'premium',
+     SET tier = 'pro',
          subscription_ends_at = $1
      WHERE id = $2`,
     [periodEnd, user.id]
