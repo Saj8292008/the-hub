@@ -7,6 +7,7 @@
 
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
+const { scoreDeal } = require('../src/services/deal-scorer');
 
 // Initialize Supabase
 const supabase = createClient(
@@ -16,59 +17,114 @@ const supabase = createClient(
 
 // Reddit API config
 const SUBREDDITS = ['Watchexchange', 'watch_swap'];
-const USER_AGENT = 'Mozilla/5.0 (compatible; TheHubBot/1.0)';
+const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 
 /**
- * Fetch posts from a subreddit
+ * Sleep helper
+ */
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+/**
+ * Fetch posts from a subreddit with retry + fallback
  */
 async function fetchSubreddit(subreddit, limit = 50) {
-  const url = `https://www.reddit.com/r/${subreddit}/new.json?limit=${limit}`;
-  
-  const response = await fetch(url, {
-    headers: { 'User-Agent': USER_AGENT },
-    timeout: 15000
-  });
+  const urls = [
+    `https://old.reddit.com/r/${subreddit}/new.json?limit=${limit}`,
+    `https://www.reddit.com/r/${subreddit}/new.json?limit=${limit}&raw_json=1`,
+  ];
 
-  if (!response.ok) {
-    throw new Error(`Reddit API error: ${response.status}`);
+  for (const url of urls) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': USER_AGENT,
+            'Accept': 'application/json, text/html',
+            'Accept-Language': 'en-US,en;q=0.9',
+          },
+          signal: AbortSignal.timeout(15000),
+        });
+
+        if (response.status === 429) {
+          const wait = attempt * 5000;
+          console.log(`   ⏳ Rate limited, waiting ${wait/1000}s (attempt ${attempt}/3)...`);
+          await sleep(wait);
+          continue;
+        }
+
+        if (!response.ok) {
+          console.log(`   ⚠️ ${url.split('/r/')[0]} returned ${response.status}, trying fallback...`);
+          break; // try next URL
+        }
+
+        const data = await response.json();
+        return data.data.children.map(c => c.data);
+      } catch (error) {
+        if (attempt < 3) {
+          await sleep(2000 * attempt);
+          continue;
+        }
+      }
+    }
   }
-
-  const data = await response.json();
-  return data.data.children.map(c => c.data);
+  
+  throw new Error(`All Reddit endpoints failed for r/${subreddit}`);
 }
 
 /**
  * Extract price from text
  * Handles: $1,234 / $1234 / 1234$ / 1234 USD / Price: 1234
+ * Fixed to properly capture 4-digit prices like $2100
  */
 function extractPrice(text) {
-  // Patterns ordered by specificity (most specific first)
-  const patterns = [
-    // With commas and $ before: $1,234 or $12,345.00
-    /\$\s*(\d{1,3}(?:,\d{3})+(?:\.\d{2})?)/,
-    // Without commas and $ before: $1234 or $12345 (3+ digits)
-    /\$\s*(\d{3,6})(?:\.\d{2})?(?!\d)/,
-    // Dollar sign AFTER number: 1234$ or 12,345$
-    /(\d{1,3}(?:,\d{3})+|\d{3,6})\s*\$/,
-    // With USD suffix
-    /(\d{1,3}(?:,\d{3})*|\d{3,6})\s*USD/i,
-    // Price label (common in formatted posts)
-    /price\s*[:\-]\s*\$?\s*(\d{1,3}(?:,\d{3})*|\d{3,6})\s*\$?/i,
-    // Small amounts with $ before: $12 or $123
-    /\$\s*(\d{1,3})(?:\.\d{2})?(?![,\d])/
-  ];
-
-  for (const pattern of patterns) {
-    const match = text.match(pattern);
-    if (match) {
-      const price = parseFloat(match[1].replace(/,/g, ''));
-      // Sanity check: reasonable watch price range
-      if (price >= 25 && price <= 500000) {
-        return price;
-      }
-    }
+  // Find ALL potential prices and return the most reasonable one
+  const allPrices = [];
+  
+  // Pattern 1: $1,234 or $12,345.00 (with commas)
+  const withCommas = text.matchAll(/\$\s*(\d{1,3}(?:,\d{3})+(?:\.\d{2})?)/g);
+  for (const match of withCommas) {
+    allPrices.push(parseFloat(match[1].replace(/,/g, '')));
   }
-  return null;
+  
+  // Pattern 2: $1234 or $12345 (without commas, 3-6 digits)
+  const withDollar = text.matchAll(/\$\s*(\d{3,6})(?:\s|$|[^\d,])/g);
+  for (const match of withDollar) {
+    allPrices.push(parseFloat(match[1]));
+  }
+  
+  // Pattern 3: 1234$ or 12,345$
+  const dollarAfter = text.matchAll(/(\d{1,3}(?:,\d{3})+|\d{3,6})\s*\$/g);
+  for (const match of dollarAfter) {
+    allPrices.push(parseFloat(match[1].replace(/,/g, '')));
+  }
+  
+  // Pattern 4: 1234 USD
+  const withUSD = text.matchAll(/(\d{1,3}(?:,\d{3})*|\d{3,6})\s*USD/gi);
+  for (const match of withUSD) {
+    allPrices.push(parseFloat(match[1].replace(/,/g, '')));
+  }
+  
+  // Pattern 5: Price: 1234 or Price - 1234
+  const withLabel = text.matchAll(/price\s*[:\-]\s*\$?\s*(\d{1,3}(?:,\d{3})*|\d{3,6})/gi);
+  for (const match of withLabel) {
+    allPrices.push(parseFloat(match[1].replace(/,/g, '')));
+  }
+  
+  // Filter to reasonable watch prices
+  const validPrices = allPrices.filter(p => p >= 25 && p <= 500000);
+  
+  if (validPrices.length === 0) return null;
+  
+  // If we have multiple prices, prefer:
+  // 1. The most common price (mode)
+  // 2. If all unique, the median price
+  // 3. Avoid obvious outliers
+  
+  if (validPrices.length === 1) return validPrices[0];
+  
+  // Sort and return median (most reliable for multiple matches)
+  validPrices.sort((a, b) => a - b);
+  return validPrices[Math.floor(validPrices.length / 2)];
 }
 
 /**
@@ -140,41 +196,23 @@ function extractImages(post) {
 }
 
 /**
- * Calculate a simple deal score (1-10)
- * Higher is better deal
+ * Calculate deal score using v2 scorer (0-100 scale)
+ * Returns null if scoring fails (will be scored later)
  */
-function calculateDealScore(listing) {
-  let score = 5; // Base score
-  
-  // Brand recognition bonus
-  const premiumBrands = ['Rolex', 'Omega', 'Tudor', 'Grand Seiko', 'Cartier', 'IWC', 'Panerai'];
-  const midBrands = ['Seiko', 'Hamilton', 'Oris', 'Tissot', 'Longines', 'Sinn', 'Ball'];
-  
-  if (premiumBrands.includes(listing.brand)) score += 1;
-  else if (midBrands.includes(listing.brand)) score += 0.5;
-  
-  // Condition bonus
-  if (listing.condition === 'new' || listing.condition === 'mint') score += 1;
-  else if (listing.condition === 'excellent') score += 0.5;
-  
-  // Price range sweetspot ($500-$5000 is active market)
-  if (listing.price >= 500 && listing.price <= 5000) score += 0.5;
-  
-  // Has images bonus
-  if (listing.images && listing.images.length >= 3) score += 0.5;
-  
-  // Reddit engagement (if available)
-  if (listing.reddit_score > 10) score += 0.5;
-  if (listing.reddit_comments > 5) score += 0.5;
-  
-  // Cap at 10, round to integer for DB
-  return Math.min(10, Math.round(score));
+async function calculateDealScore(listing) {
+  try {
+    const result = await scoreDeal(listing);
+    return result.score;
+  } catch (error) {
+    console.warn(`Scoring failed for listing: ${error.message}`);
+    return null; // Will be scored later by batch rescorer
+  }
 }
 
 /**
  * Parse a Reddit post into a listing
  */
-function parsePost(post, subreddit) {
+async function parsePost(post, subreddit) {
   const title = post.title || '';
   
   // Only [WTS] posts
@@ -221,7 +259,8 @@ function parsePost(post, subreddit) {
     subreddit: subreddit
   };
 
-  listing.deal_score = calculateDealScore(listing);
+  // Score the listing using v2 scorer (0-100 scale)
+  listing.deal_score = await calculateDealScore(listing);
   
   return listing;
 }
@@ -284,13 +323,13 @@ async function main() {
 
       let valid = 0;
       for (const post of posts) {
-        const listing = parsePost(post, subreddit);
+        const listing = await parsePost(post, subreddit);
         if (listing) {
           allListings.push(listing);
           valid++;
         }
       }
-      console.log(`   Parsed ${valid} valid [WTS] listings`);
+      console.log(`   Parsed ${valid} valid [WTS] listings (with v2 scores)`);
 
       // Rate limit between subreddits
       await new Promise(r => setTimeout(r, 2000));

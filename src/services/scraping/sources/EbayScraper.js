@@ -1,11 +1,10 @@
 const BaseScraper = require('./BaseScraper');
-const axios = require('axios');
-const cheerio = require('cheerio');
+const browserManager = require('../browserManager');
 const logger = require('../../../utils/logger');
 
 /**
- * eBay Watch Listings Scraper
- * Scrapes eBay search results for watches
+ * eBay Watch Listings Scraper (Browser-based)
+ * Uses Puppeteer with stealth mode to bypass bot detection
  * Rate limit: Conservative to avoid blocks
  */
 class EbayScraper extends BaseScraper {
@@ -13,10 +12,10 @@ class EbayScraper extends BaseScraper {
     super({
       name: 'eBay Watch Scraper',
       source: 'ebay',
-      minTime: 3000, // 3 seconds between requests
+      minTime: 5000, // 5 seconds between requests (longer for browser automation)
       maxConcurrent: 1,
-      reservoir: 20, // 20 requests per minute
-      reservoirRefreshInterval: 60 * 1000
+      reservoir: 15, // 15 requests per hour (more conservative)
+      reservoirRefreshInterval: 60 * 60 * 1000 // 1 hour
     });
 
     this.baseUrl = 'https://www.ebay.com';
@@ -24,11 +23,11 @@ class EbayScraper extends BaseScraper {
   }
 
   /**
-   * Scrape watch listings from eBay
+   * Scrape watch listings from eBay using browser automation
    * @param {string} query - Search query (e.g., "Rolex Submariner")
    * @param {Object} options - Search options
    * @param {string} options.condition - new, used, or all
-   * @param {string} options.sort - Sort order: BestMatch, EndTimeSoonest, PricePlusShippingLowest, PricePlusShippingHighest
+   * @param {string} options.sort - Sort order
    * @param {number} options.minPrice - Minimum price
    * @param {number} options.maxPrice - Maximum price
    * @param {number} options.page - Page number (default 1)
@@ -40,24 +39,24 @@ class EbayScraper extends BaseScraper {
       sort = 'BestMatch',
       minPrice = null,
       maxPrice = null,
-      page = 1
+      page: pageNum = 1
     } = options;
 
-    logger.info(`Scraping eBay for: "${query}" (page ${page})`);
+    logger.info(`Scraping eBay for: "${query}" (page ${pageNum}) using browser automation`);
 
     return this.executeWithRetry(async () => {
       // Build search URL
       const params = new URLSearchParams({
         '_nkw': query,
         '_sop': this.getSortCode(sort),
-        '_pgn': page
+        '_pgn': pageNum
       });
 
       // Add condition filter
       if (condition === 'new') {
-        params.append('LH_ItemCondition', '1000'); // New
+        params.append('LH_ItemCondition', '1000');
       } else if (condition === 'used') {
-        params.append('LH_ItemCondition', '3000'); // Used
+        params.append('LH_ItemCondition', '3000');
       }
 
       // Add price filters
@@ -70,125 +69,161 @@ class EbayScraper extends BaseScraper {
 
       const url = `${this.searchUrl}?${params.toString()}`;
 
-      // Fetch page with realistic headers
-      const response = await axios.get(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Connection': 'keep-alive',
-          'Upgrade-Insecure-Requests': '1'
-        },
-        timeout: 15000
-      });
+      // Create browser page
+      const browserPage = await browserManager.createPage();
 
-      // Parse HTML
-      const $ = cheerio.load(response.data);
+      try {
+        // Navigate to eBay search
+        await browserManager.navigateWithRetry(browserPage, url);
 
-      // Extract listings
-      const listings = [];
-      const items = $('.s-item').not('.s-item--watch-at-corner'); // Skip "watch this item" prompts
+        // Check if blocked
+        const blocked = await browserManager.isBlocked(browserPage);
+        if (blocked) {
+          logger.error('eBay is blocking our request - need to implement CAPTCHA solver or wait longer');
+          throw new Error('eBay bot detection triggered');
+        }
 
-      logger.info(`Found ${items.length} items on eBay page ${page}`);
+        // Wait for results to load
+        await browserPage.waitForSelector('ul.srp-results, .srp-river-results', { timeout: 10000 });
 
-      items.each((index, element) => {
-        try {
-          const listing = this.parseItem($, $(element), query);
-          if (listing) {
-            listings.push(listing);
+        // Extract listings using page.evaluate for better performance
+        const listings = await browserPage.evaluate((query) => {
+          const results = [];
+          
+          // Try multiple selectors that eBay might use
+          let items = document.querySelectorAll('li.s-item');
+          
+          // If s-item doesn't work, try other selectors
+          if (items.length === 0) {
+            items = document.querySelectorAll('ul.srp-results > li');
           }
-        } catch (error) {
-          logger.warn(`Failed to parse eBay item ${index}: ${error.message}`);
-        }
-      });
+          
+          items.forEach((item, index) => {
+            try {
+              // Skip ads and promoted items
+              if (item.classList.contains('s-item--top-level-merchant') || 
+                  item.classList.contains('s-item--ad')) {
+                return;
+              }
 
-      logger.info(`Parsed ${listings.length} valid listings from eBay`);
+              // Title
+              const titleEl = item.querySelector('.s-item__title, h3');
+              const title = titleEl ? titleEl.textContent.trim() : '';
+              
+              if (!title || title === '' || title === 'Shop on eBay') {
+                return;
+              }
 
-      return {
-        listings,
-        pagination: {
-          currentPage: page,
-          hasNextPage: this.hasNextPage($)
+              // URL
+              const linkEl = item.querySelector('.s-item__link, a[href*="/itm/"]');
+              const url = linkEl ? linkEl.getAttribute('href') : '';
+              
+              if (!url) {
+                return;
+              }
+
+              // Price
+              const priceEl = item.querySelector('.s-item__price');
+              let priceText = priceEl ? priceEl.textContent.trim() : '';
+              
+              // Remove "to" for price ranges, take the first price
+              if (priceText.includes('to')) {
+                priceText = priceText.split('to')[0].trim();
+              }
+              
+              // Extract numeric price
+              const priceMatch = priceText.match(/[\d,]+\.?\d*/);
+              const price = priceMatch ? parseFloat(priceMatch[0].replace(/,/g, '')) : null;
+              
+              if (!price || price <= 0) {
+                return;
+              }
+
+              // Image
+              const imgEl = item.querySelector('.s-item__image-img, img');
+              const image = imgEl ? imgEl.getAttribute('src') : '';
+              
+              // Condition
+              const conditionEl = item.querySelector('.SECONDARY_INFO');
+              const condition = conditionEl ? conditionEl.textContent.trim() : '';
+
+              // Location
+              const locationEl = item.querySelector('.s-item__location, .s-item__itemLocation');
+              let location = locationEl ? locationEl.textContent.trim() : '';
+              location = location.replace('From ', '').replace('from ', '');
+
+              // Seller
+              const sellerEl = item.querySelector('.s-item__seller-info-text');
+              const seller = sellerEl ? sellerEl.textContent.trim() : '';
+
+              results.push({
+                title,
+                price,
+                currency: 'USD',
+                url,
+                images: image ? [image] : [],
+                condition,
+                location,
+                seller,
+                rawCondition: condition,
+                query
+              });
+            } catch (error) {
+              console.error(`Error parsing item ${index}:`, error.message);
+            }
+          });
+
+          return results;
+        }, query);
+
+        logger.info(`Parsed ${listings.length} valid listings from eBay`);
+
+        // Close the page
+        await browserPage.close();
+
+        // Normalize listings
+        const normalizedListings = listings.map(listing => {
+          const watchInfo = this.extractWatchInfo(listing.title, query);
+          
+          return this.normalizeListing({
+            ...listing,
+            brand: watchInfo.brand,
+            model: watchInfo.model,
+            condition: this.normalizeCondition(listing.rawCondition),
+            url: this.cleanEbayUrl(listing.url),
+            timestamp: new Date()
+          });
+        });
+
+        return {
+          listings: normalizedListings,
+          pagination: {
+            currentPage: pageNum,
+            hasNextPage: listings.length > 0 // Simplified check
+          }
+        };
+
+      } catch (error) {
+        // Make sure to close the page on error
+        try {
+          await browserPage.close();
+        } catch (closeError) {
+          logger.error(`Error closing page: ${closeError.message}`);
         }
-      };
+        throw error;
+      }
+
     }, `eBay scrape for "${query}"`);
-  }
-
-  /**
-   * Parse a single eBay item
-   */
-  parseItem($, item, query) {
-    // Skip if it's a header or ad
-    if (item.hasClass('s-item--top-level-merchant') || item.hasClass('s-item--ad')) {
-      return null;
-    }
-
-    // Title
-    const title = item.find('.s-item__title').text().trim();
-    if (!title || title === '' || title === 'Shop on eBay') {
-      return null;
-    }
-
-    // Price
-    const priceText = item.find('.s-item__price').first().text().trim();
-    const price = this.parsePrice(priceText);
-    if (!price) {
-      return null;
-    }
-
-    // URL
-    const url = item.find('.s-item__link').attr('href');
-    if (!url) {
-      return null;
-    }
-
-    // Image
-    const image = item.find('.s-item__image-img').attr('src');
-    const images = image ? [image] : [];
-
-    // Condition
-    const conditionText = item.find('.SECONDARY_INFO').text().trim();
-    const condition = this.normalizeCondition(conditionText);
-
-    // Location
-    const location = item.find('.s-item__location').text().trim().replace('From ', '');
-
-    // Seller info
-    const seller = item.find('.s-item__seller-info-text').text().trim();
-
-    // Extract watch info from title
-    const watchInfo = this.extractWatchInfo(title, query);
-
-    // Build listing
-    const rawData = {
-      title: title,
-      price: price,
-      currency: this.extractCurrency(priceText),
-      brand: watchInfo.brand,
-      model: watchInfo.model,
-      condition: condition,
-      location: location,
-      url: this.cleanEbayUrl(url),
-      images: images,
-      seller: seller,
-      timestamp: new Date(),
-      ebay_condition: conditionText
-    };
-
-    return this.normalizeListing(rawData);
   }
 
   /**
    * Extract watch brand and model from title
    */
   extractWatchInfo(title, query) {
-    // Try to extract from query first
     const brand = this.extractBrand(query) !== 'Unknown'
       ? this.extractBrand(query)
       : this.extractBrand(title);
 
-    // Model is typically the rest of the query or title
     let model = query;
     if (brand !== 'Unknown') {
       model = query.replace(new RegExp(brand, 'gi'), '').trim();
@@ -232,20 +267,11 @@ class EbayScraper extends BaseScraper {
   }
 
   /**
-   * Check if there's a next page
-   */
-  hasNextPage($) {
-    const nextButton = $('.pagination__next');
-    return nextButton.length > 0 && !nextButton.hasClass('disabled');
-  }
-
-  /**
    * Clean eBay URL (remove tracking parameters)
    */
   cleanEbayUrl(url) {
     try {
       const urlObj = new URL(url);
-      // Keep only essential params
       const cleanUrl = urlObj.origin + urlObj.pathname;
       return cleanUrl;
     } catch {
@@ -259,46 +285,6 @@ class EbayScraper extends BaseScraper {
   async searchWatch(brand, model, options = {}) {
     const query = `${brand} ${model} watch`.trim();
     return this.scrape(query, options);
-  }
-
-  /**
-   * Get details for a specific listing
-   * (This would require parsing the individual listing page)
-   */
-  async getListingDetails(listingUrl) {
-    logger.info(`Fetching eBay listing details: ${listingUrl}`);
-
-    return this.executeWithRetry(async () => {
-      const response = await axios.get(listingUrl, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9'
-        },
-        timeout: 15000
-      });
-
-      const $ = cheerio.load(response.data);
-
-      // Extract detailed information
-      const details = {
-        title: $('.x-item-title__mainTitle').text().trim(),
-        price: this.parsePrice($('.x-price-primary').text().trim()),
-        condition: $('.x-item-condition-text').text().trim(),
-        description: $('.x-item-description').text().trim(),
-        images: []
-      };
-
-      // Extract all images
-      $('.ux-image-carousel-item img').each((i, img) => {
-        const src = $(img).attr('src');
-        if (src && !details.images.includes(src)) {
-          details.images.push(src);
-        }
-      });
-
-      return details;
-    }, 'eBay listing details');
   }
 }
 

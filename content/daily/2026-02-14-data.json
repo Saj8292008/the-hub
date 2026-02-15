@@ -1,0 +1,47 @@
+{
+  "date": "2026-02-14",
+  "listings": 5,
+  "topDeals": [
+    {
+      "title": "[WTS] Serviced Omega Genève Automatic – Ref. 166.0...",
+      "price": 455,
+      "source": "reddit"
+    },
+    {
+      "title": "[WTS] Rare April 1998 Seiko 5 Automatic – Ref. SKX...",
+      "price": 199,
+      "source": "reddit"
+    },
+    {
+      "title": "[WTS] Rare February 1982 Seiko 5 Automatic – Ref. ...",
+      "price": 199,
+      "source": "reddit"
+    },
+    {
+      "title": "[WTS] Mercedes-Benz Automatic Chronograph – Aviato...",
+      "price": 899,
+      "source": "reddit"
+    },
+    {
+      "title": "[WTS] Omega Geneve 166.0125, Full Set, Rare Beauti...",
+      "price": 999,
+      "source": "reddit"
+    }
+  ],
+  "priceRanges": {
+    "under200": 2,
+    "under1000": 3,
+    "under5000": 0,
+    "over5000": 0
+  },
+  "topBrands": [
+    [
+      "Omega",
+      2
+    ],
+    [
+      "Seiko",
+      2
+    ]
+  ]
+}

@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hub — Never Overpay Again</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --off-white: #f8f7f5;
+    --gray-100: #f2f1ef;
+    --gray-200: #e5e3df;
+    --gray-400: #a8a5a0;
+    --gray-600: #6b6763;
+    --green: #1a8d5f;
+    --green-light: #e8f5ee;
+    --red: #d94040;
+    --red-light: #fdeaea;
+    --accent: #1a1a1a;
+  }
+
+  [data-theme="dark"] {
+    --black: #f0f0f0;
+    --white: #0a0a0a;
+    --off-white: #0f0f0f;
+    --gray-100: #141414;
+    --gray-200: rgba(255,255,255,0.08);
+    --gray-400: #888;
+    --gray-600: #888;
+    --green-light: rgba(26, 141, 95, 0.15);
+    --red-light: rgba(217, 64, 64, 0.15);
+    --accent: #f0f0f0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--black);
+    background: var(--white);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .mono { font-family: 'Space Mono', monospace; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 20px 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(20px);
+    z-index: 100;
+    border-bottom: 1px solid var(--gray-200);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  [data-theme="dark"] nav {
+    background: rgba(10,10,10,0.92);
+  }
+  .nav-logo {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.5px;
+  }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a {
+    text-decoration: none; color: var(--gray-600);
+    font-size: 14px; font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--black); }
+  
+  /* Theme Toggle */
+  .theme-toggle {
+    background: transparent;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .theme-toggle:hover {
+    border-color: var(--black);
+  }
+  
+  /* Mobile Hamburger */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .hamburger span {
+    width: 24px;
+    height: 2px;
+    background: var(--black);
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+  .hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+  }
+  
+  .btn-primary {
+    background: var(--accent); color: var(--white);
+    padding: 10px 24px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none; display: inline-block;
+    transition: all 0.2s;
+    border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  [data-theme="dark"] .btn-primary {
+    background: #f0f0f0;
+    color: #0a0a0a;
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--white); color: var(--black);
+    padding: 10px 24px; border-radius: 8px;
+    font-size: 14px; font-weight: 600;
+    text-decoration: none; display: inline-block;
+    border: 1.5px solid var(--gray-200);
+    transition: all 0.2s;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-secondary:hover { border-color: var(--black); }
+
+  /* HERO */
+  .hero {
+    padding: 160px 48px 80px;
+    max-width: 1200px; margin: 0 auto;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green-light); color: var(--green);
+    padding: 6px 16px; border-radius: 100px;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .hero h1 {
+    font-size: clamp(42px, 6vw, 72px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .hero p {
+    font-size: 18px; line-height: 1.6;
+    color: var(--gray-600);
+    max-width: 560px; margin: 0 auto 40px;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+  .hero-ctas {
+    display: flex; gap: 12px; justify-content: center;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SOCIAL PROOF */
+  .social-proof {
+    padding: 40px 48px;
+    text-align: center;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    max-width: 900px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+    color: var(--black);
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  /* LIVE DEALS TICKER */
+  .ticker-section {
+    padding: 40px 0;
+    overflow: hidden;
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--off-white);
+    transition: background 0.3s, border-color 0.3s;
+  }
+  .ticker-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gray-400);
+    text-align: center; margin-bottom: 20px;
+  }
+  .ticker-track {
+    display: flex; gap: 24px;
+    animation: scroll 30s linear infinite;
+    width: max-content;
+  }
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .deal-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 20px 24px;
+    min-width: 300px;
+    display: flex; flex-direction: column; gap: 8px;
+    flex-shrink: 0;
+    transition: border-color 0.2s, background 0.3s;
+  }
+  [data-theme="dark"] .deal-card {
+    background: #141414;
+  }
+  .deal-card:hover { border-color: var(--gray-400); }
+  .deal-card-header {
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .deal-category {
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--gray-400);
+  }
+  .deal-badge {
+    font-size: 10px; font-weight: 700; 
+    padding: 4px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .deal-badge.hot { 
+    background: var(--green); 
+    color: white;
+  }
+  .deal-badge.good { 
+    background: rgba(255, 152, 0, 0.15); 
+    color: #FF9800;
+  }
+  [data-theme="dark"] .deal-badge.good {
+    background: rgba(255, 152, 0, 0.2);
+  }
+  .deal-name {
+    font-size: 16px; font-weight: 600; letter-spacing: -0.3px;
+  }
+  .deal-prices {
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .deal-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px; font-weight: 700;
+  }
+  .deal-market {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px; color: var(--gray-400);
+    text-decoration: line-through;
+  }
+  .deal-savings {
+    font-size: 13px; font-weight: 600; color: var(--green);
+  }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 100px 48px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .section-label {
+    font-size: 12px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gray-400);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700; letter-spacing: -1px;
+    margin-bottom: 60px;
+    max-width: 500px;
+  }
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+  .how-card {
+    padding: 32px;
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    transition: all 0.3s;
+    background: var(--white);
+  }
+  [data-theme="dark"] .how-card {
+    background: transparent;
+  }
+  .how-card:hover {
+    border-color: var(--black);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+  }
+  [data-theme="dark"] .how-card:hover {
+    box-shadow: 0 12px 40px rgba(255,255,255,0.03);
+  }
+  .how-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 48px; font-weight: 700;
+    color: var(--gray-200);
+    margin-bottom: 20px;
+    line-height: 1;
+  }
+  .how-card h3 {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 12px;
+  }
+  .how-card p {
+    font-size: 15px; line-height: 1.6;
+    color: var(--gray-600);
+  }
+
+  /* CATEGORIES */
+  .categories-section {
+    padding: 100px 48px;
+    background: var(--off-white);
+    transition: background 0.3s;
+  }
+  .categories-inner {
+    max-width: 1200px; margin: 0 auto;
+  }
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  .cat-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 36px 28px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  [data-theme="dark"] .cat-card {
+    background: #141414;
+  }
+  .cat-card:hover {
+    border-color: var(--black);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+  }
+  [data-theme="dark"] .cat-card:hover {
+    box-shadow: 0 12px 40px rgba(255,255,255,0.03);
+  }
+  .cat-icon {
+    font-size: 40px; margin-bottom: 16px;
+    display: block;
+  }
+  .cat-card h3 {
+    font-size: 18px; font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .cat-card p {
+    font-size: 14px; color: var(--gray-600);
+    line-height: 1.5;
+  }
+
+  /* REAL DEAL EXAMPLE */
+  .example-section {
+    padding: 100px 48px;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .example-card {
+    background: var(--white);
+    border: 1.5px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    transition: background 0.3s, border-color 0.3s;
+  }
+  [data-theme="dark"] .example-card {
+    background: #141414;
+  }
+  .example-left h3 {
+    font-size: 14px; font-weight: 600;
+    color: var(--green); margin-bottom: 12px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  .example-left h2 {
+    font-size: 32px; font-weight: 700;
+    letter-spacing: -1px; margin-bottom: 8px;
+  }
+  .example-left .source {
+    font-size: 14px; color: var(--gray-400);
+    margin-bottom: 24px;
+  }
+  .price-comparison {
+    display: flex; gap: 40px; margin-bottom: 24px;
+  }
+  .price-col label {
+    font-size: 12px; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--gray-400);
+    font-weight: 600; display: block; margin-bottom: 4px;
+  }
+  .price-col .amount {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px; font-weight: 700;
+  }
+  .price-col .amount.strike {
+    color: var(--gray-400);
+    text-decoration: line-through;
+    font-size: 22px;
+  }
+  .savings-bar {
+    background: var(--green-light);
+    border-radius: 8px; padding: 12px 20px;
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--green); font-weight: 700; font-size: 15px;
+  }
+  .example-right {
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .feature-row {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .feature-row:last-child { border-bottom: none; }
+  .feature-icon {
+    width: 40px; height: 40px;
+    background: var(--off-white);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .feature-row h4 {
+    font-size: 15px; font-weight: 600; margin-bottom: 2px;
+  }
+  .feature-row p {
+    font-size: 13px; color: var(--gray-600); line-height: 1.5;
+  }
+
+  /* CHANNELS */
+  .channels-section {
+    padding: 100px 48px;
+    background: var(--off-white);
+    transition: background 0.3s;
+  }
+  .channels-inner {
+    max-width: 1200px; margin: 0 auto;
+  }
+  .channels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .channel-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 32px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+  [data-theme="dark"] .channel-card {
+    background: #141414;
+  }
+  .channel-card:hover {
+    border-color: var(--black);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.06);
+  }
+  [data-theme="dark"] .channel-card:hover {
+    box-shadow: 0 12px 40px rgba(255,255,255,0.03);
+  }
+  .channel-icon {
+    font-size: 36px; margin-bottom: 16px;
+  }
+  .channel-card h3 {
+    font-size: 18px; font-weight: 700; margin-bottom: 8px;
+  }
+  .channel-card p {
+    font-size: 14px; color: var(--gray-600); line-height: 1.5;
+    margin-bottom: 20px;
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: 100px 48px;
+    text-align: center;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .cta-section h2 {
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 700; letter-spacing: -1.5px;
+    margin-bottom: 16px;
+  }
+  .cta-section p {
+    font-size: 18px; color: var(--gray-600);
+    margin-bottom: 36px;
+    max-width: 480px; margin-left: auto; margin-right: auto;
+  }
+  .cta-buttons {
+    display: flex; gap: 12px; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .cta-note {
+    font-size: 13px; color: var(--gray-400);
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 48px;
+    border-top: 1px solid var(--gray-200);
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 1200px; margin: 0 auto;
+    transition: border-color 0.3s;
+  }
+  footer p {
+    font-size: 13px; color: var(--gray-400);
+  }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a {
+    font-size: 13px; color: var(--gray-400);
+    text-decoration: none; transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--black); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links a:not(.btn-primary):not(.theme-toggle) { display: none; }
+    .hamburger { display: flex; }
+    .nav-links.mobile-open {
+      position: fixed;
+      top: 65px;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      flex-direction: column;
+      align-items: stretch;
+      padding: 20px 24px;
+      gap: 16px;
+    }
+    [data-theme="dark"] .nav-links.mobile-open {
+      background: #0a0a0a;
+    }
+    .nav-links.mobile-open a:not(.btn-primary):not(.theme-toggle) {
+      display: block;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    .nav-links.mobile-open a:last-child {
+      border-bottom: none;
+    }
+    .hero, .how-section, .example-section, .cta-section { padding-left: 24px; padding-right: 24px; }
+    .categories-section, .channels-section { padding-left: 24px; padding-right: 24px; }
+    .social-proof { padding-left: 24px; padding-right: 24px; }
+    .stats-row { gap: 30px; }
+    .how-grid, .cat-grid, .channels-grid { grid-template-columns: 1fr; }
+    .example-card { grid-template-columns: 1fr; padding: 32px; }
+    footer { flex-direction: column; gap: 16px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">The Hub</div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  <div class="nav-links" id="nav-links">
+    <a href="#how">How It Works</a>
+    <a href="#categories">Categories</a>
+    <a href="#channels">Alerts</a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+      <span id="theme-icon">☀️</span>
+    </button>
+    <a href="https://thehubdeals.com/signup" class="btn-primary">Get Started Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Live — tracking 4 items right now
+  </div>
+  <h1>Never overpay<br>for what you collect.</h1>
+  <p>The Hub tracks prices across watches, sneakers, cars, and memorabilia — and alerts you the moment a deal drops below your target.</p>
+  <div class="hero-ctas">
+    <a href="https://thehubdeals.com/signup" class="btn-primary">Start Tracking Free</a>
+    <a href="#how" class="btn-secondary">See How It Works</a>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF -->
+<section class="social-proof">
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-number">1,700+</div>
+      <div class="stat-label">Listings Tracked</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">4</div>
+      <div class="stat-label">Markets Monitored</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">24/7</div>
+      <div class="stat-label">Real-Time Alerts</div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE DEALS TICKER -->
+<section class="ticker-section">
+  <div class="ticker-label">Live Deals — Updated Continuously</div>
+  <div class="ticker-track" id="ticker">
+    <!-- Populated by JS -->
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title">Set your target. We do the rest.</h2>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-number">01</div>
+      <h3>Tell us what you want</h3>
+      <p>Add any watch, sneaker, car, or collectible to your watchlist. Set the price you're willing to pay.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-number">02</div>
+      <h3>We scan everything</h3>
+      <p>Our agents monitor Chrono24, eBay, StockX, dealer sites, and more — 24/7, so you don't have to.</p>
+    </div>
+    <div class="how-card">
+      <div class="how-number">03</div>
+      <h3>Get alerted instantly</h3>
+      <p>Price drops below your target? You'll know within minutes via Telegram, email, or right on your dashboard.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="categories-section" id="categories">
+  <div class="categories-inner">
+    <div class="section-label">What We Track</div>
+    <h2 class="section-title">Four markets. One dashboard.</h2>
+    <div class="cat-grid">
+      <div class="cat-card">
+        <span class="cat-icon">⌚</span>
+        <h3>Watches</h3>
+        <p>Rolex, Grand Seiko, Tudor, Omega — tracked across Chrono24, eBay, and authorized dealers.</p>
+      </div>
+      <div class="cat-card">
+        <span class="cat-icon">👟</span>
+        <h3>Sneakers</h3>
+        <p>Nike Dunks, Jordans, New Balance collabs — prices from StockX, GOAT, and retail drops.</p>
+      </div>
+      <div class="cat-card">
+        <span class="cat-icon">🚗</span>
+        <h3>Cars</h3>
+        <p>Classic muscle, JDM legends, modern collectibles — auctions and private sales monitored.</p>
+      </div>
+      <div class="cat-card">
+        <span class="cat-icon">🏆</span>
+        <h3>Sports & Memorabilia</h3>
+        <p>Cards, signed gear, game-worn items — tracked across auction houses and marketplaces.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REAL DEAL EXAMPLE -->
+<section class="example-section">
+  <div class="section-label">Real Deal</div>
+  <h2 class="section-title">This is what it looks like.</h2>
+  <div class="example-card">
+    <div class="example-left">
+      <h3>🔴 Hot Deal Alert</h3>
+      <h2>Grand Seiko Snowflake</h2>
+      <p class="source">Found on Chrono24</p>
+      <div class="price-comparison">
+        <div class="price-col">
+          <label>Deal Price</label>
+          <div class="amount">$4,745</div>
+        </div>
+        <div class="price-col">
+          <label>Target Price</label>
+          <div class="amount strike">$5,500</div>
+        </div>
+      </div>
+      <div class="savings-bar">
+        ↓ 13.7% below your target — $755 saved
+      </div>
+    </div>
+    <div class="example-right">
+      <div class="feature-row">
+        <div class="feature-icon">🎯</div>
+        <div>
+          <h4>Your price, your rules</h4>
+          <p>You set $5,500 as your max. We found it at $4,745. You decide if it's the one.</p>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <h4>Alerted in minutes</h4>
+          <p>The moment this listing hit Chrono24 below your target, your phone buzzed.</p>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">📊</div>
+        <div>
+          <h4>Price context included</h4>
+          <p>See how the deal compares to recent sales, market average, and your target — all in one view.</p>
+        </div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">🔗</div>
+        <div>
+          <h4>Direct link to listing</h4>
+          <p>One tap from the alert takes you straight to the seller. No middleman.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHANNELS -->
+<section class="channels-section" id="channels">
+  <div class="channels-inner">
+    <div class="section-label">Stay Connected</div>
+    <h2 class="section-title">Get deals where you already are.</h2>
+    <div class="channels-grid">
+      <div class="channel-card">
+        <div class="channel-icon">✈️</div>
+        <h3>Telegram</h3>
+        <p>Real-time deal alerts the second they drop. For collectors who move fast.</p>
+        <a href="https://t.me/hubtest123" class="btn-primary">Join Channel</a>
+      </div>
+      <div class="channel-card">
+        <div class="channel-icon">📸</div>
+        <h3>Instagram</h3>
+        <p>Daily deal highlights, price drops, and finds you won't see anywhere else.</p>
+        <a href="https://instagram.com/thehubdeals08" class="btn-primary">Follow @thehubdeals08</a>
+      </div>
+      <div class="channel-card">
+        <div class="channel-icon">🖥️</div>
+        <h3>Dashboard</h3>
+        <p>Your personal command center. Track watchlists, set targets, review price history.</p>
+        <a href="https://thehubdeals.com/signup" class="btn-primary">Sign Up Free</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2>Stop browsing.<br>Start tracking.</h2>
+  <p>Join collectors who let The Hub do the hunting. Set your targets and we'll tell you when it's time to buy.</p>
+  <div class="cta-buttons">
+    <a href="https://thehubdeals.com/signup" class="btn-primary">Get Started Free</a>
+    <a href="https://t.me/hubtest123" class="btn-secondary">Join Telegram</a>
+  </div>
+  <p class="cta-note">Free to use. No credit card required.</p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>&copy; 2026 The Hub. Built for collectors, by collectors.</p>
+  <div class="footer-links">
+    <a href="https://t.me/hubtest123">Telegram</a>
+    <a href="https://instagram.com/thehubdeals08">Instagram</a>
+    <a href="#">Discord</a>
+    <a href="https://thehubdeals.com/blog">Blog</a>
+  </div>
+</footer>
+
+<script>
+// Theme toggle functionality
+function initTheme() {
+  const html = document.documentElement;
+  const themeToggle = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  
+  // Check localStorage for saved preference, default to dark
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  html.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+  
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+  });
+  
+  function updateThemeIcon(theme) {
+    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+}
+
+// Mobile hamburger menu
+function initMobileMenu() {
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('nav-links');
+  
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navLinks.classList.toggle('mobile-open');
+  });
+  
+  // Close menu when clicking a link
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('mobile-open');
+    });
+  });
+}
+
+// Deal ticker data
+const deals = [
+  { category: "WATCHES", name: "Grand Seiko Snowflake", price: "$4,745", market: "$5,500", savings: "13.7% below target", hot: true },
+  { category: "SNEAKERS", name: "Nike Dunk Low Panda", price: "$85", market: "$110", savings: "23% below retail", hot: true },
+  { category: "WATCHES", name: "Tudor Black Bay 58", price: "$3,250", market: "$3,800", savings: "14.5% below market", hot: true },
+  { category: "CARS", name: "1992 Mazda Miata NA", price: "$12,800", market: "$16,000", savings: "20% under comps", hot: false },
+  { category: "SNEAKERS", name: "New Balance 990v6", price: "$142", market: "$199", savings: "29% off retail", hot: true },
+  { category: "WATCHES", name: "Omega Speedmaster Reduced", price: "$3,100", market: "$3,600", savings: "14% below average", hot: false },
+  { category: "MEMORABILIA", name: "PSA 10 Jeter Rookie", price: "$385", market: "$520", savings: "26% below recent sale", hot: true },
+  { category: "CARS", name: "2006 Porsche Cayman S", price: "$28,500", market: "$34,000", savings: "16% under market", hot: false },
+];
+
+function createDealCards() {
+  const ticker = document.getElementById('ticker');
+  const allDeals = [...deals, ...deals]; // duplicate for seamless scroll
+  allDeals.forEach(deal => {
+    const card = document.createElement('div');
+    card.className = 'deal-card';
+    card.innerHTML = `
+      <div class="deal-card-header">
+        <span class="deal-category">${deal.category}</span>
+        <span class="deal-badge ${deal.hot ? 'hot' : 'good'}">${deal.hot ? 'HOT DEAL' : 'GOOD DEAL'}</span>
+      </div>
+      <div class="deal-name">${deal.name}</div>
+      <div class="deal-prices">
+        <span class="deal-price">${deal.price}</span>
+        <span class="deal-market">${deal.market}</span>
+      </div>
+      <div class="deal-savings">↓ ${deal.savings}</div>
+    `;
+    ticker.appendChild(card);
+  });
+}
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+
+// Initialize everything
+initTheme();
+initMobileMenu();
+createDealCards();
+</script>
+</body>
+</html>

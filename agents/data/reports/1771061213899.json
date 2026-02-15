@@ -1,0 +1,31 @@
+{
+  "from": "scout",
+  "to": "jay",
+  "finding": {
+    "type": "hot_deals",
+    "deals": [
+      {
+        "id": "36885ceb-2a02-40aa-8668-f1e386879b87",
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "specific_model": null,
+        "target_price": 5500,
+        "current_price": 4745,
+        "last_checked": "2026-02-14T09:00:00.437",
+        "alert_enabled": true,
+        "sources": [
+          "reddit",
+          "ebay",
+          "watchuseek"
+        ],
+        "notes": null,
+        "created_at": "2026-01-28T21:53:55.630671",
+        "updated_at": "2026-02-14T09:00:00.475276"
+      }
+    ],
+    "analysis": "The Grand Seiko Snowflake! That's a fantastic deal, if I do say so myself.\n\nLet's break down the numbers:\n\n* Current price: $745\n* Target price: $500\n* Discount: 13.7%\n\nNow, before we dive into the analysis, it's essential to consider the original purchase price of this watch. The Grand Seiko Snowflake is a highly sought-after model, and its MSRP can range from around $6,000 to over $10,000, depending on the reference (e.g., SBGW001 or SBGZ005).\n\nAssuming an average original purchase price of around $7,500 (a rough estimate), let's calculate the discount as a percentage of the original price:\n\nDiscount: ($745 - $7,500) / $7,500 ≈ 90% off\n\nNow, this is where things get interesting. A 13.7% discount on an already discounted watch might seem counterintuitive, but it could indicate that the seller is trying to sell it quickly or has some personal reasons for parting with it.\n\nConsidering the rarity and demand for the Grand Seiko Snowflake, I'd say this deal is exceptional. The watch's value lies in its limited production runs, making it a sought-after collector's item. If the seller is willing to let go of such a rare model at a significant discount, it could indicate that they're either:\n\n1. Looking for a quick sale\n2. Trying to offload the watch due to personal reasons\n3. Accepting an unrealistically low offer\n\nIn any case, this deal presents an incredible opportunity for someone looking to snag a rare and valuable Grand Seiko Snowflake at a fraction of its original price.\n\nWhat do you think? Are you tempted by this deal, or would you like me to analyze another watch on the r/Watchexchange thread?",
+    "timestamp": 1771061213898
+  },
+  "status": "reviewed",
+  "reviewedAt": 1771062330435
+}

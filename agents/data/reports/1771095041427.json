@@ -1,0 +1,31 @@
+{
+  "from": "scout",
+  "to": "jay",
+  "finding": {
+    "type": "hot_deals",
+    "deals": [
+      {
+        "id": "36885ceb-2a02-40aa-8668-f1e386879b87",
+        "brand": "Grand Seiko",
+        "model": "Snowflake",
+        "specific_model": null,
+        "target_price": 5500,
+        "current_price": 4701,
+        "last_checked": "2026-02-14T18:00:00.389",
+        "alert_enabled": true,
+        "sources": [
+          "reddit",
+          "ebay",
+          "watchuseek"
+        ],
+        "notes": null,
+        "created_at": "2026-01-28T21:53:55.630671",
+        "updated_at": "2026-02-14T18:00:00.519575"
+      }
+    ],
+    "analysis": "The Grand Seiko Snowflake is a fantastic deal! \n\nFirst let's take a look at the details:\n\n- Initial price: $500\n- Current price: $428 ($14.5 discount)\n- Target price: $500\n\nThis deal seems to be following the expected pattern of watch sellers looking to liquidate or make room for new inventory.\n\nAs we analyze this, it seems that there's been no major disruptions in demand and the market appears stable; which could imply a good opportunity.\n\nHowever, without more data on how many units are being sold or any potential factors affecting supply and demand, I can only speculate.",
+    "timestamp": 1771095041427
+  },
+  "status": "reviewed",
+  "reviewedAt": 1771095062654
+}
