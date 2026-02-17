@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const WTBMonitor = require('../../services/reddit/WTBMonitor');
+const WTBOutreach = require('../../services/reddit/WTBOutreach');
 const logger = require('../../utils/logger');
 
 const wtbMonitor = new WTBMonitor();
@@ -156,6 +157,66 @@ router.get('/opportunities', async (req, res) => {
     });
   } catch (error) {
     logger.error(`WTB opportunities failed: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/wtb/outreach
+ * Trigger WTB auto-outreach (matches + posts comments)
+ * Body: { dryRun, limit, minTransactions, minScore }
+ * Returns matches and posting results
+ */
+router.post('/outreach', async (req, res) => {
+  try {
+    const {
+      dryRun = true, // Default to dry run for safety
+      limit = 10,
+      delay = 120000, // 2 minutes
+      minTransactions = 0,
+      minScore = 50
+    } = req.body || {};
+    
+    logger.info(`🚀 WTB outreach triggered via API (dryRun: ${dryRun}, limit: ${limit})`);
+    
+    // Validate Reddit credentials if not dry run
+    if (!dryRun) {
+      const requiredVars = ['REDDIT_CLIENT_ID', 'REDDIT_CLIENT_SECRET', 'REDDIT_REFRESH_TOKEN'];
+      const missing = requiredVars.filter(v => !process.env[v]);
+      
+      if (missing.length > 0) {
+        return res.status(400).json({
+          success: false,
+          error: `Missing Reddit credentials: ${missing.join(', ')}. Set dryRun=true to test without posting.`
+        });
+      }
+    }
+    
+    // Initialize outreach service
+    const outreach = new WTBOutreach({
+      minTransactions,
+      maxCommentsPerRun: limit,
+      minDealScore: minScore
+    });
+    
+    // Run outreach
+    const result = await outreach.runOutreach({
+      dryRun,
+      limit,
+      delay,
+      minScore
+    });
+    
+    res.json({
+      success: true,
+      dryRun: dryRun,
+      ...result
+    });
+  } catch (error) {
+    logger.error(`WTB outreach failed: ${error.message}`);
     res.status(500).json({
       success: false,
       error: error.message
