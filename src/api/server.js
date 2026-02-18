@@ -81,6 +81,13 @@ app.post('/api/subscriptions/webhook',
   (req, res, next) => { req.url = '/webhook'; subscriptionsRouter(req, res, next); }
 );
 
+// Checkout webhook also needs raw body — register before express.json()
+const checkoutRouter = require('./checkout');
+app.post('/api/checkout/webhook',
+  express.raw({ type: 'application/json' }),
+  (req, res, next) => { req.url = '/webhook'; checkoutRouter(req, res, next); }
+);
+
 app.use(express.json());
 
 // Cookie parser for JWT tokens
@@ -143,6 +150,13 @@ app.use('/api/stripe', stripeRouter);
 // Note: webhook route already mounted above (before express.json)
 // These routes (create-checkout, status, portal) use parsed JSON bodies
 app.use('/api/subscriptions', subscriptionsRouter);
+
+// ============================================================================
+// CHECKOUT ROUTES (Public toolkit checkout)
+// ============================================================================
+// Note: webhook route already mounted above (before express.json)
+// These routes handle toolkit purchases (no auth required)
+app.use('/api/checkout', checkoutRouter);
 
 // ============================================================================
 // SCRAPER DEBUG ROUTES

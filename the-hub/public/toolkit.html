@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Hub Deal Hunter's Toolkit — Your Unfair Advantage in Watches, Sneakers & Cars</title>
+<meta name="description" content="Get exclusive deal alerts, price history reports, authentication guides & buy/sell timing strategies. Save thousands on your next purchase.">
+<meta property="og:title" content="The Hub Deal Hunter's Toolkit">
+<meta property="og:description" content="Your unfair advantage. Exclusive deal alerts, market reports, and strategies used by top collectors.">
+<meta property="og:image" content="https://thehubdeals.com/og-toolkit.jpg">
+<meta property="og:type" content="product">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Analytics -->
+<script>
+  // Track page views & conversions
+  function trackEvent(name, data = {}) {
+    if (window.gtag) gtag('event', name, data);
+    // Also store locally for our funnel analytics
+    const events = JSON.parse(localStorage.getItem('hub_events') || '[]');
+    events.push({ event: name, data, ts: Date.now(), page: 'toolkit' });
+    localStorage.setItem('hub_events', JSON.stringify(events.slice(-100)));
+  }
+  window.addEventListener('load', () => trackEvent('toolkit_page_view'));
+</script>
+
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-elevated: #111111;
+    --bg-card: #161616;
+    --bg-card-hover: #1a1a1a;
+    --border: #222222;
+    --border-light: #2a2a2a;
+    --text: #fafafa;
+    --text-muted: #888888;
+    --text-dim: #666666;
+    --green: #10b981;
+    --green-glow: rgba(16, 185, 129, 0.15);
+    --green-dark: #059669;
+    --purple: #8b5cf6;
+    --purple-glow: rgba(139, 92, 246, 0.15);
+    --blue: #3b82f6;
+    --orange: #f59e0b;
+    --gradient-green: linear-gradient(135deg, #10b981, #059669);
+    --gradient-purple: linear-gradient(135deg, #8b5cf6, #6d28d9);
+    --gradient-hero: linear-gradient(135deg, #10b981 0%, #8b5cf6 50%, #3b82f6 100%);
+    --radius: 12px;
+    --radius-lg: 20px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.3);
+    --shadow-glow: 0 0 60px rgba(16, 185, 129, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  .mono { font-family: 'Space Mono', monospace; }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.5); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-in {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .animate-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== STICKY NAV ===== */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 14px 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s;
+  }
+  .nav-logo {
+    font-size: 20px; font-weight: 800; letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: var(--green); }
+  .nav-cta {
+    background: var(--gradient-green);
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+  }
+  .nav-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(16, 185, 129, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .hero-content { position: relative; max-width: 800px; z-index: 1; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green-glow);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--green);
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 32px;
+    animation: fadeIn 0.8s ease;
+  }
+  .hero-badge .dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.8s ease 0.2s both;
+  }
+  .hero h1 .gradient-text {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: clamp(17px, 2vw, 20px);
+    color: var(--text-muted);
+    max-width: 580px;
+    margin: 0 auto 40px;
+    animation: fadeInUp 0.8s ease 0.4s both;
+  }
+  .hero-cta-group {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    animation: fadeInUp 0.8s ease 0.6s both;
+  }
+  .btn-primary {
+    background: var(--gradient-green);
+    color: #fff;
+    border: none;
+    padding: 16px 40px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 24px rgba(16, 185, 129, 0.25);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(16, 185, 129, 0.35);
+  }
+  .btn-secondary {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border-light);
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .btn-secondary:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--text-dim);
+  }
+
+  /* ===== SOCIAL PROOF BAR ===== */
+  .proof-bar {
+    display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+    padding: 48px 24px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-elevated);
+  }
+  .proof-stat {
+    text-align: center;
+  }
+  .proof-stat .number {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+  .proof-stat .number span { color: var(--green); }
+  .proof-stat .label {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ===== SECTIONS ===== */
+  section {
+    padding: 100px 24px;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-label {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .section-subtitle {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 600px;
+  }
+
+  /* ===== PROBLEM SECTION ===== */
+  .problem {
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .problem-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    transition: all 0.3s;
+  }
+  .problem-card:hover {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.03);
+  }
+  .problem-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+  .problem-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .problem-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* ===== WHAT'S INCLUDED ===== */
+  .included-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .included-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    transition: all 0.4s;
+    position: relative;
+    overflow: hidden;
+  }
+  .included-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gradient-green);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .included-card:hover::before { opacity: 1; }
+  .included-card:hover {
+    border-color: var(--border-light);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow);
+  }
+  .included-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--green);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .included-card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  .included-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .included-tag {
+    display: inline-block;
+    background: var(--green-glow);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-top: 16px;
+  }
+
+  /* ===== HOW IT WORKS ===== */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+  }
+  .step {
+    text-align: center;
+    padding: 32px;
+  }
+  .step-number {
+    width: 56px; height: 56px;
+    background: var(--gradient-green);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 auto 20px;
+  }
+  .step h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .step p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* ===== TESTIMONIALS ===== */
+  .testimonials {
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .testimonial-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    position: relative;
+  }
+  .testimonial-card::before {
+    content: '"';
+    position: absolute;
+    top: 16px; left: 24px;
+    font-size: 60px;
+    color: var(--green);
+    opacity: 0.15;
+    font-family: Georgia, serif;
+    line-height: 1;
+  }
+  .testimonial-text {
+    font-size: 16px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .testimonial-author {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .testimonial-avatar {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--gradient-green);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #fff;
+  }
+  .testimonial-name {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .testimonial-role {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .testimonial-stars {
+    color: var(--orange);
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  /* ===== DEAL EXAMPLE ===== */
+  .deal-preview {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    max-width: 500px;
+    margin: 48px auto 0;
+  }
+  .deal-preview-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px;
+  }
+  .deal-preview-badge {
+    background: var(--green-glow);
+    color: var(--green);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 100px;
+  }
+  .deal-preview-score {
+    font-family: 'Space Mono', monospace;
+    color: var(--green);
+    font-weight: 700;
+    font-size: 20px;
+  }
+  .deal-preview h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .deal-preview .source { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .deal-prices {
+    display: flex; gap: 24px; align-items: baseline;
+    padding: 16px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .deal-price-current {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--green);
+    font-family: 'Space Mono', monospace;
+  }
+  .deal-price-market {
+    font-size: 16px;
+    color: var(--text-dim);
+    text-decoration: line-through;
+  }
+  .deal-savings {
+    background: var(--green-glow);
+    color: var(--green);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .deal-meta {
+    display: flex; gap: 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  /* ===== PRICING ===== */
+  .pricing { text-align: center; }
+  .pricing-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 800px;
+    margin: 48px auto 0;
+  }
+  .pricing-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px 32px;
+    text-align: left;
+    transition: all 0.3s;
+    position: relative;
+  }
+  .pricing-card.featured {
+    border-color: var(--green);
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.1);
+  }
+  .pricing-card.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute;
+    top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--gradient-green);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 6px 20px;
+    border-radius: 100px;
+  }
+  .pricing-tier {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .pricing-amount {
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    margin-bottom: 4px;
+  }
+  .pricing-amount span { font-size: 18px; color: var(--text-muted); font-weight: 500; }
+  .pricing-desc {
+    color: var(--text-muted);
+    font-size: 15px;
+    margin-bottom: 28px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+  .pricing-features { list-style: none; margin-bottom: 32px; }
+  .pricing-features li {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 8px 0;
+    font-size: 15px;
+    color: var(--text);
+  }
+  .pricing-features li::before {
+    content: '✓';
+    color: var(--green);
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .pricing-btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s;
+  }
+  .pricing-btn-primary {
+    background: var(--gradient-green);
+    color: #fff;
+    box-shadow: 0 4px 24px rgba(16, 185, 129, 0.25);
+  }
+  .pricing-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 40px rgba(16, 185, 129, 0.35);
+  }
+  .pricing-btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border-light);
+  }
+  .pricing-btn-secondary:hover {
+    border-color: var(--green);
+  }
+
+  /* ===== GUARANTEE ===== */
+  .guarantee {
+    text-align: center;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .guarantee-box {
+    background: var(--bg-card);
+    border: 2px solid var(--green);
+    border-radius: var(--radius-lg);
+    padding: 48px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.08);
+  }
+  .guarantee-icon { font-size: 56px; margin-bottom: 16px; }
+  .guarantee-box h3 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  .guarantee-box p {
+    color: var(--text-muted);
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* ===== FAQ ===== */
+  .faq-list {
+    max-width: 700px;
+    margin: 48px auto 0;
+  }
+  .faq-item {
+    border-bottom: 1px solid var(--border);
+    padding: 24px 0;
+  }
+  .faq-question {
+    display: flex; justify-content: space-between; align-items: center;
+    cursor: pointer;
+    gap: 16px;
+  }
+  .faq-question h3 {
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .faq-toggle {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+  }
+  .faq-answer.open {
+    max-height: 300px;
+    padding-top: 16px;
+  }
+  .faq-answer p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .faq-item.active .faq-toggle {
+    background: var(--green-glow);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  /* ===== FINAL CTA ===== */
+  .final-cta {
+    text-align: center;
+    padding: 120px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .final-cta::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .final-cta h2 {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+  .final-cta p {
+    font-size: 18px;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    padding: 48px 24px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  footer p {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  footer a:hover { color: var(--green); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .nav { padding: 12px 16px; }
+    section { padding: 64px 16px; }
+    .steps { grid-template-columns: 1fr; gap: 16px; }
+    .proof-bar { gap: 32px; padding: 32px 16px; }
+    .pricing-cards { grid-template-columns: 1fr; }
+    .guarantee-box { padding: 32px 24px; }
+    .hero { padding: 100px 16px 60px; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+    .hero-cta-group { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">THE <span>HUB</span></div>
+  <a href="#pricing" class="nav-cta">Get the Toolkit →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      2,116+ deals tracked this month
+    </div>
+    <h1>Your Unfair Advantage<br>in <span class="gradient-text">Deal Hunting</span></h1>
+    <p>Exclusive alerts, price history reports, and strategies that save collectors thousands. Built from 2,116+ tracked listings across watches, sneakers & cars.</p>
+    <div class="hero-cta-group">
+      <a href="#pricing" class="btn-primary" onclick="trackEvent('hero_cta_click')">
+        Get the Toolkit
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#included" class="btn-secondary">
+        See What's Inside ↓
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF BAR -->
+<div class="proof-bar">
+  <div class="proof-stat">
+    <div class="number">2,116<span>+</span></div>
+    <div class="label">Deals Tracked</div>
+  </div>
+  <div class="proof-stat">
+    <div class="number">$3.2<span>M</span></div>
+    <div class="label">In Listings Analyzed</div>
+  </div>
+  <div class="proof-stat">
+    <div class="number">23<span>%</span></div>
+    <div class="label">Avg. Savings Found</div>
+  </div>
+  <div class="proof-stat">
+    <div class="number">500<span>+</span></div>
+    <div class="label">New Deals Weekly</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container animate-in">
+    <span class="section-label">The Problem</span>
+    <h2 class="section-title">You're leaving money<br>on the table.</h2>
+    <p class="section-subtitle">Without the right data, you're overpaying, mistiming buys, and missing deals that disappear in minutes.</p>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">💸</div>
+        <h3>Overpaying by 15–30%</h3>
+        <p>Without price history, you can't tell if a "deal" is actually a deal. Sellers count on this.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">⏰</div>
+        <h3>Missing Time-Sensitive Deals</h3>
+        <p>The best deals get scooped in under an hour. By the time you find them, they're gone.</p>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🎭</div>
+        <h3>Buying Fakes Without Knowing</h3>
+        <p>The replica market is a $500B industry. One wrong purchase can cost thousands.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INCLUDED -->
+<section id="included">
+  <div class="container animate-in">
+    <span class="section-label">What's Included</span>
+    <h2 class="section-title">Everything you need to<br>buy smarter.</h2>
+    <p class="section-subtitle">A complete toolkit built from real data, not theory.</p>
+    <div class="included-grid">
+      <div class="included-card">
+        <div class="included-number">01</div>
+        <h3>🔔 Exclusive Deal Alerts</h3>
+        <p>Get early access to the highest-scored deals before they go live on the site. Delivered via Telegram with direct links.</p>
+        <span class="included-tag">Weekly Updates</span>
+      </div>
+      <div class="included-card">
+        <div class="included-number">02</div>
+        <h3>📊 Price History & Market Reports</h3>
+        <p>See exactly how prices have moved over weeks and months. Know what a fair price really is before you buy.</p>
+        <span class="included-tag">Data-Driven</span>
+      </div>
+      <div class="included-card">
+        <div class="included-number">03</div>
+        <h3>🎯 Deal Score Breakdown</h3>
+        <p>Understand our proprietary scoring algorithm. Learn to spot 90+ scored deals on your own across any marketplace.</p>
+        <span class="included-tag">Strategy Guide</span>
+      </div>
+      <div class="included-card">
+        <div class="included-number">04</div>
+        <h3>🔍 Authentication Guide</h3>
+        <p>Step-by-step visual guides for verifying watches and sneakers. Red flags, serial number checks, and trusted resources.</p>
+        <span class="included-tag">Watch + Sneaker</span>
+      </div>
+      <div class="included-card">
+        <div class="included-number">05</div>
+        <h3>📈 Buy/Sell Timing Strategies</h3>
+        <p>Market cycles exist. Learn the best months to buy, when to sell, and how seasonal trends affect prices.</p>
+        <span class="included-tag">Profit Maximizer</span>
+      </div>
+      <div class="included-card">
+        <div class="included-number">06</div>
+        <h3>💬 Private Community Access</h3>
+        <p>Join a private Telegram group of serious collectors. Share finds, get authentication help, and network.</p>
+        <span class="included-tag">Members Only</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEAL PREVIEW -->
+<section style="background: var(--bg-elevated); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="container animate-in" style="text-align: center;">
+    <span class="section-label">See It In Action</span>
+    <h2 class="section-title">This is what a Toolkit<br>alert looks like.</h2>
+    <p class="section-subtitle" style="margin: 0 auto;">Members got this deal 4 hours before it went public.</p>
+    <div class="deal-preview">
+      <div class="deal-preview-header">
+        <span class="deal-preview-badge">🔥 EARLY ACCESS</span>
+        <span class="deal-preview-score">94/100</span>
+      </div>
+      <h3>Omega Speedmaster Professional</h3>
+      <div class="source">Chrono24 · Listed 12 min ago</div>
+      <div class="deal-prices">
+        <span class="deal-price-current">$4,250</span>
+        <span class="deal-price-market">$5,800</span>
+        <span class="deal-savings">Save $1,550</span>
+      </div>
+      <div class="deal-meta">
+        <span>📍 Full set, box & papers</span>
+        <span>📉 18% below market avg</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section>
+  <div class="container animate-in">
+    <div style="text-align: center;">
+      <span class="section-label">How It Works</span>
+      <h2 class="section-title">Three steps. That's it.</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Subscribe</h3>
+        <p>Pick your plan and get instant access. Setup takes under 2 minutes.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Get Alerts</h3>
+        <p>Receive curated deals and reports via Telegram and email before anyone else.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Save Money</h3>
+        <p>Act on data-backed deals and save an average of 23% per purchase.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+  <div class="container animate-in">
+    <div style="text-align: center;">
+      <span class="section-label">Testimonials</span>
+      <h2 class="section-title">What collectors are saying.</h2>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">Saved $2,200 on a Submariner in my first month. The price history data alone is worth 10x the subscription.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">MK</div>
+          <div>
+            <div class="testimonial-name">Marcus K.</div>
+            <div class="testimonial-role">Watch Collector · 3 months</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">The authentication guide caught a fake Jordan 4 I was about to buy for $380. This toolkit literally paid for itself instantly.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JR</div>
+          <div>
+            <div class="testimonial-name">James R.</div>
+            <div class="testimonial-role">Sneaker Reseller · 6 months</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">I flip 3-4 watches a month. The buy/sell timing guide helped me increase margins by about 15%. Absolute no-brainer.</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">DL</div>
+          <div>
+            <div class="testimonial-name">David L.</div>
+            <div class="testimonial-role">Watch Dealer · 2 months</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="container animate-in">
+    <span class="section-label">Pricing</span>
+    <h2 class="section-title">One deal pays for a year.</h2>
+    <p class="section-subtitle" style="margin: 0 auto;">Members save an average of $1,200/year. The toolkit costs less than a single sneaker.</p>
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <div class="pricing-tier">Monthly</div>
+        <div class="pricing-amount">$9<span>/mo</span></div>
+        <p class="pricing-desc">Perfect if you want to try it out. Cancel anytime.</p>
+        <ul class="pricing-features">
+          <li>Weekly exclusive deal alerts</li>
+          <li>Price history reports</li>
+          <li>Deal score breakdowns</li>
+          <li>Authentication guides</li>
+          <li>Buy/sell timing strategies</li>
+          <li>Private Telegram community</li>
+        </ul>
+        <button class="pricing-btn pricing-btn-secondary" onclick="handleCheckout('monthly')" id="monthly-cta">Start Monthly →</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="pricing-tier">Annual</div>
+        <div class="pricing-amount">$47<span>/yr</span></div>
+        <p class="pricing-desc">Best value — save 56% vs monthly. Billed once a year.</p>
+        <ul class="pricing-features">
+          <li><strong>Everything in Monthly, plus:</strong></li>
+          <li>Annual market trend report</li>
+          <li>Priority deal alerts (30 min early)</li>
+          <li>1-on-1 deal review (monthly)</li>
+          <li>Exclusive "Top 10 Deals" weekly digest</li>
+          <li>Lifetime price: locked in forever</li>
+        </ul>
+        <button class="pricing-btn pricing-btn-primary" onclick="handleCheckout('yearly')" id="annual-cta">Get Annual Access →</button>
+      </div>
+    </div>
+    <p style="text-align: center; color: var(--text-dim); font-size: 14px; margin-top: 24px;">
+      🔒 Secure checkout via Stripe · Cancel anytime · 30-day money-back guarantee
+    </p>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee">
+  <div class="container animate-in">
+    <div class="guarantee-box">
+      <div class="guarantee-icon">🛡️</div>
+      <h3>30-Day Money-Back Guarantee</h3>
+      <p>If you don't save more than the cost of the toolkit in your first 30 days, email us and we'll refund every cent. No questions asked. We're that confident.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section>
+  <div class="container">
+    <div style="text-align: center;">
+      <span class="section-label">FAQ</span>
+      <h2 class="section-title">Questions? We've got answers.</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <h3>How are deal alerts delivered?</h3>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Deal alerts are sent via our private Telegram channel and email. You'll get a notification the moment a high-scored deal is found — typically 2-4 hours before it appears on the main site.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <h3>What categories do you cover?</h3>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>We currently track watches (Rolex, Omega, Tudor, etc.), sneakers (Nike, Jordan, New Balance, etc.), and cars (sports cars, classics, EVs). We're constantly adding new categories.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <h3>Can I cancel anytime?</h3>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Absolutely. Cancel with one click from your account. No contracts, no commitments. Plus, there's a 30-day money-back guarantee — zero risk.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <h3>How is this different from the free site?</h3>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>The free site shows current listings. The Toolkit gives you early access to deals (before public), price history data, authentication guides, market reports, and direct strategies to save money. Think of it as the difference between reading headlines and getting the full analysis.</p>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <h3>What's the deal scoring system?</h3>
+          <div class="faq-toggle">+</div>
+        </div>
+        <div class="faq-answer">
+          <p>Every listing gets scored 0-100 based on price vs. market average, seller reputation, completeness (box/papers), listing age, and historical price trends. Scores above 85 are exceptional deals. Toolkit members learn exactly how to interpret and find these.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container animate-in">
+    <h2>Stop overpaying.<br><span style="color: var(--green);">Start deal hunting.</span></h2>
+    <p>Join collectors who save thousands every year with data-driven deal hunting.</p>
+    <a href="#pricing" class="btn-primary" onclick="trackEvent('final_cta_click')" style="font-size: 19px; padding: 18px 48px;">
+      Get the Toolkit Now →
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="margin-bottom: 8px;">
+    <a href="https://thehubdeals.com">The Hub</a> · 
+    <a href="https://t.me/thehubdeals">Telegram</a> · 
+    <a href="https://instagram.com/thehubdeals08">Instagram</a> · 
+    <a href="mailto:support@thehubdeals.com">Support</a>
+  </p>
+  <p>© 2025 The Hub. All rights reserved.</p>
+</footer>
+
+<script>
+  // Scroll animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.animate-in').forEach(el => observer.observe(el));
+
+  // FAQ toggle
+  function toggleFaq(el) {
+    const item = el.closest('.faq-item');
+    const answer = item.querySelector('.faq-answer');
+    const toggle = item.querySelector('.faq-toggle');
+    const isOpen = item.classList.contains('active');
+
+    // Close all
+    document.querySelectorAll('.faq-item').forEach(i => {
+      i.classList.remove('active');
+      i.querySelector('.faq-answer').classList.remove('open');
+      i.querySelector('.faq-toggle').textContent = '+';
+    });
+
+    if (!isOpen) {
+      item.classList.add('active');
+      answer.classList.add('open');
+      toggle.textContent = '−';
+    }
+  }
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Count-up animation for stats
+  function animateCountUp() {
+    document.querySelectorAll('.proof-stat .number').forEach(el => {
+      el.style.animation = 'countUp 0.6s ease both';
+    });
+  }
+  const proofObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        animateCountUp();
+        proofObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  const proofBar = document.querySelector('.proof-bar');
+  if (proofBar) proofObserver.observe(proofBar);
+
+  // ============================================================
+  // STRIPE CHECKOUT HANDLER
+  // ============================================================
+  
+  const PRICE_IDS = {
+    monthly: 'price_1Sy1BjCaz620S5FSO8c5KhF9',
+    yearly: 'price_1Sy1BjCaz620S5FSDGlVkwJ4'
+  };
+
+  async function handleCheckout(plan) {
+    const button = document.getElementById(`${plan === 'yearly' ? 'annual' : 'monthly'}-cta`);
+    const originalText = button.textContent;
+    
+    // Track checkout attempt
+    trackEvent('checkout_click', { 
+      plan: plan, 
+      price: plan === 'yearly' ? 47 : 9 
+    });
+
+    try {
+      // Disable button and show loading state
+      button.disabled = true;
+      button.textContent = 'Loading...';
+      button.style.opacity = '0.6';
+
+      const priceId = PRICE_IDS[plan];
+      const baseUrl = window.location.origin;
+      
+      // Call our checkout API
+      const response = await fetch('/api/checkout/create-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          priceId: priceId,
+          successUrl: `${baseUrl}/toolkit.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${baseUrl}/toolkit.html?canceled=true`
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.url) {
+        // Redirect to Stripe Checkout
+        trackEvent('checkout_redirect', { plan });
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert('Failed to start checkout. Please try again or contact support.');
+      
+      // Reset button
+      button.disabled = false;
+      button.textContent = originalText;
+      button.style.opacity = '1';
+      
+      trackEvent('checkout_error', { 
+        plan, 
+        error: error.message 
+      });
+    }
+  }
+
+  // Handle success/cancel redirect params
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('success') === 'true') {
+    trackEvent('checkout_success');
+    // Could show a success message or redirect to thank-you page
+    alert('🎉 Welcome to The Hub Toolkit! Check your email for next steps.');
+  } else if (urlParams.get('canceled') === 'true') {
+    trackEvent('checkout_canceled');
+  }
+</script>
+</body>
+</html>
