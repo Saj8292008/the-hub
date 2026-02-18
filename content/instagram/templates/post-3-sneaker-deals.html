@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 1080px;
+            height: 1080px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: 'Arial Black', Arial, sans-serif;
+            color: white;
+            padding: 60px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .brand {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+        }
+        .fire {
+            color: #ff6b35;
+        }
+        .title {
+            font-size: 56px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .sneaker-emoji {
+            font-size: 64px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .deal-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .deal-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: linear-gradient(135deg, #00ff88 0%, #00d4aa 100%);
+            color: #1a1a2e;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: 900;
+        }
+        .sneaker-icon {
+            font-size: 120px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .sneaker-name {
+            font-size: 28px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 15px;
+        }
+        .price {
+            font-size: 52px;
+            font-weight: 900;
+            color: #00ff88;
+        }
+        .retail {
+            font-size: 20px;
+            color: rgba(255,255,255,0.5);
+            text-decoration: line-through;
+        }
+        .cta {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 32px;
+            color: #00d4ff;
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="brand">🔥 THE HUB</div>
+        <div class="title"><span class="sneaker-emoji">👟</span> BEST SNEAKER DEALS</div>
+    </div>
+    
+    <div class="grid">
+        <div class="deal-card">
+            <div class="deal-badge">HOT 🔥</div>
+            <div>
+                <div class="sneaker-icon">👟</div>
+                <div class="sneaker-name">YEEZY PIRATE BLACK</div>
+            </div>
+            <div class="price-row">
+                <div class="price">$250</div>
+                <div class="retail">$800</div>
+            </div>
+        </div>
+        
+        <div class="deal-card">
+            <div class="deal-badge">GRAIL 👑</div>
+            <div>
+                <div class="sneaker-icon">🏀</div>
+                <div class="sneaker-name">TRAVIS SCOTT AJ1</div>
+            </div>
+            <div class="price-row">
+                <div class="price">$990</div>
+                <div class="retail">$2.5K</div>
+            </div>
+        </div>
+        
+        <div class="deal-card">
+            <div class="deal-badge">STEAL 💎</div>
+            <div>
+                <div class="sneaker-icon">👟</div>
+                <div class="sneaker-name">NEW BALANCE 1906R</div>
+            </div>
+            <div class="price-row">
+                <div class="price">$120</div>
+                <div class="retail">$180</div>
+            </div>
+        </div>
+        
+        <div class="deal-card">
+            <div class="deal-badge">SALE ⚡</div>
+            <div>
+                <div class="sneaker-icon">👟</div>
+                <div class="sneaker-name">JORDAN 4 RETRO</div>
+            </div>
+            <div class="price-row">
+                <div class="price">$180</div>
+                <div class="retail">$225</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cta">
+        LINK IN BIO FOR MORE 👆
+    </div>
+</body>
+</html>

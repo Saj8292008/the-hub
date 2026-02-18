@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 1080px;
+            height: 1080px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Arial Black', Arial, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        .brand {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            color: white;
+            font-weight: 900;
+            letter-spacing: 8px;
+        }
+        .fire {
+            color: #ff6b35;
+            font-size: 56px;
+        }
+        .badge {
+            position: absolute;
+            top: 120px;
+            right: 60px;
+            background: linear-gradient(135deg, #00ff88 0%, #00d4aa 100%);
+            color: #1a1a2e;
+            padding: 20px 30px;
+            border-radius: 50px;
+            font-size: 28px;
+            font-weight: 900;
+            transform: rotate(12deg);
+            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.4);
+        }
+        .watch-container {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 80px;
+            box-shadow: 0 0 100px rgba(0, 212, 255, 0.3);
+        }
+        .watch-placeholder {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            color: rgba(255,255,255,0.6);
+            border: 8px solid rgba(0, 212, 255, 0.3);
+        }
+        .deal-text {
+            position: absolute;
+            bottom: 180px;
+            text-align: center;
+        }
+        .deal-title {
+            color: white;
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .deal-model {
+            color: #00d4ff;
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+        .price {
+            font-size: 120px;
+            font-weight: 900;
+            color: #00ff88;
+            text-shadow: 0 0 40px rgba(0, 255, 136, 0.6);
+            line-height: 1;
+        }
+        .flame-emoji {
+            position: absolute;
+            font-size: 80px;
+            animation: float 3s ease-in-out infinite;
+        }
+        .flame1 { top: 200px; left: 100px; animation-delay: 0s; }
+        .flame2 { top: 400px; right: 120px; animation-delay: 1s; }
+        .flame3 { bottom: 300px; left: 150px; animation-delay: 2s; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="brand">🔥 THE HUB</div>
+    <div class="badge">95% BELOW<br>MARKET</div>
+    <div class="flame-emoji flame1">🔥</div>
+    <div class="flame-emoji flame2">🔥</div>
+    <div class="flame-emoji flame3">🔥</div>
+    <div class="watch-container">
+        <div class="watch-placeholder">⌚</div>
+    </div>
+    <div class="deal-text">
+        <div class="deal-title">DEAL ALERT</div>
+        <div class="deal-model">Omega Speedmaster</div>
+        <div class="price">$250</div>
+    </div>
+</body>
+</html>

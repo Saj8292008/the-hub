@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 1080px;
+            height: 1080px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 100%);
+            font-family: 'Arial', sans-serif;
+            color: white;
+            padding: 60px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .brand {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+        }
+        .fire {
+            color: #ff6b35;
+        }
+        .title {
+            font-size: 52px;
+            font-weight: 900;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 28px;
+            color: rgba(255,255,255,0.7);
+        }
+        .chart-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: 40px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+        }
+        .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 30px 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .brand-row:last-child {
+            border-bottom: none;
+        }
+        .brand-info {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex: 1;
+        }
+        .brand-logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 900;
+            color: white;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+        }
+        .brand-name {
+            font-size: 42px;
+            font-weight: 900;
+        }
+        .price-info {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .price {
+            font-size: 48px;
+            font-weight: 900;
+            color: #00ff88;
+        }
+        .trend {
+            font-size: 56px;
+        }
+        .up { color: #00ff88; }
+        .down { color: #ff4757; }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 24px;
+            color: rgba(255,255,255,0.6);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="brand">🔥 THE HUB</div>
+        <div class="title">📊 WATCH MARKET REPORT</div>
+        <div class="subtitle">Week of February 15, 2025</div>
+    </div>
+    
+    <div class="chart-container">
+        <div class="brand-row">
+            <div class="brand-info">
+                <div class="brand-logo">R</div>
+                <div class="brand-name">ROLEX</div>
+            </div>
+            <div class="price-info">
+                <div class="price">$15.5K</div>
+                <div class="trend up">↗</div>
+            </div>
+        </div>
+        
+        <div class="brand-row">
+            <div class="brand-info">
+                <div class="brand-logo">Ω</div>
+                <div class="brand-name">OMEGA</div>
+            </div>
+            <div class="price-info">
+                <div class="price">$6.8K</div>
+                <div class="trend down">↘</div>
+            </div>
+        </div>
+        
+        <div class="brand-row">
+            <div class="brand-info">
+                <div class="brand-logo">T</div>
+                <div class="brand-name">TUDOR</div>
+            </div>
+            <div class="price-info">
+                <div class="price">$2.7K</div>
+                <div class="trend up">↗</div>
+            </div>
+        </div>
+        
+        <div class="brand-row">
+            <div class="brand-info">
+                <div class="brand-logo">S</div>
+                <div class="brand-name">SEIKO</div>
+            </div>
+            <div class="price-info">
+                <div class="price">$230</div>
+                <div class="trend up">↗</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        Real-time market data • Updated weekly
+    </div>
+</body>
+</html>

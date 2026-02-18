@@ -1,0 +1,38 @@
+{
+  "runId": "mlrgs2hl",
+  "timestamp": "2026-02-18T03:21:13.021Z",
+  "deal": {
+    "title": "Seiko SKX007 Automatic Dive Watch - Modded",
+    "price": 280,
+    "source": "ebay"
+  },
+  "script": {
+    "beats": [
+      {
+        "id": 1,
+        "label": "hook",
+        "text": "Alright watch lovers, stop scrolling! I've got a deal that's too good to keep to myself. You're going to want to hear this if you're into classic dive watches."
+      },
+      {
+        "id": 2,
+        "label": "deal",
+        "text": "We just spotted a killer deal on eBay: a Seiko SKX007 automatic dive watch, modded, for just $280! That's right, the legendary SKX, ready to hit the waves (or just look amazing on your wrist)."
+      },
+      {
+        "id": 3,
+        "label": "value",
+        "text": "These things are going for way more than that stock, let alone modded! The condition is listed as good, so you're getting a dependable classic with potentially upgraded parts for an absolute steal. This is vintage Seiko value right here."
+      },
+      {
+        "id": 4,
+        "label": "cta",
+        "text": "Make sure you're following @thehubdeals08 for more insane deals like this. We find luxury deals so you don't have to! Link in bio for the eBay listing."
+      }
+    ],
+    "fullScript": "Alright watch lovers, stop scrolling! I've got a deal that's too good to keep to myself. You're going to want to hear this if you're into classic dive watches. We just spotted a killer deal on eBay: a Seiko SKX007 automatic dive watch, modded, for just $280! That's right, the legendary SKX, ready to hit the waves (or just look amazing on your wrist). These things are going for way more than that stock, let alone modded! The condition is listed as good, so you're getting a dependable classic with potentially upgraded parts for an absolute steal. This is vintage Seiko value right here. Make sure you're following @thehubdeals08 for more insane deals like this. We find luxury deals so you don't have to! Link in bio for the eBay listing.",
+    "title": "SKX007 Steal!"
+  },
+  "voice": "Adam",
+  "videoFile": "avatar-reel-2026-02-18T03-20-31.mp4",
+  "caption": "STOP SCROLLING! SKX007 MODDED for UNDER $300?! 🤯\n\nThis legendary Seiko diver is a STEAL at $280! 🔥\n\nPerfect for everyday wear and built like a tank. 🪖\n\nDon't miss out, this deal won't last! ⏳\n\nFollow @thehubdeals08 for daily deals 🔥\n\n#seiko #skx007 #seikoskx007 #divewatch #watchdeals #watchforsale #watchmod #watchmodding #affordablewatches #wristcheck #watchcollector #watchoftheday #instawatch #wornandwound #hodinkee #watchfam #dealsandsteals #deals #sale #watches #thehubdeals08"
+}
