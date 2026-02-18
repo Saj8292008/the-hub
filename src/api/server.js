@@ -98,6 +98,23 @@ app.use(performanceMonitor.middleware());
 // Response caching middleware
 const cacheMiddleware = require('../middleware/caching');
 
+// ============================================================================
+// STATIC FILE SERVING (Sales Pages)
+// ============================================================================
+const path = require('path');
+
+// Serve static files from the-hub/public directory
+app.use('/public', express.static(path.join(__dirname, '../../the-hub/public')));
+
+// Sales funnel pages
+app.get('/toolkit', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../the-hub/public/toolkit.html'));
+});
+
+app.get('/links', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../the-hub/public/links.html'));
+});
+
 // Basic route
 app.get('/', (req, res) => {
   res.json({ message: 'API Server is running!' });
@@ -141,6 +158,23 @@ const handleRoute = (handler) => async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Newsletter signup endpoint (used by landing page + price checker)
+app.post('/api/subscribe', async (req, res) => {
+  try {
+    const { email, source = 'website' } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+    const sb = require('../db/supabase');
+    const { data, error } = await sb.client
+      .from('newsletter_subscribers')
+      .upsert({ email, source }, { onConflict: 'email', ignoreDuplicates: true })
+      .select();
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Watch tracker endpoints
 app.get('/watches', handleRoute((req) => watchTracker.listWatches(req.query)));
@@ -616,6 +650,8 @@ app.use('/api/dashboard', dashboardRouter);
 // ============================================================================
 const affiliatesRouter = require('./affiliates');
 app.use('/api/affiliates', affiliatesRouter);
+// Mount affiliate redirect at root level (not under /api/)
+app.use('/', affiliatesRouter.redirect);
 
 // ============================================================================
 // AMAZON DEALS API
