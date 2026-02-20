@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
 import { NotificationProvider } from './contexts/NotificationContext'
+import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import LandingNew from './pages/LandingNew'
@@ -46,6 +47,7 @@ import { InstallPrompt } from './components/InstallPrompt'
 function App() {
   return (
     <HelmetProvider>
+      <AuthProvider>
       <NotificationProvider>
         <Router>
           <InstallPrompt variant="banner" />
@@ -135,6 +137,7 @@ function App() {
           </Routes>
           </Router>
         </NotificationProvider>
+      </AuthProvider>
     </HelmetProvider>
   )
 }

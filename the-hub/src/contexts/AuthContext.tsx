@@ -1,27 +1,25 @@
 /**
- * Auth Context
- * Provides authentication state and methods throughout the app
+ * Auth Context — Clerk-backed compatibility layer
+ * Maps Clerk auth to the legacy useAuth() interface so existing components work unchanged.
  */
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import {
-  login as loginService,
-  logout as logoutService,
-  signup as signupService,
-  getCurrentUser,
-  refreshToken,
-  type User,
-  type LoginData,
-  type SignupData,
-} from '../services/auth';
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useUser, useClerk, useAuth as useClerkAuth } from '@clerk/clerk-react';
+
+interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+}
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
-  login: (data: LoginData) => Promise<void>;
-  signup: (data: SignupData) => Promise<void>;
+  login: (data: any) => Promise<void>;
+  signup: (data: any) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   clearError: () => void;
@@ -34,112 +32,41 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerk();
 
-  // Check if user is authenticated on mount
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  const user: User | null = clerkUser ? {
+    id: clerkUser.id,
+    email: clerkUser.primaryEmailAddress?.emailAddress || '',
+    name: clerkUser.fullName || clerkUser.firstName || '',
+    role: (clerkUser.publicMetadata?.role as string) || 'user',
+  } : null;
 
-  // Set up token refresh interval
-  useEffect(() => {
-    if (!user) return;
-
-    // Refresh token every 14 minutes (before 15 min expiry)
-    const interval = setInterval(async () => {
-      try {
-        await refreshToken();
-        console.log('Token refreshed successfully');
-      } catch (err) {
-        console.error('Token refresh failed:', err);
-        // If refresh fails, user needs to log in again
-        setUser(null);
-      }
-    }, 14 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, [user]);
-
-  async function checkAuth() {
-    try {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-    } catch (err) {
-      // Not authenticated or token expired
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+  async function login() {
+    // Clerk handles login via <SignIn /> component
   }
 
-  async function login(data: LoginData) {
-    try {
-      setError(null);
-      setLoading(true);
-
-      const response = await loginService(data);
-
-      if (response.user) {
-        setUser(response.user);
-      }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Login failed';
-      setError(message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function signup(data: SignupData) {
-    try {
-      setError(null);
-      setLoading(true);
-
-      await signupService(data);
-      // Don't set user - they need to verify email first
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Signup failed';
-      setError(message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
+  async function signup() {
+    // Clerk handles signup via <SignUp /> component
   }
 
   async function logout() {
-    try {
-      setError(null);
-      await logoutService();
-      setUser(null);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Logout failed';
-      setError(message);
-      throw err;
-    }
+    await signOut();
   }
 
   async function refreshUser() {
-    try {
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
-    } catch (err) {
-      console.error('Failed to refresh user:', err);
-      setUser(null);
-    }
+    // Clerk handles this automatically
   }
 
   function clearError() {
-    setError(null);
+    // No-op with Clerk
   }
 
   const value: AuthContextType = {
     user,
-    loading,
-    error,
-    isAuthenticated: !!user,
+    loading: !isLoaded,
+    error: null,
+    isAuthenticated: !!isSignedIn,
     login,
     signup,
     logout,
