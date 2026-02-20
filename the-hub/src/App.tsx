@@ -1,7 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
-import { AuthProvider } from './contexts/AuthContext'
 import { NotificationProvider } from './contexts/NotificationContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
@@ -47,9 +46,8 @@ import { InstallPrompt } from './components/InstallPrompt'
 function App() {
   return (
     <HelmetProvider>
-      <AuthProvider>
-        <NotificationProvider>
-          <Router>
+      <NotificationProvider>
+        <Router>
           <InstallPrompt variant="banner" />
           <ConnectionStatus />
           <Toaster
@@ -78,7 +76,7 @@ function App() {
           />
           <Routes>
             {/* Landing Page (No Layout) */}
-            <Route path="/" element={<LandingNew />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/landing-old" element={<Landing />} />
             <Route path="/about" element={<About />} />
             
@@ -137,7 +135,6 @@ function App() {
           </Routes>
           </Router>
         </NotificationProvider>
-      </AuthProvider>
     </HelmetProvider>
   )
 }

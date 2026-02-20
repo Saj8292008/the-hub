@@ -13,6 +13,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.61.0",
     "@stripe/stripe-js": "^8.7.0",
     "@supabase/supabase-js": "^2.91.1",
     "chart.js": "^4.4.0",
