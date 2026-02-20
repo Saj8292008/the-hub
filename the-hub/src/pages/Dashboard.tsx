@@ -311,34 +311,48 @@ const Dashboard: React.FC = () => {
     <div className="space-y-8 animate-fade-in">
       {/* Header with gradient - Redesigned for no overlap */}
       <header className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 via-purple-500/10 to-pink-500/10 rounded-3xl blur-3xl"></div>
+        <div className="absolute inset-0 opacity-30 rounded-3xl blur-3xl" style={{ background: 'linear-gradient(90deg, rgba(26,141,95,0.1), rgba(26,141,95,0.05))' }}></div>
         <div className="relative">
           {/* User info bar */}
           {isAuthenticated && user && (
-            <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-800/50">
+            <div className="flex items-center justify-between mb-4 pb-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#1a8d5f' }}>
                   <User className="text-white" size={20} />
                 </div>
                 <div>
-                  <p className="text-white font-medium">
+                  <p className="font-semibold" style={{ color: '#f0f0f0' }}>
                     Welcome back, {user.firstName || user.email?.split('@')[0]}!
                   </p>
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm" style={{ color: '#888' }}>
                     {user.email}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 {/* Tier Badge */}
-                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r ${tierBadge.color} text-white text-sm font-medium`}>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full text-white text-sm font-semibold" style={{
+                  background: tierBadge.label === 'Premium' ? '#1a8d5f' : 'rgba(255,255,255,0.1)'
+                }}>
                   <tierBadge.icon size={14} />
                   {tierBadge.label}
                 </div>
                 {/* Logout Button */}
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 transition-colors font-medium"
+                  style={{ 
+                    color: '#888',
+                    borderRadius: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                    e.currentTarget.style.color = '#f0f0f0'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent'
+                    e.currentTarget.style.color = '#888'
+                  }}
                 >
                   <LogOut size={16} />
                   <span className="hidden sm:inline">Logout</span>
@@ -351,12 +365,15 @@ const Dashboard: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-3">
-                <h2 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-gray-100 to-gray-300 bg-clip-text text-transparent">
+                <h2 className="text-3xl sm:text-4xl font-bold" style={{ 
+                  color: '#f0f0f0',
+                  letterSpacing: '-1px'
+                }}>
                   Dashboard Overview
                 </h2>
-                <Sparkles className="text-primary-400" size={24} />
+                <Sparkles size={24} style={{ color: '#1a8d5f' }} />
               </div>
-              <p className="text-gray-400 mt-2 text-base sm:text-lg">
+              <p className="mt-2 text-base sm:text-lg" style={{ color: '#888' }}>
                 Live snapshot across all tracker agents • {totalItems} items tracked
               </p>
             </div>
@@ -365,13 +382,18 @@ const Dashboard: React.FC = () => {
             <button
               onClick={fetchData}
               disabled={refreshing}
-              className="group relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 overflow-hidden min-w-[140px]"
+              className="group relative inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 overflow-hidden min-w-[140px]"
+              style={{ 
+                background: '#1a8d5f',
+                borderRadius: '12px'
+              }}
+              onMouseEnter={(e) => {
+                if (!refreshing) e.currentTarget.style.opacity = '0.9'
+              }}
+              onMouseLeave={(e) => {
+                if (!refreshing) e.currentTarget.style.opacity = '1'
+              }}
             >
-              {/* Shimmer effect when refreshing */}
-              {refreshing && (
-                <div className="absolute inset-0 animate-shimmer opacity-30"></div>
-              )}
-              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-primary-400 to-primary-300 opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500"></div>
               <Activity size={16} className={refreshing ? 'animate-spin' : 'group-hover:rotate-90 transition-transform duration-300'} />
               <span className="relative">{refreshing ? 'Refreshing...' : 'Refresh Data'}</span>
             </button>
@@ -382,56 +404,49 @@ const Dashboard: React.FC = () => {
       {/* Stats Cards */}
       <section className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {statsConfig.map(({ label, value, change, icon: Icon }, index) => {
-          const gradients = [
-            'from-blue-500/20 to-cyan-500/20',
-            'from-purple-500/20 to-pink-500/20',
-            'from-emerald-500/20 to-teal-500/20',
-            'from-yellow-500/20 to-orange-500/20',
-            'from-orange-500/20 to-red-500/20'
-          ]
-          const iconBgs = [
-            'from-blue-500/20 to-cyan-500/30',
-            'from-purple-500/20 to-pink-500/30',
-            'from-emerald-500/20 to-teal-500/30',
-            'from-yellow-500/20 to-orange-500/30',
-            'from-orange-500/20 to-red-500/30'
-          ]
-          const iconColors = [
-            'text-blue-400',
-            'text-purple-400',
-            'text-emerald-400',
-            'text-yellow-400',
-            'text-orange-400'
-          ]
+          const iconColors = ['#3b82f6', '#a855f7', '#10b981', '#f59e0b', '#ef4444']
 
           return (
             <div
               key={label}
-              className="group relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl shadow-black/20 backdrop-blur-sm transition-all duration-300 hover:border-gray-700 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.02]"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="group relative overflow-hidden p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1"
+              style={{ 
+                background: '#141414',
+                border: '1px solid rgba(255,255,255,0.08)',
+                borderRadius: '12px',
+                animationDelay: `${index * 100}ms`
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+              }}
             >
-              {/* Gradient overlay */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
-              {/* Glow effect */}
-              <div className={`absolute -inset-1 bg-gradient-to-r ${gradients[index]} opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-500 -z-10`}></div>
-
               {/* Content */}
               <div className="relative">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
-                  <span className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${iconBgs[index]} ${iconColors[index]} shadow-lg transition-transform group-hover:scale-110 group-hover:rotate-6`}>
+                  <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#888' }}>{label}</span>
+                  <span 
+                    className="flex h-12 w-12 items-center justify-center transition-transform group-hover:scale-110 group-hover:rotate-6"
+                    style={{ 
+                      background: `${iconColors[index]}15`,
+                      borderRadius: '10px',
+                      color: iconColors[index]
+                    }}
+                  >
                     <Icon size={20} />
                   </span>
                 </div>
-                <div className="mt-6 text-4xl font-bold text-white">{value}</div>
+                <div className="mt-6 text-4xl font-bold" style={{ color: '#f0f0f0' }}>{value}</div>
                 <div className="mt-3 flex items-center gap-2 text-sm">
-                  <div className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1">
-                    <TrendingUp className="text-emerald-400" size={14} />
-                    <span className="text-emerald-400 font-semibold">
+                  <div className="flex items-center gap-1 rounded-full px-2 py-1" style={{ background: 'rgba(26, 141, 95, 0.15)' }}>
+                    <TrendingUp size={14} style={{ color: '#1a8d5f' }} />
+                    <span className="font-semibold" style={{ color: '#1a8d5f' }}>
                       {change}
                     </span>
                   </div>
-                  <span className="text-gray-500">total tracked</span>
+                  <span style={{ color: '#555' }}>total tracked</span>
                 </div>
               </div>
             </div>
@@ -442,12 +457,15 @@ const Dashboard: React.FC = () => {
       {/* Alerts & Watchlist */}
       <section className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Latest Alerts */}
-        <div className="relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl backdrop-blur-sm">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-rose-500/5 rounded-full blur-3xl"></div>
+        <div className="relative overflow-hidden p-6 backdrop-blur-sm" style={{ 
+          background: '#141414',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '12px'
+        }}>
           <div className="relative">
             <div className="flex items-center gap-2 mb-6">
               <Bell className="text-rose-400" size={20} />
-              <h3 className="text-lg font-bold text-white">Latest Alerts</h3>
+              <h3 className="text-lg font-bold" style={{ color: '#f0f0f0', letterSpacing: '-0.3px' }}>Latest Alerts</h3>
               {alerts.length > 0 && (
                 <span className="ml-auto rounded-full bg-rose-500/20 px-2.5 py-0.5 text-xs font-semibold text-rose-400">
                   {alerts.length}
@@ -457,12 +475,15 @@ const Dashboard: React.FC = () => {
             <div className="space-y-3">
               {alerts.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-rose-500/10 to-pink-500/10 mb-4 animate-pulse-subtle">
+                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full mb-4 animate-pulse-subtle" style={{ background: 'rgba(244, 63, 94, 0.1)' }}>
                     <Bell className="text-rose-400/50" size={24} />
                   </div>
-                  <p className="text-gray-400 text-sm font-semibold mb-1">No alerts yet</p>
-                  <p className="text-gray-600 text-xs mb-4">Set target prices to get notified</p>
-                  <div className="inline-flex items-center gap-1.5 text-xs text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg">
+                  <p className="text-sm font-semibold mb-1" style={{ color: '#888' }}>No alerts yet</p>
+                  <p className="text-xs mb-4" style={{ color: '#555' }}>Set target prices to get notified</p>
+                  <div className="inline-flex items-center gap-1.5 text-xs text-rose-400 px-3 py-1.5" style={{ 
+                    background: 'rgba(244, 63, 94, 0.1)',
+                    borderRadius: '8px'
+                  }}>
                     <span className="inline-block w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
                     Use <code className="mx-1 font-mono">/settarget</code> in Telegram
                   </div>
@@ -476,40 +497,64 @@ const Dashboard: React.FC = () => {
                   return (
                     <div
                       key={alert.id}
-                      className="group relative overflow-hidden rounded-xl border border-gray-800/50 bg-gray-900/50 p-4 transition-all hover:border-rose-500/30 hover:bg-gray-900/80"
-                      style={{ animationDelay: `${index * 100}ms` }}
+                      className="group relative overflow-hidden p-4 transition-all"
+                      style={{ 
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        animationDelay: `${index * 100}ms`
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(244, 63, 94, 0.3)'
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+                      }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-rose-500/0 via-rose-500/5 to-rose-500/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       <div className="relative">
                         {/* Severity indicator banner */}
                         {severity && (
-                          <div className={`mb-3 flex items-center gap-1.5 rounded-lg bg-${severity.color}-500/10 px-2.5 py-1.5 border border-${severity.color}-500/20`}>
+                          <div className="mb-3 flex items-center gap-1.5 px-2.5 py-1.5" style={{
+                            background: severity.color === 'rose' ? 'rgba(244, 63, 94, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                            border: severity.color === 'rose' ? '1px solid rgba(244, 63, 94, 0.2)' : '1px solid rgba(245, 158, 11, 0.2)',
+                            borderRadius: '8px'
+                          }}>
                             <span className="text-sm">{severity.emoji}</span>
-                            <span className={`text-xs font-bold text-${severity.color}-400`}>{severity.label}</span>
+                            <span className="text-xs font-bold" style={{ color: severity.color === 'rose' ? '#fb7185' : '#fbbf24' }}>{severity.label}</span>
                           </div>
                         )}
 
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className={`inline-flex items-center gap-1 rounded-md bg-${typeBadge.color}-500/10 px-2 py-0.5 text-xs font-semibold text-${typeBadge.color}-400`}>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold" style={{
+                                background: `${typeBadge.color === 'emerald' ? 'rgba(16, 185, 129, 0.1)' : typeBadge.color === 'blue' ? 'rgba(59, 130, 246, 0.1)' : typeBadge.color === 'purple' ? 'rgba(168, 85, 245, 0.1)' : 'rgba(245, 158, 11, 0.1)'}`,
+                                color: `${typeBadge.color === 'emerald' ? '#10b981' : typeBadge.color === 'blue' ? '#3b82f6' : typeBadge.color === 'purple' ? '#a855f7' : '#f59e0b'}`,
+                                borderRadius: '6px'
+                              }}>
                                 <TypeIcon size={10} />
                                 {typeBadge.label}
                               </span>
                             </div>
-                            <div className="text-sm font-semibold text-white truncate">{alert.title || 'Price Alert'}</div>
-                            <div className="mt-1 text-xs text-gray-400 line-clamp-2">{alert.detail || alert.message}</div>
+                            <div className="text-sm font-semibold truncate" style={{ color: '#f0f0f0' }}>{alert.title || 'Price Alert'}</div>
+                            <div className="mt-1 text-xs line-clamp-2" style={{ color: '#888' }}>{alert.detail || alert.message}</div>
                           </div>
-                          <div className={`flex h-8 w-8 items-center justify-center rounded-lg bg-${typeBadge.color}-500/10`}>
-                            <TypeIcon className={`text-${typeBadge.color}-400`} size={14} />
+                          <div className="flex h-8 w-8 items-center justify-center" style={{
+                            background: `${typeBadge.color === 'emerald' ? 'rgba(16, 185, 129, 0.1)' : typeBadge.color === 'blue' ? 'rgba(59, 130, 246, 0.1)' : typeBadge.color === 'purple' ? 'rgba(168, 85, 245, 0.1)' : 'rgba(245, 158, 11, 0.1)'}`,
+                            color: `${typeBadge.color === 'emerald' ? '#10b981' : typeBadge.color === 'blue' ? '#3b82f6' : typeBadge.color === 'purple' ? '#a855f7' : '#f59e0b'}`,
+                            borderRadius: '8px'
+                          }}>
+                            <TypeIcon size={14} />
                           </div>
                         </div>
 
                         {/* Timestamp */}
                         <div className="mt-3 flex items-center gap-2">
-                          <span className="text-xs text-gray-500">{formatTimestamp(alert.time || alert.createdAt)}</span>
-                          <span className="inline-block w-1 h-1 rounded-full bg-gray-600"></span>
-                          <span className="text-xs text-gray-600">
+                          <span className="text-xs" style={{ color: '#555' }}>{formatTimestamp(alert.time || alert.createdAt)}</span>
+                          <span className="inline-block w-1 h-1 rounded-full" style={{ background: '#555' }}></span>
+                          <span className="text-xs" style={{ color: '#555' }}>
                             {alert.createdAt ? new Date(alert.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : ''}
                           </span>
                         </div>
@@ -523,37 +568,49 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Watchlist Snapshot */}
-        <div className="relative overflow-hidden rounded-2xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-6 shadow-xl backdrop-blur-sm xl:col-span-2">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl"></div>
+        <div className="relative overflow-hidden p-6 backdrop-blur-sm xl:col-span-2" style={{ 
+          background: '#141414',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '12px'
+        }}>
           <div className="relative">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <Activity className="text-primary-400" size={20} />
-                <h3 className="text-lg font-bold text-white">Watchlist Snapshot</h3>
+                <Activity size={20} style={{ color: '#1a8d5f' }} />
+                <h3 className="text-lg font-bold" style={{ color: '#f0f0f0', letterSpacing: '-0.3px' }}>Watchlist Snapshot</h3>
               </div>
-              <button className="text-sm font-semibold text-primary-400 hover:text-primary-300 transition-colors">
+              <button className="text-sm font-semibold transition-colors" style={{ color: '#1a8d5f' }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              >
                 View all →
               </button>
             </div>
             <div className="space-y-3">
               {watchlist.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gray-800/50 mb-4">
-                    <Watch className="text-gray-600" size={24} />
+                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <Watch size={24} style={{ color: '#555' }} />
                   </div>
-                  <p className="text-gray-500 text-sm font-semibold mb-1">No items tracked yet</p>
-                  <p className="text-gray-600 text-xs mb-6">Start tracking your first watch, car, or sneaker</p>
+                  <p className="text-sm font-semibold mb-1" style={{ color: '#888' }}>No items tracked yet</p>
+                  <p className="text-xs mb-6" style={{ color: '#555' }}>Start tracking your first watch, car, or sneaker</p>
                   <a
                     href="https://t.me/your_bot_username"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary-600 to-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary-500/25 transition-all hover:shadow-xl hover:shadow-primary-500/40 hover:scale-105"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:scale-105"
+                    style={{ 
+                      background: '#1a8d5f',
+                      borderRadius: '8px'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                   >
                     <Sparkles size={16} />
                     Track Your First Item
                   </a>
-                  <p className="text-gray-600 text-xs mt-4">
-                    Or send <code className="bg-gray-800 px-1.5 py-0.5 rounded text-primary-400">/addwatch</code> in Telegram
+                  <p className="text-xs mt-4" style={{ color: '#555' }}>
+                    Or send <code className="px-1.5 py-0.5 rounded font-mono" style={{ background: 'rgba(255,255,255,0.05)', color: '#1a8d5f' }}>/addwatch</code> in Telegram
                   </p>
                 </div>
               ) : (
@@ -568,14 +625,26 @@ const Dashboard: React.FC = () => {
                   return (
                     <div
                       key={item.id}
-                      className="group relative overflow-hidden rounded-xl border border-gray-800/50 bg-gray-900/50 p-4 transition-all hover:border-primary-500/30 hover:bg-gray-900/80 hover:scale-[1.02]"
-                      style={{ animationDelay: `${index * 100}ms` }}
+                      className="group relative overflow-hidden p-4 transition-all hover:scale-[1.01]"
+                      style={{ 
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '12px',
+                        animationDelay: `${index * 100}ms`
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(26, 141, 95, 0.3)'
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+                      }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary-500/0 via-primary-500/5 to-primary-500/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                       <div className="relative flex items-center justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <div className="text-sm font-bold text-white truncate">{item.name}</div>
+                            <div className="text-sm font-bold truncate" style={{ color: '#f0f0f0' }}>{item.name}</div>
                             {priceStatus === 'below' && (
                               <span className="flex h-2 w-2">
                                 <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-rose-400 opacity-75"></span>
@@ -583,28 +652,27 @@ const Dashboard: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          <div className="mt-1.5 flex items-center gap-2 text-xs text-gray-400">
+                          <div className="mt-1.5 flex items-center gap-2 text-xs" style={{ color: '#888' }}>
                             <span className="font-medium">{item.source}</span>
                             {item.currentPrice && (
                               <>
-                                <span className="text-gray-600">•</span>
-                                <span className="font-semibold text-white">${item.currentPrice.toLocaleString()}</span>
+                                <span style={{ color: '#555' }}>•</span>
+                                <span className="font-semibold" style={{ color: '#f0f0f0' }}>${item.currentPrice.toLocaleString()}</span>
                               </>
                             )}
                             {item.targetPrice && (
                               <>
-                                <span className="text-gray-600">•</span>
+                                <span style={{ color: '#555' }}>•</span>
                                 <span>Target: ${item.targetPrice.toLocaleString()}</span>
                               </>
                             )}
                           </div>
                           {priceDiff !== null && (
                             <div className="mt-2">
-                              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                priceStatus === 'below'
-                                  ? 'bg-rose-500/10 text-rose-400'
-                                  : 'bg-emerald-500/10 text-emerald-400'
-                              }`}>
+                              <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold" style={{
+                                background: priceStatus === 'below' ? 'rgba(244, 63, 94, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                                color: priceStatus === 'below' ? '#fb7185' : '#10b981'
+                              }}>
                                 {priceStatus === 'below' ? (
                                   <ArrowDownRight size={12} />
                                 ) : (
@@ -616,11 +684,12 @@ const Dashboard: React.FC = () => {
                           )}
                         </div>
                         <div>
-                          <span className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold ${
-                            item.status === 'Alert'
-                              ? 'bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/30'
-                              : 'bg-primary-500/20 text-primary-400 ring-1 ring-primary-500/30'
-                          }`}>
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold" style={{
+                            background: item.status === 'Alert' ? 'rgba(244, 63, 94, 0.15)' : 'rgba(26, 141, 95, 0.15)',
+                            color: item.status === 'Alert' ? '#fb7185' : '#1a8d5f',
+                            border: item.status === 'Alert' ? '1px solid rgba(244, 63, 94, 0.3)' : '1px solid rgba(26, 141, 95, 0.3)',
+                            borderRadius: '12px'
+                          }}>
                             {item.status === 'Alert' && <Bell size={12} />}
                             {item.status}
                           </span>
@@ -642,7 +711,11 @@ const Dashboard: React.FC = () => {
 
       {/* Pricing Plans */}
       {(!user || user.tier === 'free') && (
-        <section className="relative overflow-hidden rounded-3xl border border-gray-800/50 bg-gradient-to-br from-gray-900/90 to-gray-900/50 p-8 sm:p-12 shadow-xl backdrop-blur-sm">
+        <section className="relative overflow-hidden p-8 sm:p-12 backdrop-blur-sm" style={{ 
+          background: '#141414',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '16px'
+        }}>
           <PricingPlans />
         </section>
       )}

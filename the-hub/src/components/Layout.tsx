@@ -40,7 +40,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   ]
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white overflow-hidden">
+    <div className="flex h-screen text-white overflow-hidden" style={{ background: '#0a0a0a' }}>
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
@@ -51,23 +51,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Sidebar */}
       <nav className={clsx(
-        'fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gray-800 p-6 transform transition-transform duration-300 ease-in-out lg:transform-none',
+        'fixed lg:static inset-y-0 left-0 z-50 w-64 p-6 transform transition-transform duration-300 ease-in-out lg:transform-none border-r',
         mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      )}>
+      )} style={{ background: '#141414', borderColor: 'rgba(255,255,255,0.08)' }}>
         {/* Mobile close button */}
         <button
           onClick={() => setMobileMenuOpen(false)}
-          className="absolute top-4 right-4 lg:hidden p-2 rounded-lg hover:bg-gray-700 transition-colors"
+          className="absolute top-4 right-4 lg:hidden p-2 rounded-lg transition-colors"
+          style={{ background: 'rgba(255,255,255,0.05)' }}
+          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
         >
           <X size={20} />
         </button>
 
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-primary-500">The Hub</h1>
-          <p className="text-gray-400 text-sm mt-1">Personal Data Center</p>
+          <h1 className="text-2xl font-bold" style={{ color: '#f0f0f0', letterSpacing: '-0.5px' }}>The Hub</h1>
+          <p className="text-sm mt-1" style={{ color: '#888' }}>Personal Data Center</p>
         </div>
 
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {navItems.map(({ path, icon: Icon, label }) => {
             // Check if current path matches or if it's a sub-path (for blog, newsletter)
             const isActive = location.pathname === path ||
@@ -79,11 +82,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   to={path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={clsx(
-                    'flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors',
+                    'flex items-center space-x-3 px-4 py-3 transition-all duration-200 font-medium',
                     isActive
-                      ? 'bg-primary-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                      ? 'text-white'
+                      : 'text-gray-400 hover:text-white'
                   )}
+                  style={{
+                    background: isActive ? '#1a8d5f' : 'transparent',
+                    borderRadius: '12px'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.background = 'transparent'
+                    }
+                  }}
                 >
                   <Icon size={20} />
                   <span>{label}</span>
@@ -99,7 +116,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Link
               to="/premium"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center space-x-2 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium transition-all shadow-lg shadow-purple-500/25"
+              className="flex items-center justify-center space-x-2 px-4 py-3 text-white font-semibold transition-all"
+              style={{ 
+                background: '#1a8d5f',
+                borderRadius: '12px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+              onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
             >
               <Crown size={20} />
               <span>Upgrade to Premium</span>
@@ -108,13 +131,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         )}
 
         {/* Auth Section in Sidebar */}
-        <div className="mt-8 pt-6 border-t border-gray-700">
+        <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           {!isAuthenticated ? (
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                className="flex items-center space-x-3 px-4 py-3 transition-colors font-medium"
+                style={{ 
+                  color: '#888',
+                  borderRadius: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                  e.currentTarget.style.color = '#f0f0f0'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.color = '#888'
+                }}
               >
                 <LogIn size={20} />
                 <span>Login</span>
@@ -122,28 +157,41 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Link
                 to="/signup"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white transition-colors"
+                className="flex items-center space-x-3 px-4 py-3 text-white transition-all font-semibold"
+                style={{ 
+                  background: '#1a8d5f',
+                  borderRadius: '12px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
                 <UserPlus size={20} />
                 <span>Sign Up</span>
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="px-4 py-3 rounded-lg bg-gray-700/50">
+            <div className="space-y-2">
+              <div className="px-4 py-3" style={{ 
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255,255,255,0.08)'
+              }}>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: '#1a8d5f' }}>
                     <User size={20} className="text-white" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium" style={{ color: '#f0f0f0' }}>
                       {user?.firstName || user?.email?.split('@')[0] || 'User'}
                     </p>
-                    <p className="text-xs text-gray-400">{user?.email}</p>
+                    <p className="text-xs" style={{ color: '#888' }}>{user?.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xs px-2 py-1 rounded bg-purple-600/20 text-purple-300 font-medium">
+                  <span className="text-xs px-2 py-1 rounded font-medium" style={{
+                    background: 'rgba(26, 141, 95, 0.15)',
+                    color: '#1a8d5f'
+                  }}>
                     {user?.tier || 'Free'}
                   </span>
                 </div>
@@ -153,7 +201,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   setMobileMenuOpen(false);
                   handleLogout();
                 }}
-                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                className="w-full flex items-center space-x-3 px-4 py-3 transition-colors font-medium"
+                style={{ 
+                  color: '#888',
+                  borderRadius: '12px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                  e.currentTarget.style.color = '#f0f0f0'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.color = '#888'
+                }}
               >
                 <LogOut size={20} />
                 <span>Logout</span>
@@ -166,20 +226,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top Nav Bar */}
-        <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur-sm">
+        <div className="backdrop-blur-sm" style={{ 
+          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          background: 'rgba(10,10,10,0.92)'
+        }}>
           <div className="flex items-center justify-between px-4 lg:px-8 py-4">
             {/* Left side - Mobile menu + Title */}
             <div className="flex items-center gap-3">
               {/* Hamburger menu - only visible on mobile */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors"
+                className="lg:hidden p-2 transition-colors"
+                style={{ borderRadius: '8px' }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
               >
                 <Menu size={20} />
               </button>
 
               <div>
-                <h2 className="text-lg font-semibold text-white">
+                <h2 className="text-lg font-semibold" style={{ 
+                  color: '#f0f0f0',
+                  letterSpacing: '-0.3px'
+                }}>
                   {(() => {
                     // Check exact match first
                     const exactMatch = navItems.find(item => item.path === location.pathname);
@@ -196,7 +265,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     return 'Dashboard';
                   })()}
                 </h2>
-                <p className="text-sm text-gray-400 hidden sm:block">Live tracking and monitoring</p>
+                <p className="text-sm hidden sm:block" style={{ color: '#888' }}>Live tracking and monitoring</p>
               </div>
             </div>
 
@@ -208,7 +277,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {/* Login Button */}
                   <Link
                     to="/login"
-                    className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                    className="hidden sm:flex items-center gap-2 px-4 py-2 transition-colors font-medium"
+                    style={{ 
+                      color: '#888',
+                      borderRadius: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                      e.currentTarget.style.color = '#f0f0f0'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent'
+                      e.currentTarget.style.color = '#888'
+                    }}
                   >
                     <LogIn size={18} />
                     <span>Login</span>
@@ -217,7 +298,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {/* Sign Up Button */}
                   <Link
                     to="/signup"
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-medium transition-all"
+                    className="flex items-center gap-2 px-4 py-2 text-white font-semibold transition-all"
+                    style={{ 
+                      background: '#1a8d5f',
+                      borderRadius: '8px'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                   >
                     <UserPlus size={18} />
                     <span>Sign Up</span>
@@ -226,23 +313,38 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               ) : (
                 <>
                   {/* User Info */}
-                  <div className="hidden sm:flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-800/50">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-purple-600 flex items-center justify-center">
+                  <div className="hidden sm:flex items-center gap-3 px-3 py-2" style={{ 
+                    background: 'rgba(255,255,255,0.05)',
+                    borderRadius: '8px'
+                  }}>
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#1a8d5f' }}>
                       <User size={16} className="text-white" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium" style={{ color: '#f0f0f0' }}>
                         {user?.firstName || user?.email?.split('@')[0] || 'User'}
                       </span>
-                      <span className="text-xs text-gray-400">{user?.tier || 'Free'}</span>
+                      <span className="text-xs" style={{ color: '#888' }}>{user?.tier || 'Free'}</span>
                     </div>
                   </div>
 
                   {/* Logout Button */}
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 transition-colors font-medium"
                     title="Logout"
+                    style={{ 
+                      color: '#888',
+                      borderRadius: '8px'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+                      e.currentTarget.style.color = '#f0f0f0'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent'
+                      e.currentTarget.style.color = '#888'
+                    }}
                   >
                     <LogOut size={18} />
                     <span className="hidden lg:inline">Logout</span>
@@ -251,13 +353,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
 
               {/* Vertical Divider */}
-              <div className="hidden sm:block h-8 w-px bg-gray-800"></div>
+              <div className="hidden sm:block h-8 w-px" style={{ background: 'rgba(255,255,255,0.08)' }}></div>
 
               {/* Notification Panel */}
               <NotificationPanel />
 
               {/* Vertical Divider - hidden on mobile */}
-              <div className="hidden sm:block h-8 w-px bg-gray-800"></div>
+              <div className="hidden sm:block h-8 w-px" style={{ background: 'rgba(255,255,255,0.08)' }}></div>
 
               {/* Connection Status - Inline version */}
               <div className="hidden sm:flex">
@@ -268,7 +370,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-8" style={{ background: '#0a0a0a' }}>
           {children}
         </div>
       </main>
