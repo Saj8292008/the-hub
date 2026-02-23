@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install && vite build && mv dist/index.html dist/index-app.html && cp public/landing.html dist/index.html",
+  "buildCommand": "npm install && vite build && mv dist/index.html dist/index-app.html && cp public/landing.html dist/index.html && cp public/robots.txt dist/robots.txt",
   "installCommand": "npm install",
   "outputDirectory": "dist",
   "framework": "vite",
@@ -15,7 +15,15 @@
     { "source": "/sso-callback", "destination": "/index-app.html" },
     { "source": "/dashboard", "destination": "/index-app.html" },
     { "source": "/dashboard/(.*)", "destination": "/index-app.html" },
-    { "source": "/blog/(.*)", "destination": "/blog/$1" },
+    { "source": "/deals", "destination": "/index-app.html" },
+    { "source": "/deals/:brand", "destination": "/index-app.html" },
+    { "source": "/deals/category/:category", "destination": "/index-app.html" },
+    { "source": "/blog", "destination": "/index-app.html" },
+    { "source": "/blog/category/:category", "destination": "/index-app.html" },
+    { "source": "/blog/admin", "destination": "/index-app.html" },
+    { "source": "/blog/editor/:id", "destination": "/index-app.html" },
+    { "source": "/blog/:slug.html", "destination": "/blog/$1.html" },
+    { "source": "/blog/:slug", "destination": "/index-app.html" },
     { "source": "/guides/(.*)", "destination": "/guides/$1" }
   ]
 }
