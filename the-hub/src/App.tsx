@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import Layout from './components/Layout'
 import Landing from './pages/Landing'
 import LandingNew from './pages/LandingNew'
+import LandingClean from './pages/LandingClean'
 import Dashboard from './pages/Dashboard'
 import Analytics from './pages/Analytics'
 import Integrations from './pages/Integrations'
@@ -39,6 +40,7 @@ import Deals from './pages/Deals'
 
 
 import AlertPreferences from './pages/AlertPreferences'
+import SniperAlerts from './pages/SniperAlerts'
 
 import { Resellers, Collectors, Dealers } from './pages/for'
 import { ConnectionStatus } from './components/ConnectionStatus'
@@ -78,7 +80,7 @@ function App() {
           />
           <Routes>
             {/* Landing Page (No Layout) */}
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<LandingClean />} />
             <Route path="/landing-old" element={<Landing />} />
             <Route path="/about" element={<About />} />
             
@@ -95,6 +97,13 @@ function App() {
             <Route path="/deals" element={<Deals />} />
             <Route path="/deals/:brand" element={<Deals />} />
             <Route path="/deals/category/:category" element={<Deals />} />
+
+            {/* Blog Routes (With Layout) */}
+            <Route path="/blog" element={<Layout><Blog /></Layout>} />
+            <Route path="/blog/category/:category" element={<Layout><Blog /></Layout>} />
+            <Route path="/blog/admin" element={<Layout><BlogAdmin /></Layout>} />
+            <Route path="/blog/editor/:id" element={<Layout><BlogEditor /></Layout>} />
+            <Route path="/blog/:slug" element={<Layout><BlogPost /></Layout>} />
 
             {/* Auth Routes (No Layout) */}
             <Route path="/login" element={<Login />} />
@@ -116,16 +125,12 @@ function App() {
                   <Route path="/cars" element={<Cars />} />
                   <Route path="/sneakers" element={<Sneakers />} />
                   <Route path="/sports" element={<Sports />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/blog/category/:category" element={<Blog />} />
-                  <Route path="/blog/admin" element={<BlogAdmin />} />
-                  <Route path="/blog/editor/:id" element={<BlogEditor />} />
-                  <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/newsletter/admin" element={<NewsletterAdmin />} />
                   <Route path="/analytics" element={<Analytics />} />
                   <Route path="/integrations" element={<Integrations />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/settings/alerts" element={<AlertPreferences />} />
+                  <Route path="/sniper-alerts" element={<SniperAlerts />} />
                   <Route path="/admin" element={<AdminSettings />} />
                   <Route path="/admin/scraper-debug" element={<ScraperDebug />} />
                   <Route path="/mission-control" element={<MissionControl />} />
