@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm install && vite build && mv dist/index.html dist/index-app.html && cp public/landing.html dist/index.html && cp public/robots.txt dist/robots.txt",
+  "buildCommand": "npm install && vite build && mv dist/index.html dist/index-app.html && cp public/landing.html dist/index.html && cp public/robots.txt dist/robots.txt && cp dist/index-app.html dist/blog/index.html",
   "installCommand": "npm install",
   "outputDirectory": "dist",
   "framework": "vite",
