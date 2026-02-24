@@ -7,39 +7,39 @@
     <link rel="icon" type="image/svg+xml" href="/hub-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#6366f1" />
-    <meta name="description" content="Deal aggregator for watches, sneakers & cars. Get instant notifications on the best deals!" />
+    <!-- SEO Meta Tags -->
+    <title>The Hub - Best Luxury Watch & Sneaker Deals | Rolex, Nike, Seiko</title>
+    <meta name="description" content="Find authenticated luxury watch deals, sneaker drops, and designer discounts. 2,900+ curated deals on Rolex, Omega, Nike Dunks, and more. Updated daily." />
     
-    <!-- Apple Touch Icon -->
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://thehubdeals.com/" />
+    <meta property="og:title" content="The Hub - Best Luxury Watch & Sneaker Deals" />
+    <meta property="og:description" content="2,900+ authenticated luxury deals on watches, sneakers, and designer goods. Updated daily." />
     
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://thehubdeals.com/" />
+    <meta property="twitter:title" content="The Hub - Best Luxury Watch & Sneaker Deals" />
+    <meta property="twitter:description" content="2,900+ authenticated luxury deals on watches, sneakers, and designer goods. Updated daily." />
     
-    <title>The Hub - Deal Aggregator</title>
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "The Hub",
+      "url": "https://thehubdeals.com",
+      "description": "Curated luxury watch and sneaker deals from across the web"
+    }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     
-    <!-- Service Worker Registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker
-            .register('/sw.js')
-            .then(registration => {
-              console.log('SW registered:', registration);
-            })
-            .catch(error => {
-              console.log('SW registration failed:', error);
-            });
-        });
-      }
-    </script>
   </body>
 </html>

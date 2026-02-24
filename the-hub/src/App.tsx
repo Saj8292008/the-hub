@@ -23,6 +23,7 @@ import BlogEditor from './pages/BlogEditor'
 import AdminSettings from './pages/AdminSettings'
 import NewsletterAdmin from './pages/NewsletterAdmin'
 import NewsletterUnsubscribe from './pages/NewsletterUnsubscribe'
+import Subscribe from './pages/Subscribe'
 import ScraperDebug from './pages/ScraperDebug'
 import MissionControl from './pages/MissionControl'
 import Projects from './pages/Projects'
@@ -114,6 +115,7 @@ function App() {
             <Route path="/premium" element={<Premium />} />
             <Route path="/premium/success" element={<PremiumSuccess />} />
             <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
+            <Route path="/subscribe" element={<Subscribe />} />
 
             {/* App Routes (With Layout) */}
             <Route path="/*" element={
