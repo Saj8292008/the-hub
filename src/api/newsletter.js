@@ -104,19 +104,21 @@ async function subscribe(req) {
     throw new Error(`Failed to create subscriber: ${error.message}`);
   }
 
-  // Send confirmation email
-  const emailData = emailTemplates.generateConfirmationEmail(subscriber);
+  // Send confirmation email (don't fail subscription if email fails)
+  try {
+    const emailData = emailTemplates.generateConfirmationEmail(subscriber);
+    const sendResult = await resendClient.sendEmail({
+      to: email,
+      subject: emailData.subject,
+      html: emailData.html,
+      text: emailData.text
+    });
 
-  const sendResult = await resendClient.sendEmail({
-    to: email,
-    subject: emailData.subject,
-    html: emailData.html,
-    text: emailData.text
-  });
-
-  if (!sendResult.success) {
-    console.error('Failed to send confirmation email:', sendResult.error);
-    // Don't fail the subscription, just log the error
+    if (!sendResult.success) {
+      console.error('Failed to send confirmation email:', sendResult.error);
+    }
+  } catch (emailError) {
+    console.error('Email service unavailable, subscription saved without confirmation:', emailError.message);
   }
 
   // ============================================================================
